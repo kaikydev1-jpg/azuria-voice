@@ -1,237 +1,136 @@
-# VoiceStudio — Install on Windows
+# Azúria Voice — Windows
 
-VoiceStudio's Windows desktop app is built with Electron. The archived Tauri
-app (MSI installers) is no longer maintained; if you still run it, follow the
-[migration guide](../electron-migration.md).
-
-## Requirements
-
-- **Windows 10 or 11**, x64 — or Windows on ARM (experimental, see below).
-- **~10 GB free disk** for the app, its Python environment, and model weights.
-- Optional: an **NVIDIA GPU + driver** for CUDA acceleration — see
-  [GPU support on Windows](#gpu-support).
-
-Python, FFmpeg, and model weights are bootstrapped by the app itself on first
-launch; no toolchain is needed for the installer.
-
-## Keep engine environments off `C:`
-
-Engine environments (IndexTTS, CosyVoice, MOSS-TTS and other sidecars, plus the
-audio.cpp runtime) install under `<app data>\engines` and can reach several GB
-each. To place them on another drive, set `OMNIVOICE_ENGINES_DIR` before
-launching VoiceStudio, for example in PowerShell:
-
-```powershell
-[Environment]::SetEnvironmentVariable('OMNIVOICE_ENGINES_DIR', 'D:\VoiceStudio\engines', 'User')
-```
-
-Restart VoiceStudio afterwards. Voices, projects and settings stay in the data
-folder (`OMNIVOICE_DATA_DIR` moves that too). Engines already installed under the
-old folder are not moved: reinstall them from Engines, or move the
-`engines\<engine>` folder yourself and delete the old copy.
+Azúria Voice is an independent Electron distribution of VoiceStudio. It keeps
+the original speech engines and local runtime behavior.
 
 ## Install
 
-Download the installer matching your PC from the
-[Releases page](https://github.com/debpalash/VoiceStudio/releases/latest):
+Use Windows 10 or 11 on an Intel/AMD x64 PC. An NVIDIA GPU and driver enable
+CUDA; CPU operation is supported. Windows on ARM remains experimental and runs
+the x64 Python backend under emulation, on CPU.
 
-| PC | Installer |
-|---|---|
-| Intel / AMD (x64) | `VoiceStudio-Electron-<version>-win-x64.exe` |
-| Windows on ARM (Snapdragon X etc., experimental) | `VoiceStudio-Electron-<version>-win-arm64.exe` (releases without it: the x64 installer also works, under emulation) |
+Download `Azuria-Voice-Electron-0.5.7-win-x64.exe` from
+[Azúria Voice Releases](https://github.com/kaikydev1-jpg/azuria-voice/releases).
+The version number changes with each published update. When a release is not
+published yet, download the `Azuria-Voice-Windows-x64` artifact from the latest
+successful [Windows build](https://github.com/kaikydev1-jpg/azuria-voice/actions/workflows/azuria-windows.yml)
+and extract it first.
 
-The setup wizard installs for the current user by default (no administrator
-rights needed) and lets you choose the installation folder. Compare the download with the
-release's `SHA256SUMS.txt` before running it.
+The artifact/release also contains `SHA256SUMS.txt`. Check the installer hash
+with `Get-FileHash -Algorithm SHA256` before opening it. The installer runs for
+the current user and lets you select an installation folder. Builds without a
+configured Windows signing certificate are unsigned.
 
-Or, from a regular (non-admin) PowerShell, let the
-[install script](script.md) pick the right installer, verify it, and open the
-wizard:
+The release installer can also be downloaded and verified by the repository
+script:
 
 ```powershell
-irm https://voicestudio.sh/install | iex
+irm https://raw.githubusercontent.com/kaikydev1-jpg/azuria-voice/main/scripts/install.ps1 | iex
 ```
 
-### PCs without an NVIDIA GPU
+This command requires a published release; Actions artifacts are downloaded
+through the GitHub Actions page.
 
-VoiceStudio is fully usable without a dedicated GPU: laptops with Intel or AMD
-integrated graphics, Ryzen/Ryzen AI parts and older desktops all run the whole
-app on the CPU, just slower (integrated graphics are not used for AI work).
-On first run the runtime installer detects that no NVIDIA driver is present and
-installs the small CPU build of PyTorch instead of the multi-GB CUDA one, so
-the download is much smaller and needs about 5 GiB free instead of 9 GiB. For
-the best experience on a CPU, pick a light voice engine (KittenTTS,
-Supertonic-3, PocketTTS) and a small Whisper model in the Model Catalogue; the
-setup screen lists them as its CPU preset. Set `OMNIVOICE_TORCH_VARIANT=cuda`
-(or `cpu`) before launching to override the detection.
-Source setup (`bun run setup:api`) also selects locked CPU wheels when NVIDIA
-is absent. See [CPU setup and overrides](../../electron/README.md#running-without-a-gpu).
+## First launch
 
-### Windows on ARM (Snapdragon X etc.)
+1. Open Azúria Voice and review the environment location and download region.
+2. Start the local runtime installation. It downloads managed Python 3.11 and
+   the locked dependencies. The app selects CPU-only PyTorch when it cannot
+   detect an NVIDIA driver. Allow at least 5 GiB free for CPU setup or 9 GiB
+   for the CUDA environment, plus space for the models you select.
+3. Complete the model setup. Model weights are separate downloads, selected
+   in the app; they are not bundled in the installer. Light engines such as
+   KittenTTS, Supertonic-3 or PocketTTS suit CPU machines. Choose a small
+   Whisper model for transcription on CPU.
+4. Choose a saved voice or provide a clean reference recording, enter text,
+   and generate. After the selected runtime and models are installed, local
+   generation works offline. Optional cloud features retain their own setup.
 
-> [!NOTE]
-> **Experimental.** The ARM64 installer and the emulated runtime are built by
-> CI but have not yet passed an end-to-end validation on real hardware. Expect
-> rough edges and please report them.
+The installer does not require a system Python, FFmpeg, CUDA Toolkit, or
+developer toolchain. Media tools are managed by the app. For gated models,
+provide your Hugging Face token in Settings; model licenses remain separate
+from the application license.
 
-The app shell is native ARM64. PyTorch has no ARM64 Windows wheels for
-torchaudio/torchvision, so the AI backend runs as an **x64 Python under
-Windows' built-in emulation, on the CPU only** (no GPU or NPU acceleration).
-It is designed to work but will be slower than on an x64 PC; Windows 11 24H2
-or newer gives the emulator the AVX2 support PyTorch benefits from. Setup shows
-a "Windows on ARM" notice and applies the same light-engine advice as above.
+## Updates and saved data
 
-### Everything on an external drive
+Settings checks application updates from
+[`kaikydev1-jpg/azuria-voice`](https://github.com/kaikydev1-jpg/azuria-voice/releases).
+Download an offered update, then install it when ready to restart. You can
+also run a newer Azúria Voice installer over the existing installation.
 
-The Electron app has no single-file portable build. To keep it all on another
-drive (for example an external SSD):
+Application files are replaced while downloaded models, voices, projects,
+settings and the managed Python environment remain in their persistent
+locations. Keep the application identity `com.azuria.voice.desktop` and product
+name `Azúria Voice` stable in future versions. Do not delete these directories
+when updating:
 
-1. Run the installer and choose the external drive on its **Installation
-   Folder** page.
-2. On the setup screen, press **Change…** beside **App environment** and pick
-   the drive. That one folder then holds the Python environment, uv's download
-   cache, managed Python, your data (`data`), the model cache (`models`) and
-   scratch files (`tmp`), so nothing is staged on `C:`. The setup screen lists
-   each effective location. Variables you set yourself (`OMNIVOICE_DATA_DIR`,
-   `OMNIVOICE_CACHE_DIR`, `TEMP`) win over the folder.
-3. An existing installation is never moved. To relocate its data or model cache
-   later, use **Settings > Storage**.
+| Content | Default Windows location |
+| --- | --- |
+| Electron preferences, browser storage and runtime location | `%APPDATA%\Azúria Voice` |
+| Managed Python project/environment | `%APPDATA%\Azúria Voice\runtime\project` |
+| Runtime download cache and managed Python | Adjacent `runtime\.uv-cache` and `runtime\.python` |
+| Voices, generated files, settings database and engine environments | `%APPDATA%\OmniVoice` |
+| Hugging Face model cache | `%LOCALAPPDATA%\OmniVoice\hf_cache` |
+| Custom data/cache overrides | `%USERPROFILE%\.config\omnivoice\env` |
 
-The drive must be connected when VoiceStudio starts.
+The `OmniVoice` backend directory names and `OMNIVOICE_*` environment variables
+are retained for compatibility. Existing environment overrides and paths
+selected in Settings take precedence. Azúria Voice does not migrate or remove
+an existing VoiceStudio Electron profile.
 
-## GPU support on Windows
+For another drive, select **Change…** beside **App environment** before the
+first installation. The chosen folder holds the environment and its download
+caches, plus `data`, `models` and `tmp`. Existing installations are not moved
+by choosing a new folder; use Settings → Storage for relocation afterwards.
+`OMNIVOICE_DATA_DIR`, `OMNIVOICE_CACHE_DIR`, `OMNIVOICE_ENGINES_DIR` and explicit
+temporary-directory variables remain supported. Keep an external drive
+connected whenever the app runs.
 
-<a id="gpu-support"></a>
+Use Windows Settings → Apps, or `scripts/install.ps1 -Uninstall`, to remove the
+application while preserving data. The historical clean-uninstaller scripts
+target the original shared backend directories; they are not an update step.
 
-**PyTorch GPU acceleration on Windows is NVIDIA/CUDA-only.** The Windows install
-ships the CUDA build of PyTorch; with an NVIDIA GPU and a regular NVIDIA
-driver it's picked up automatically (no CUDA Toolkit install needed).
+## Build from source
 
-**AMD GPUs — including Ryzen / Ryzen AI integrated Radeon graphics — do not
-accelerate PyTorch engines on Windows.** The runtime has PyTorch 2.8 as either
-the NVIDIA CUDA build or (with no NVIDIA driver present) the CPU-only build;
-neither can drive a Radeon card, so those engines run on the CPU. pytorch.org publishes no Windows ROCm wheels, and VoiceStudio's ROCm
-option (`OMNIVOICE_TORCH_VARIANT=rocm`) is Linux-only — it is ignored on Windows
-rather than failing setup. (The Ryzen AI NPU is likewise not used.) Everything
-still works on CPU, just slower. What you can do today:
-
-- **Use an engine with its own GPU runtime.** [audio.cpp](../engines/audio-cpp.md)
-  (Breeze-TTS-2) ships a Vulkan build that runs on Radeon GPUs: install the
-  runtime from **Settings → Models**. VoiceStudio picks the discrete GPU
-  automatically.
-- **Run on Linux** (native, or the ROCm Docker image) for ROCm acceleration of
-  the PyTorch engines — see [linux.md — AMD GPU (ROCm)](linux.md#amd-gpu-rocm).
-- **Advanced / unsupported: AMD's own Windows ROCm wheels.** AMD publishes
-  PyTorch ROCm wheels for Windows (`https://repo.amd.com/rocm/whl-multi-arch/`,
-  Python 3.11–3.14, RDNA 3 / RDNA 4 cards such as the RX 7000 and RX 9000 series).
-  They are PyTorch 2.9 or newer, not the 2.8 the engines here are validated
-  against, and faster-whisper (CTranslate2) needs its own separate HIP build for
-  the GPU, so expect parts of the app (WhisperX is a reported example) to break. VoiceStudio does not install them, and no engine
-  parity is claimed. DirectML is not an option either: `torch-directml` needs
-  PyTorch 2.4.
-
-**Settings → Performance → GPU acceleration** shows exactly what applies to your
-machine: the GPUs Windows reports, which PyTorch build is installed, and a
-verdict for every engine (uses the GPU, runs on the CPU and why, or CPU by
-design). **Settings → About → Run self-check** names the card instead of just
-saying "no GPU acceleration detected".
-
-## Building from source
-
-Use this for development or to run current `main`. The install script's
-`main` mode (`$env:VOICESTUDIO_INSTALL_MODE='main'; irm https://voicestudio.sh/install | iex`)
-builds and installs a desktop package from `main` without a checkout; see
-[the install script guide](script.md).
-
-Prerequisites:
-
-- **Git for Windows** — `winget install --id Git.Git -e`.
-- **Bun** — `powershell -c "irm bun.sh/install.ps1 | iex"`.
-- **uv** — `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"` (it
-  provides the managed Python 3.11 the backend uses).
-- **Node.js 22+**.
-- **Rust / Cargo** — `winget install Rustlang.Rustup`; close and reopen
-  PowerShell afterwards.
-- **Microsoft C++ Build Tools** — the
-  [Visual Studio 2022 Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
-  with the **"Desktop development with C++"** workload (plus the ARM64 build
-  tools on Windows on ARM).
+Install Git for Windows, Node.js 22+, Bun 1.4.2, Rust/Cargo with the
+`x86_64-pc-windows-msvc` target, and Visual Studio 2022 C++ Build Tools with the
+**Desktop development with C++** workload. Source backend development also
+needs uv; the maintained workflow pins uv 0.12.13. ARM64 builds additionally
+need the ARM64 C++ tools and the `aarch64-pc-windows-msvc` Rust target.
 
 ```powershell
-git clone https://github.com/debpalash/VoiceStudio.git
-cd VoiceStudio
-bun install
-bun run setup:api   # create the Python environment with uv
-bun run dev         # Electron with hot reload; it starts and supervises the backend
-```
-
-Use `bun run desktop-prod` to build and launch the production bundle, or
-`bun run dist` to create a local NSIS installer in `electron/release/` without
-publishing. See [Electron setup](../../electron/README.md) for backend
-configuration.
-
-## HF_TOKEN persistence
-
-The **recommended path** is the in-app **Settings → API Keys** panel: it
-writes the token to VoiceStudio's encrypted SQLite store *and* to the canonical
-`huggingface_hub` location, so every subprocess the app spawns picks it up.
-
-If you prefer setting an environment variable directly (power-user / CLI runs
-from source), use **PowerShell** with `[Environment]::SetEnvironmentVariable`:
-
-```powershell
-[Environment]::SetEnvironmentVariable("HF_TOKEN","hf_yourtokenhere","User")
-```
-
-That writes to the user-scope environment and is picked up by every **new**
-shell — close and reopen PowerShell or your terminal to see it.
-
-> **Don't use `setx`.** `setx HF_TOKEN "hf_..."` works in theory but has
-> three real gotchas that produce "I set it but it's empty" bug reports:
-> it doesn't propagate to the current shell, it silently truncates values
-> longer than 1024 chars, and it doesn't escape `%` characters. Use the
-> in-app panel or the PowerShell one-liner above.
-
-Full HF token guide: [docs/setup/huggingface-token.md](../setup/huggingface-token.md).
-
-## Triton / torch.compile OOM
-
-<a id="torch-compile-oom"></a>
-
-On Windows, certain TTS engines (notably IndexTTS 2.5 and some CosyVoice paths)
-trigger `torch.compile` / Triton kernel compilation during the first
-synthesise call. On machines with <16 GB VRAM, that compile step can OOM
-*before* the audio render even begins — the error usually surfaces as
-`OutOfMemoryError: CUDA out of memory` or `RuntimeError: Triton compilation
-failed`.
-
-**The one-click fix:** open **Settings → Performance** in the app and toggle
-**"Disable torch.compile"** on. That sets the `TORCH_COMPILE_DISABLE=1` env var
-on every engine subprocess VoiceStudio spawns and forces the in-process engine
-to eager mode as well. You'll lose a few percent of peak throughput in exchange
-for the engine actually loading.
-
-**From the CLI / from source:** set the env var manually before launching:
-
-```powershell
-$env:TORCH_COMPILE_DISABLE = "1"
+git clone https://github.com/kaikydev1-jpg/azuria-voice.git
+cd azuria-voice
+bun install --frozen-lockfile
+bun run setup:api
 bun run dev
 ```
 
-The OOM this section describes is Windows-specific, but the toggle itself works
-on **every** platform — it used to be greyed out elsewhere, which left Linux and
-macOS users with no way to switch off a `torch.compile` that was breaking their
-engine. Tracking issues:
-[#65](https://github.com/debpalash/VoiceStudio/issues/65) (this OOM) and
-[#2135](https://github.com/debpalash/VoiceStudio/issues/2135) (the same toggle
-on Linux/CUDA).
+To build a local installer:
 
-## Hugging Face token (optional but recommended)
+```powershell
+bun run dist
+```
 
-See [docs/setup/huggingface-token.md](../setup/huggingface-token.md).
+This creates `electron/release/Azuria-Voice-Electron-<version>-win-x64.exe`
+on an x64 build host without publishing. The Rust helper is compiled during
+packaging. To include uv in the installer, copy the pinned `uv.exe` to
+`electron/build/uv/uv-x86_64-pc-windows-msvc.exe` before packaging. Without a
+bundled executable, first-run setup can download the same pinned version.
+
+The [Windows workflow](https://github.com/kaikydev1-jpg/azuria-voice/actions/workflows/azuria-windows.yml)
+provides this toolchain and bundles uv. Every push to `main` builds a reviewable
+artifact. Manual dispatch defaults to `publish: false`; selecting `publish`
+creates the versioned release and updater feed after validation. A version
+already published cannot be overwritten by that workflow. Change the root
+`package.json` version and maintained mirrors together before a future release.
 
 ## Troubleshooting
 
-Hit a wall? See [docs/install/troubleshooting.md](troubleshooting.md).
+Check Settings → About → Run self-check and the setup log. Model downloads may
+need a Hugging Face token or a different mirror. CPU execution is slower;
+AMD integrated graphics and NPUs do not accelerate the PyTorch backend on
+Windows. Windows ARM support has not been fully validated on real hardware.
 
-Migration configuration is kept ASCII so Alembic can read it under Windows locale code pages as well as UTF-8. This applies to source installs and direct Alembic commands.
+Report issues in the
+[Azúria Voice issue tracker](https://github.com/kaikydev1-jpg/azuria-voice/issues).

@@ -119,7 +119,7 @@ export function WorkspaceSidebar() {
             src={brandArtwork}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 w-full object-cover object-right opacity-25 [mask-image:linear-gradient(black,transparent)] dark:opacity-40"
+            className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 w-full object-cover object-right grayscale opacity-25 [mask-image:linear-gradient(black,transparent)] dark:opacity-40"
           />
           <header
             className={cn(

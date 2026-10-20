@@ -16,6 +16,11 @@ function requiredPort(value, key) {
 
 export const PRODUCT_NAME = requiredString(rawConfig.productName, "productName");
 export const APP_ID = requiredString(rawConfig.appId, "appId");
+export const REPOSITORY = requiredString(rawConfig.repository, "repository");
+export const ARTIFACT_SLUG = PRODUCT_NAME.normalize("NFKD")
+  .replace(/\p{Diacritic}/gu, "")
+  .replace(/[^A-Za-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "");
 export const DEFAULT_BACKEND_PORT = requiredPort(rawConfig.ports?.backend, "backend");
 export const DEFAULT_WEB_PORT = requiredPort(rawConfig.ports?.web, "web");
 export const DEFAULT_ELECTRON_DEV_PORT = requiredPort(rawConfig.ports?.electronDev, "electronDev");
@@ -34,6 +39,7 @@ if (DEFAULT_ELECTRON_PROXY_PORT > 65535 || configuredPorts.includes(DEFAULT_ELEC
 export const APP_CONFIG = Object.freeze({
   productName: PRODUCT_NAME,
   appId: APP_ID,
+  repository: REPOSITORY,
   ports: Object.freeze({
     backend: DEFAULT_BACKEND_PORT,
     web: DEFAULT_WEB_PORT,

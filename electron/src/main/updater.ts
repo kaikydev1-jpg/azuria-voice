@@ -7,6 +7,7 @@ import type { UpdateReleaseInfo, UpdateState } from '../preload/index.d';
 import { sendToLiveWindow } from './window-safety';
 import { applicationUpdatesSupported, CURRENT_DISTRIBUTION } from './distribution';
 import type { DistributionTarget } from '../../../config/distributions.mjs';
+import { ARTIFACT_SLUG, REPOSITORY } from '../../../config/app-config.mjs';
 
 // electron-updater is CommonJS. Electron executes our main bundle as ESM, so
 // named runtime imports fail before the app can create a window.
@@ -15,8 +16,8 @@ const { autoUpdater } = updaterPackage;
 // Only tagged releases are published as an update feed. A Preview channel used
 // to exist, but no workflow ever published its feed, so it silently served
 // Stable; it was removed rather than left as a choice that does nothing.
-const STABLE_FEED = 'https://github.com/debpalash/VoiceStudio/releases/latest/download';
-const RELEASES_API = 'https://api.github.com/repos/debpalash/VoiceStudio/releases?per_page=30';
+const STABLE_FEED = `https://github.com/${REPOSITORY}/releases/latest/download`;
+const RELEASES_API = `https://api.github.com/repos/${REPOSITORY}/releases?per_page=30`;
 
 function feedChannelName(
   platform: NodeJS.Platform = process.platform,
@@ -48,7 +49,7 @@ export async function resolveUpdateFeedUrl(
   const response = await fetcher(RELEASES_API, {
     headers: {
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'VoiceStudio',
+      'User-Agent': ARTIFACT_SLUG,
     },
     signal: AbortSignal.timeout(10_000),
   });
@@ -88,7 +89,7 @@ export async function resolveUpdateFeedUrl(
   });
   const release = matchingReleases[0]?.release;
   if (!release) throw new Error(`No Microsoft Store update feed publishes ${manifest}`);
-  return `https://github.com/debpalash/VoiceStudio/releases/download/${encodeURIComponent(
+  return `https://github.com/${REPOSITORY}/releases/download/${encodeURIComponent(
     release.tag_name as string,
   )}`;
 }
@@ -109,7 +110,7 @@ export async function listDesktopReleases(
   const response = await fetcher(RELEASES_API, {
     headers: {
       Accept: 'application/vnd.github+json',
-      'User-Agent': 'VoiceStudio',
+      'User-Agent': ARTIFACT_SLUG,
     },
     signal: AbortSignal.timeout(10_000),
   });

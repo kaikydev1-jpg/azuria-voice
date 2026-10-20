@@ -1,13 +1,10 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # PR-gated continuous integration for the maintained Electron desktop,
 # shared backend, web frontend and native bridge.
 
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -19,6 +16,7 @@ env:
 
 jobs:
   installer:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Electron installer contracts
     runs-on: ubuntu-24.04
     steps:
@@ -46,6 +44,7 @@ jobs:
         run: ./electron/tests/powershell-installer.ps1
 
   test:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Tests (backend + frontend)
     runs-on: ubuntu-22.04
     env:
@@ -197,6 +196,7 @@ jobs:
   # crawler runs every fault mode concurrently in one process, and a matrix of
   # twelve jobs per push queued behind the runner limit for hours.
   ui-crawler:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: UI crawler
     runs-on: ubuntu-24.04
     timeout-minutes: 45
@@ -248,6 +248,7 @@ jobs:
           node electron/tests/ui-crawler.mjs
 
   linux-native-package:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Linux native package
     runs-on: ubuntu-24.04
     steps:
@@ -277,6 +278,7 @@ jobs:
   # macOS and Windows surface on the PR instead of at release time. Packaged
   # installers are covered separately by packaged-smoke.mjs on release paths.
   electron-ui:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Desktop UI (${{ matrix.label }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -354,6 +356,7 @@ jobs:
   # job above misses. Narrow scope (tests/smoke/ only) — full pytest stays
   # on Linux until Phase 1's INST-01 lands setuptools for WhisperX.
   smoke-matrix:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Smoke (${{ matrix.label }})
     needs: test
     strategy:

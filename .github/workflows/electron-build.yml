@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 name: Electron packaging rehearsal
 
 # Explicitly artifact-only: no tag, schedule, release, or publishing permission.
@@ -13,6 +14,7 @@ concurrency:
 
 jobs:
   package:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     continue-on-error: ${{ matrix.experimental == true }}

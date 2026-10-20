@@ -40,7 +40,7 @@ def prepare(assets, tag, sunset_tag=None):
         if actual != expected:
             raise ValueError("Updater payload checksum mismatch")
     for suffix in ("mac-arm64.dmg", "mac-x64.dmg", "linux-x64.deb"):
-        if not (assets / f"VoiceStudio-Electron-{version}-{suffix}").is_file():
+        if not (assets / f"Azuria-Voice-Electron-{version}-{suffix}").is_file():
             raise ValueError(f"Missing installer: {suffix}")
     if sunset_tag:
         for name in ("latest.json", "latest-user.json"):

@@ -1,7 +1,9 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 name: Mac App Store package
 
 # Builds signed MAS packages for private validation. It never uploads to App
 # Store Connect, creates a listing, starts TestFlight, or publishes a version.
+# Upstream publishing recipe retained for reference; Azúria releases use azuria-windows.yml.
 on:
   workflow_dispatch:
 
@@ -17,6 +19,7 @@ env:
 
 jobs:
   validate:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -27,6 +30,7 @@ jobs:
         run: node scripts/validate_store_foundation.mjs --distribution=mac-app-store
 
   package:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     needs: validate
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 75

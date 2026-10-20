@@ -9,7 +9,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packageNativeHelper } from './native-helper-build.mjs';
 import { repairSnapArtifacts } from './snap-template-payload.mjs';
-import { APP_ID, PRODUCT_NAME } from '../config/app-config.mjs';
+import { APP_ID, PRODUCT_NAME, ARTIFACT_SLUG, REPOSITORY } from '../config/app-config.mjs';
 import { DISTRIBUTION_PROFILE, DISTRIBUTION_TARGET } from '../config/distributions.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -22,7 +22,7 @@ const artifactLabel =
     'microsoft-store': 'MicrosoftStore',
     'mac-app-store': 'MacAppStore',
   }[DISTRIBUTION_TARGET] ?? 'Electron';
-const artifactPrefix = `${PRODUCT_NAME.replace(/[^A-Za-z0-9]+/g, '-')}-${artifactLabel}`;
+const artifactPrefix = `${ARTIFACT_SLUG}-${artifactLabel}`;
 // Stable is the only Electron update feed: there is no `preview` release to
 // point at. Packaging rehearsals from main are stamped stable too; they are
 // review artifacts and are never published.
@@ -33,7 +33,7 @@ if (
 ) {
   throw new Error(`Unsupported Electron update channel: ${updateChannel}`);
 }
-const updateUrl = 'https://github.com/debpalash/VoiceStudio/releases/latest/download';
+const updateUrl = `https://github.com/${REPOSITORY}/releases/latest/download`;
 
 export function distributionPackaging(target = DISTRIBUTION_TARGET) {
   if (target === 'snap-store') {

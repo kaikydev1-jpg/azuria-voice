@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # Publish Docker images to GitHub Container Registry (GHCR).
 #
 # Triggers:
@@ -42,11 +43,8 @@
 
 name: Docker (GHCR)
 
+# Upstream publishing recipe retained for reference; Azúria releases use azuria-windows.yml.
 on:
-  push:
-    branches: [main]
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       backfill_release:
@@ -78,8 +76,8 @@ env:
 
 jobs:
   build-and-push:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')) }}
     # Only version releases publish images; other release tags are ignored.
-    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -249,8 +247,8 @@ jobs:
   # build step — so it gets a full runner disk to itself: the ROCm base alone
   # is ~10 GB compressed / ~25 GB unpacked.
   build-and-push-rocm:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')) }}
     # Only version releases publish images; other release tags are ignored.
-    if: github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

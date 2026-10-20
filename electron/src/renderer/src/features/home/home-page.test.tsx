@@ -42,12 +42,12 @@ it('previews the official website only when the title is clicked', () => {
   browser.open.mockClear();
   render(<HomePage />);
   const title = screen.getByRole('link', { name: 'homeUi.title' });
-  expect(en.homeUi.title).toBe('VoiceStudio.sh Open Source');
-  expect(title).toHaveAttribute('href', 'https://voicestudio.sh');
+  expect(en.homeUi.title).toBe('Azúria Voice Open Source');
+  expect(title).toHaveAttribute('href', 'https://github.com/kaikydev1-jpg/azuria-voice');
   fireEvent.mouseEnter(title);
   expect(browser.open).not.toHaveBeenCalled();
   fireEvent.click(title);
-  expect(browser.open).toHaveBeenCalledWith('https://voicestudio.sh');
+  expect(browser.open).toHaveBeenCalledWith('https://github.com/kaikydev1-jpg/azuria-voice');
 });
 
 it('names the feature Dubbing consistently while preserving the existing route', () => {
@@ -85,17 +85,13 @@ it('credits qualifying contributors and opens their GitHub profiles externally',
   }
 });
 
-it('opens both creator profiles from the accessible avatar card', async () => {
+it('keeps the creator attribution as a source link without social promotion', () => {
   render(<HomePage />);
-  fireEvent.click(screen.getByRole('button', { name: '@debpalash' }));
-  const github = await screen.findByRole('link', { name: 'GitHub @debpalash' });
-  const x = screen.getByRole('link', { name: 'X @idebpalash' });
+  const github = screen.getByRole('link', { name: 'GitHub · @debpalash' });
   expect(github).toHaveAttribute('href', 'https://github.com/debpalash');
-  expect(x).toHaveAttribute('href', 'https://x.com/idebpalash');
   fireEvent.click(github);
   expect(files.openExternal).toHaveBeenCalledWith('https://github.com/debpalash');
-  fireEvent.click(x);
-  expect(files.openExternal).toHaveBeenCalledWith('https://x.com/idebpalash');
+  expect(screen.queryByRole('link', { name: /X @/ })).toBeNull();
 });
 
 it('separates three primary creation actions and describes all nine destinations', () => {

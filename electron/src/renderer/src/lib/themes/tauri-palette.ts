@@ -1,17 +1,16 @@
 import { GROVE_THEME, type ThemeColors, type ThemeDefinition } from './t3-palettes';
 
-// Refined VoiceStudio/Tauri palette: original charcoal canvas and rose action,
-// lavender text, plum surfaces, and quieter translucent borders.
+// Azúria Voice silver and blue palette with the existing heritage identity.
 // The light variant is a complementary adaptation; the original default is dark.
 function colors(light: boolean): ThemeColors {
-  const canvas = light ? '#faf6fc' : '#211c29';
-  const chrome = light ? '#eee5f2' : '#191420';
-  const surface = light ? '#fffbff' : '#302638';
-  const text = light ? '#392c42' : '#eee5f4';
-  const muted = light ? '#796784' : '#b8a5c3';
-  const action = light ? '#8f3f71' : '#d3869b';
-  const border = light ? 'rgb(100 65 125 / 15%)' : 'rgb(217 185 237 / 14%)';
-  const hover = light ? '#eadff0' : '#403049';
+  const canvas = light ? '#F1F5F9' : '#0B1220';
+  const chrome = light ? '#E2E8F0' : '#0B1220';
+  const surface = light ? '#FFFFFF' : '#111D30';
+  const text = light ? '#0B1220' : '#E2E8F0';
+  const muted = light ? '#64748B' : '#CBD5E1';
+  const action = '#2563EB';
+  const border = light ? '#CBD5E1' : 'rgb(203 213 225 / 14%)';
+  const hover = light ? '#DBEAFE' : '#1E293B';
   return {
     ...(light ? GROVE_THEME.colors : GROVE_THEME.variants!.dark!),
     canvas,
@@ -23,15 +22,15 @@ function colors(light: boolean): ThemeColors {
     toolbarControlForeground: text,
     toolbarControlHover: hover,
     surface,
-    surfaceRaised: light ? '#ffffff' : '#382c42',
-    surfaceOverlay: light ? '#fffbff' : '#382c42',
+    surfaceRaised: light ? '#FFFFFF' : '#1E293B',
+    surfaceOverlay: light ? '#FFFFFF' : '#1E293B',
     text,
     textMuted: muted,
     border,
     input: border,
     focus: action,
     accent: action,
-    accentForeground: light ? '#ffffff' : '#1d2021',
+    accentForeground: '#FFFFFF',
     secondary: hover,
     secondaryForeground: text,
     muted: hover,
@@ -53,8 +52,8 @@ function colors(light: boolean): ThemeColors {
     messageSurface: surface,
     messageForeground: text,
     messageAction: action,
-    messageActionForeground: light ? '#ffffff' : '#1d2021',
-    messageActionHover: light ? '#7b305e' : '#b16286',
+    messageActionForeground: '#FFFFFF',
+    messageActionHover: light ? '#1D4ED8' : '#3B82F6',
     codeBackground: chrome,
     codeForeground: text,
     sidebar: chrome,
@@ -62,7 +61,7 @@ function colors(light: boolean): ThemeColors {
     sidebarMutedForeground: muted,
     sidebarControlSurface: surface,
     sidebarRowHover: hover,
-    sidebarRowActive: light ? '#e5d3ee' : '#50365c',
+    sidebarRowActive: light ? '#BFDBFE' : '#172F50',
     sidebarRowSelected: surface,
     sidebarBorder: border,
     terminalBackground: canvas,
@@ -75,7 +74,7 @@ function colors(light: boolean): ThemeColors {
 }
 export const TAURI_THEME: ThemeDefinition = {
   id: 'heritage',
-  label: 'VoiceStudio Classic',
+  label: 'Azúria Voice Classic',
   appearance: 'dark',
   colors: colors(false),
   variants: { light: colors(true) },

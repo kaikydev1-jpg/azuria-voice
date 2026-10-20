@@ -22,10 +22,10 @@ export function PalettePicker({ appearance }: { appearance: ThemeAppearance }) {
         {options.map((option) => {
           const colors = paletteColors(option.id, appearance);
           const dark = appearance === 'dark';
-          const background = colors?.canvas ?? (dark ? '#0a0a0a' : '#fdfdfd');
-          const sidebar = colors?.sidebar ?? (dark ? '#111111' : '#fafafa');
-          const text = colors?.text ?? (dark ? '#f5f5f5' : '#27272a');
-          const accent = colors?.messageAction ?? (dark ? '#3268ef' : '#2449df');
+          const background = colors?.canvas ?? (dark ? '#0B1220' : '#F1F5F9');
+          const sidebar = colors?.sidebar ?? (dark ? '#111D30' : '#E2E8F0');
+          const text = colors?.text ?? (dark ? '#E2E8F0' : '#0B1220');
+          const accent = colors?.messageAction ?? '#2563EB';
           const selected = settings[appearance] === option.id;
           return (
             <button

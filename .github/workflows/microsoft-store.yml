@@ -1,8 +1,10 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 name: Microsoft Store package
 
 # Builds a signed, Store-specific NSIS package and Partner Center handoff.
 # It never submits or publishes a listing. Uploading immutable package URLs is
 # an explicit owner-only action; Partner Center submission remains owner-gated.
+# Upstream publishing recipe retained for reference; Azúria releases use azuria-windows.yml.
 on:
   workflow_dispatch:
     inputs:
@@ -28,6 +30,7 @@ env:
 
 jobs:
   validate:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -60,6 +63,7 @@ jobs:
           fi
 
   package:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     needs: validate
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 70
@@ -223,6 +227,7 @@ jobs:
             electron/release/authenticode-win32-${{ matrix.arch }}.json
 
   handoff:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     needs: package
     runs-on: ubuntu-latest
     steps:
@@ -264,7 +269,7 @@ jobs:
           path: microsoft-store-handoff
 
   stage:
-    if: inputs.stage_package_urls == true
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (inputs.stage_package_urls == true) }}
     needs: handoff
     runs-on: ubuntu-latest
     permissions:

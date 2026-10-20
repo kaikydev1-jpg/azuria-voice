@@ -9,6 +9,7 @@ import { ProfileAvatar } from '@/components/profile-avatar';
 import { Button } from '@/components/ui/button';
 import { useProfiles } from '@/hooks/use-profiles';
 import { brandArtwork } from '@/lib/brand';
+import { REPO_URL } from '@shared/utils/contactLinks';
 import { patchCloneSettings } from '@/lib/store/clone-settings';
 import { selectCloneProfile } from '@/lib/store/reference';
 import { blankLongformDraft, editLongform } from '@/features/longform/longform-session';
@@ -203,7 +204,7 @@ export function HomePage() {
                 src={brandArtwork}
                 alt=""
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-1/2 object-cover object-right opacity-25 [mask-image:linear-gradient(90deg,transparent,black)]"
+                className="pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-1/2 object-cover object-right grayscale opacity-25 [mask-image:linear-gradient(90deg,transparent,black)]"
               />
               <div className="home-heading-row">
                 <div className="home-heading-copy">
@@ -215,7 +216,7 @@ export function HomePage() {
                       <TooltipTrigger
                         render={
                           <a
-                            href="https://voicestudio.sh"
+                            href={REPO_URL}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="rounded-md transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
@@ -225,7 +226,7 @@ export function HomePage() {
                               event.preventDefault();
                               event.currentTarget.focus();
                               runRendererTask('Preview official website', () =>
-                                browser.open('https://voicestudio.sh'),
+                                browser.open(REPO_URL),
                               );
                             }}
                           />

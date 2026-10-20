@@ -1,12 +1,12 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 name: Snap Store package
 
 # Every v* tag uploads its verified Snap and releases it to `candidate`. Stable
 # is never automatic: an owner dispatches `promote_revision` after the
 # runbook's install, refresh and rollback checks. Store credentials exist only
 # in the `snap-store` environment used by the upload and promote jobs.
+# Upstream publishing recipe retained for reference; Azúria releases use azuria-windows.yml.
 on:
-  push:
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       upload:
@@ -30,7 +30,7 @@ env:
 
 jobs:
   package:
-    if: ${{ !inputs.promote_revision }}
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (!inputs.promote_revision) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     env:
@@ -134,8 +134,8 @@ jobs:
             electron/release/snap-store-assets/
 
   upload:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (github.ref_type == 'tag' && (github.event_name == 'push' || inputs.upload)) }}
     needs: package
-    if: github.ref_type == 'tag' && (github.event_name == 'push' || inputs.upload)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: snap-store
@@ -196,7 +196,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   promote:
-    if: ${{ inputs.promote_revision }}
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (inputs.promote_revision) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: snap-store

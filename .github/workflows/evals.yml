@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # LLM-judge evals — semantic quality suites, NEVER a gate.
 #
 # Hard rule (parity program Wave 0.3 / competitive-analysis Spec 9b): LLM
@@ -14,9 +15,6 @@
 name: evals
 
 on:
-  schedule:
-    # Weekly, Sundays 04:00 UTC.
-    - cron: "0 4 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -24,6 +22,7 @@ permissions:
 
 jobs:
   evals:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

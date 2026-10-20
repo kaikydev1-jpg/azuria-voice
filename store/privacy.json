@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyUrl": "https://voicestudio.sh/privacy",
+  "policyUrl": "https://github.com/kaikydev1-jpg/azuria-voice/blob/main/docs/electron-privacy.md",
   "defaultBehavior": {
     "accountRequired": false,
     "analyticsEnabled": false,
@@ -40,15 +40,28 @@
       "destination": "GitHub API",
       "condition": "public star badge is visible",
       "purpose": "display the public repository star count",
-      "data": ["ordinary network request metadata"],
-      "excluded": ["credentials", "user content", "project data"]
+      "data": [
+        "ordinary network request metadata"
+      ],
+      "excluded": [
+        "credentials",
+        "user content",
+        "project data"
+      ]
     },
     {
       "destination": "User-selected download providers",
       "condition": "explicit setup, model, gallery, update or media-tool action",
       "purpose": "download the requested runtime, model, gallery asset, update or media tool",
-      "data": ["ordinary request metadata", "provider credential only when required"],
-      "excluded": ["audio", "transcripts", "project content"]
+      "data": [
+        "ordinary request metadata",
+        "provider credential only when required"
+      ],
+      "excluded": [
+        "audio",
+        "transcripts",
+        "project content"
+      ]
     }
   ]
 }

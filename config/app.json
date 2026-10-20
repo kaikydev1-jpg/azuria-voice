@@ -1,6 +1,7 @@
 {
-  "productName": "VoiceStudio",
-  "appId": "com.voicestudio.desktop",
+  "productName": "Azúria Voice",
+  "appId": "com.azuria.voice.desktop",
+  "repository": "kaikydev1-jpg/azuria-voice",
   "ports": {
     "backend": 3900,
     "web": 3901,

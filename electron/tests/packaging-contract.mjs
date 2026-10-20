@@ -62,21 +62,21 @@ const artifactResources = resolve(
   artifactRoot,
   process.platform === 'darwin' ? 'Resources' : 'resources',
 );
+const electronPackage = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 const artifactExecutable = resolve(
   artifactRoot,
   process.platform === 'win32'
     ? `${PRODUCT_NAME}.exe`
     : process.platform === 'darwin'
       ? `MacOS/${PRODUCT_NAME}`
-      : (config.linux.executableName ?? 'voicestudio-electron'),
+      : (config.linux.executableName ?? electronPackage.name),
 );
-const electronPackage = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
 assert.match(electronPackage.author?.email ?? '', /@/, 'Linux package declares a maintainer email');
 assert.equal(config.productName, PRODUCT_NAME, 'Builder uses the central product name');
 assert.equal(config.appId, APP_ID, 'Builder uses the central application ID');
 assert.equal(
   config.artifactName,
-  `${PRODUCT_NAME}-${
+  `Azuria-Voice-${
     {
       'microsoft-store': 'MicrosoftStore',
       'mac-app-store': 'MacAppStore',

@@ -1,5 +1,8 @@
 # Changelog
 
+Azúria Voice distribution changes are documented in [its distribution guide](docs/AZURIA.md).
+The history below preserves the original VoiceStudio changes and contributor credits.
+
 All notable changes to VoiceStudio.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).

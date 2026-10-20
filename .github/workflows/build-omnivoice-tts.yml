@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # Build the `omnivoice-tts` C++ runtime binary (Phase 4 Plan 04-01, GGUF-03).
 #
 # The runtime is PINNED to a commit SHA in
@@ -18,19 +19,8 @@
 # entry here if first-class Intel binaries are ever needed.
 name: Build omnivoice-tts
 
+# Upstream publishing recipe retained for reference; Azúria releases use azuria-windows.yml.
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - backend/engines/omnivoice_gguf/quant_map.json
-      - scripts/build-omnivoice-tts.sh
-      - .github/workflows/build-omnivoice-tts.yml
-  push:
-    branches: [main]
-    paths:
-      - backend/engines/omnivoice_gguf/quant_map.json
-      - scripts/build-omnivoice-tts.sh
-      - .github/workflows/build-omnivoice-tts.yml
   workflow_dispatch:
 
 permissions:
@@ -38,6 +28,7 @@ permissions:
 
 jobs:
   build-omnivoice-tts:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Build omnivoice-tts (${{ matrix.platform }})
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}

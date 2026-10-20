@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # Commit identity gate — fails a PR when any of its commits carries a blocked
 # author/committer/trailer identity (hashed personal emails, placeholder and
 # hostname-style tool identities, AI agents) or when a commit message or the
@@ -12,8 +13,7 @@
 name: commit-identity
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened, edited]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -26,6 +26,7 @@ concurrency:
 
 jobs:
   identities:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Commit identities
     runs-on: ubuntu-24.04
     timeout-minutes: 5

@@ -40,7 +40,7 @@ interface BackendGateProps {
   repairDock?: ReactNode;
 }
 
-const RELEASES_URL = 'https://github.com/debpalash/VoiceStudio/releases/latest';
+const RELEASES_URL = 'https://github.com/kaikydev1-jpg/azuria-voice/releases/latest';
 const RETRYABLE = new Set(['crashed', 'failed', 'port_in_use']);
 const SETUP_PHASES = ['checking', 'downloading_uv', 'installing_deps', 'verifying'] as const;
 
@@ -453,7 +453,11 @@ export function BackendGate({ children, repairDock }: BackendGateProps) {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{t('firstrun.env_dir')}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {t(status.runtimeStorage ? 'firstrun.env_dir_desc_scoped' : 'firstrun.env_dir_desc')}
+                        {t(
+                          status.runtimeStorage
+                            ? 'firstrun.env_dir_desc_scoped'
+                            : 'firstrun.env_dir_desc',
+                        )}
                       </p>
                       <p
                         className="mt-2 truncate font-mono text-xs text-muted-foreground"

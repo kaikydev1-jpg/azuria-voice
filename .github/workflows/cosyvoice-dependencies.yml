@@ -1,17 +1,13 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 name: CosyVoice dependency smoke
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'backend/services/sidecar_install.py'
-      - 'backend/engines/cosyvoice_subprocess/**'
-      - 'scripts/smoke-cosyvoice-dependencies.py'
-      - '.github/workflows/cosyvoice-dependencies.yml'
   workflow_dispatch:
+
 permissions:
   contents: read
 jobs:
   native-dependencies:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: CosyVoice dependencies (${{ matrix.os }})
     strategy:
       fail-fast: false

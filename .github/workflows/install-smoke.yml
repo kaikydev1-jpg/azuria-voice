@@ -1,18 +1,16 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # Exercise the maintained Electron installers, never the archived Tauri build.
 name: Install smoke
 on:
-  pull_request:
-    paths: ['scripts/install.sh', 'scripts/install.ps1', 'electron/tests/*installer*', '.github/workflows/install-smoke.yml']
-  push:
-    branches: [main]
-    paths: ['scripts/install.sh', 'scripts/install.ps1', 'electron/tests/*installer*', '.github/workflows/install-smoke.yml']
   workflow_dispatch:
+
 permissions:
   contents: read
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   install:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     name: Install (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60

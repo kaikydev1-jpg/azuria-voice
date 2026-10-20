@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # Mobile — native iOS and Android companion apps (mobile/contract/SPEC.md).
 #
 # Both apps build from generated inputs (theme tokens, OpenAPI, Electron locale
@@ -7,21 +8,6 @@
 name: mobile
 
 on:
-  pull_request:
-    paths:
-      - "mobile/**"
-      - "electron/src/renderer/src/i18n/locales/**"
-      - "electron/src/shared/languages.json"
-      - "package.json"
-      - ".github/workflows/mobile.yml"
-  push:
-    branches: [main]
-    paths:
-      - "mobile/**"
-      - "electron/src/renderer/src/i18n/locales/**"
-      - "electron/src/shared/languages.json"
-      - "package.json"
-      - ".github/workflows/mobile.yml"
   workflow_dispatch:
 
 permissions:
@@ -33,6 +19,7 @@ concurrency:
 
 jobs:
   android:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     defaults:
@@ -66,6 +53,7 @@ jobs:
           retention-days: 7
 
   ios:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: macos-15
     timeout-minutes: 50
     steps:

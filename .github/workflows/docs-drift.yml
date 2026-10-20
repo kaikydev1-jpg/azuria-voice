@@ -1,3 +1,4 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 # Docs drift — daily inventory-vs-docs check with a single rolling issue.
 #
 # docs/features.yaml is the canonical inventory; scripts/check-docs-drift.py
@@ -12,9 +13,6 @@
 name: docs-drift
 
 on:
-  schedule:
-    # Daily 03:30 UTC — after most merges, before EU morning triage.
-    - cron: "30 3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -23,6 +21,7 @@ permissions:
 
 jobs:
   drift:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

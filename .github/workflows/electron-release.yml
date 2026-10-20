@@ -1,9 +1,9 @@
+# Historical upstream recipe: disabled in this fork; use azuria-windows.yml.
 name: Electron desktop release
 
 # Builds are safe by default. Only an explicit publish dispatch exposes a release.
+# Upstream publishing recipe retained for reference; Azúria releases use azuria-windows.yml.
 on:
-  push:
-    tags: ['v*']
   workflow_dispatch:
     inputs:
       release_tag:
@@ -31,8 +31,8 @@ env:
 
 jobs:
   validate:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' && (github.event_name == 'workflow_dispatch' || github.ref_name != vars.TAURI_SUNSET_TAG) }}
     # The archived sunset tag was assembled separately; future tags are Electron-only.
-    if: github.event_name == 'workflow_dispatch' || github.ref_name != vars.TAURI_SUNSET_TAG
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -60,6 +60,7 @@ jobs:
           test "$REF" = "refs/tags/v$VERSION" || { echo "Select the exact version tag"; exit 1; }
           test "$(git rev-parse HEAD)" = "$(git rev-parse "$REF^{commit}")" || { echo "Checkout does not match the release tag"; exit 1; }
   package:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     needs: validate
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
@@ -220,6 +221,7 @@ jobs:
             electron/release/store-artifact-manifest-*.json
 
   release:
+    if: ${{ github.repository == 'debpalash/VoiceStudio' }}
     needs: package
     runs-on: ubuntu-latest
     permissions:

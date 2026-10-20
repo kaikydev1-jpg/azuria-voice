@@ -1,13 +1,13 @@
 {
-  "name": "voicestudio-electron",
+  "name": "azuria-voice-electron",
   "version": "0.0.0-electron",
   "private": true,
-  "description": "VoiceStudio desktop shell (Electron) - local voice cloning, no cloud.",
-  "homepage": "https://github.com/debpalash/VoiceStudio",
+  "description": "Azúria Voice - local voice cloning, design, dubbing and transcription.",
+  "homepage": "https://github.com/kaikydev1-jpg/azuria-voice",
   "license": "AGPL-3.0-only",
   "author": {
-    "name": "VoiceStudio contributors",
-    "email": "hi@voicestudio.sh"
+    "name": "Azúria Voice contributors",
+    "email": "kaikydev1-jpg@users.noreply.github.com"
   },
   "type": "module",
   "main": "./out/main/index.js",
@@ -32,8 +32,8 @@
     "smoke:live-routes": "node tests/live-route-health.mjs",
     "smoke:account-live": "node tests/account-sign-in-live.mjs",
     "check": "vp check",
-    "dist": "bun run build:web && electron-vite build && node tests/packaging-contract.mjs && electron-builder --config electron-builder.config.mjs && node --input-type=module -e \"if (process.platform === 'linux') await import('./scripts/embed-appimage-update.mjs')\" && node tests/update-package-contract.mjs",
-    "dist:dir": "bun run build:web && electron-vite build && node tests/packaging-contract.mjs && electron-builder --config electron-builder.config.mjs --dir",
+    "dist": "bun run build:web && electron-vite build && node tests/packaging-contract.mjs && electron-builder --config electron-builder.config.mjs --publish never && node --input-type=module -e \"if (process.platform === 'linux') await import('./scripts/embed-appimage-update.mjs')\" && node tests/update-package-contract.mjs",
+    "dist:dir": "bun run build:web && electron-vite build && node tests/packaging-contract.mjs && electron-builder --config electron-builder.config.mjs --dir --publish never",
     "ui:add": "shadcn add"
   },
   "dependencies": {

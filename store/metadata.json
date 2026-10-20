@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
   "identity": {
-    "productName": "VoiceStudio",
-    "applicationId": "com.voicestudio.desktop",
+    "productName": "Azúria Voice",
+    "applicationId": "com.azuria.voice.desktop",
     "publisherLegalName": "Yupcha Softwares Private Limited",
     "license": "AGPL-3.0-only",
     "defaultLocale": "en-US"
   },
   "listing": {
-    "title": "VoiceStudio",
+    "title": "Azúria Voice",
     "shortDescription": "Local voice cloning, voice design, dubbing and dictation on your computer.",
-    "description": "VoiceStudio is a local-first desktop studio for voice cloning, voice design, video dubbing, transcription and real-time dictation. Audio and projects remain on the user's computer by default, with no account or API key required. Models and the managed runtime are installed only through explicit setup or model-install actions.",
+    "description": "Azúria Voice is a local-first desktop studio for voice cloning, voice design, video dubbing, transcription and real-time dictation. Audio and projects remain on the user's computer by default, with no account or API key required. Models and the managed runtime are installed only through explicit setup or model-install actions.",
     "keywords": [
       "voice cloning",
       "text to speech",
@@ -21,18 +21,26 @@
     ]
   },
   "urls": {
-    "website": "https://voicestudio.sh",
-    "privacyPolicy": "https://voicestudio.sh/privacy",
-    "support": "https://github.com/debpalash/VoiceStudio/issues",
-    "source": "https://github.com/debpalash/VoiceStudio"
+    "website": "https://github.com/kaikydev1-jpg/azuria-voice",
+    "privacyPolicy": "https://github.com/kaikydev1-jpg/azuria-voice/blob/main/docs/electron-privacy.md",
+    "support": "https://github.com/kaikydev1-jpg/azuria-voice/issues",
+    "source": "https://github.com/kaikydev1-jpg/azuria-voice"
   },
   "requirements": {
     "diskGib": 10,
     "firstRunNetworkRequired": true,
     "architectures": {
-      "windows": ["x64", "arm64-experimental"],
-      "linux": ["x64"],
-      "macos": ["arm64", "x64-ui-only"]
+      "windows": [
+        "x64",
+        "arm64-experimental"
+      ],
+      "linux": [
+        "x64"
+      ],
+      "macos": [
+        "arm64",
+        "x64-ui-only"
+      ]
     },
     "minimumOs": {
       "windows": "Windows 10",

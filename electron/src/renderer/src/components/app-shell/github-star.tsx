@@ -3,7 +3,6 @@ import { StarIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getBridge } from '@/components/bridge';
 import { runRendererTask } from '@/lib/global-error-recovery';
-import { REPO_URL } from '@shared/utils/contactLinks';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 function GithubIcon({ className }: { className?: string }) {
@@ -14,6 +13,8 @@ function GithubIcon({ className }: { className?: string }) {
   );
 }
 
+// This legacy credit component refers to the upstream repository's count.
+const REPO_URL = 'https://github.com/debpalash/VoiceStudio';
 const STARS_URL = 'https://api.github.com/repos/debpalash/VoiceStudio';
 const REFRESH_MS = 20 * 60 * 1000;
 // The last bundled count remains visible when GitHub cannot be reached.

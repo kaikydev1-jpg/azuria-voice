@@ -104,8 +104,8 @@ assert.equal(hashes.sha512, fileSha, 'Update metadata SHA-512 matches artifact b
 const osToken = platform === 'win32' ? 'win' : platform === 'darwin' ? 'mac' : 'linux';
 const artifactBrand =
   process.env.VOICESTUDIO_DISTRIBUTION === 'microsoft-store'
-    ? 'VoiceStudio-MicrosoftStore'
-    : 'VoiceStudio-Electron';
+    ? 'Azuria-Voice-MicrosoftStore'
+    : 'Azuria-Voice-Electron';
 assert(
   fileUrl.startsWith(`${artifactBrand}-${expectedVersion}-${osToken}-${arch}.`),
   'Update artifact preserves the branded version/platform/architecture name',
@@ -131,7 +131,7 @@ if (platform === 'win32') {
   }).trim();
   assert.equal(
     updateInfo,
-    'gh-releases-zsync|debpalash|VoiceStudio|latest|VoiceStudio-Electron-*-linux-x64.AppImage.zsync',
+    'gh-releases-zsync|kaikydev1-jpg|azuria-voice|latest|Azuria-Voice-Electron-*-linux-x64.AppImage.zsync',
     'External AppImage updaters follow the stable Linux release feed',
   );
   const control = `${artifactPath}.zsync`;
@@ -139,7 +139,7 @@ if (platform === 'win32') {
   const header = readFileSync(control).subarray(0, 4096).toString('utf8');
   assert(
     header.includes(
-      `URL: https://github.com/debpalash/VoiceStudio/releases/download/v${expectedVersion}/${fileUrl}\n`,
+      `URL: https://github.com/kaikydev1-jpg/azuria-voice/releases/download/v${expectedVersion}/${fileUrl}\n`,
     ),
     'zsync downloads the matching release artifact',
   );

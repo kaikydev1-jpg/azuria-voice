@@ -5,6 +5,7 @@ import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:net';
+import { PRODUCT_NAME } from '../../config/app-config.mjs';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const targetArch = process.env.VOICESTUDIO_RUST_TARGET?.startsWith('aarch64')
   ? 'arm64'
@@ -35,9 +36,12 @@ const defaultExecutableCandidates =
             'electron/release/linux-unpacked/voicestudio-electron',
           ]
         : ['electron/release/linux-unpacked/voicestudio-electron'];
+const brandedExecutableCandidates = defaultExecutableCandidates.map((candidate) =>
+  candidate.replaceAll('VoiceStudio', PRODUCT_NAME).replaceAll('voicestudio-electron', 'azuria-voice-electron'),
+);
 const defaultExecutable =
-  defaultExecutableCandidates.find((candidate) => existsSync(resolve(repoRoot, candidate))) ??
-  defaultExecutableCandidates[0];
+  brandedExecutableCandidates.find((candidate) => existsSync(resolve(repoRoot, candidate))) ??
+  brandedExecutableCandidates[0];
 const executablePath = resolve(repoRoot, process.env.VOICESTUDIO_PACKAGED_EXE || defaultExecutable);
 const existing = process.env.VOICESTUDIO_TEST_PROFILE;
 const profile = existing || mkdtempSync(join(tmpdir(), 'voicestudio-packaged-check-'));
@@ -164,14 +168,14 @@ try {
     verifyManagedShutdown = true;
     console.log('PASS: packaged backend reached deferred startup before deliberate quit');
   } else if (setup) {
-    await window.getByText('VoiceStudio', { exact: true }).first().waitFor();
+    await window.getByText(PRODUCT_NAME, { exact: true }).first().waitFor();
     await app.evaluate(({ BrowserWindow }) => {
       BrowserWindow.getAllWindows()[0]?.setSize(960, 640);
     });
-    const setupLayout = await window.evaluate(() => {
+    const setupLayout = await window.evaluate((productName) => {
       const header = document.querySelector('header.workspace-titlebar');
       const scroller = document.querySelector('[data-testid="backend-gate-scroll"]');
-      const brand = header?.textContent?.includes('VoiceStudio') ? header : null;
+      const brand = header?.textContent?.includes(productName) ? header : null;
       const headerRect = header?.getBoundingClientRect();
       const scrollRect = scroller?.getBoundingClientRect();
       return {
@@ -183,7 +187,7 @@ try {
         width: document.documentElement.clientWidth,
         scrollWidth: document.documentElement.scrollWidth,
       };
-    });
+    }, PRODUCT_NAME);
     assert.equal(setupLayout.brandVisible, true, 'Setup branding must remain visible');
     assert.equal(setupLayout.headerTop, 0, 'Setup header must stay pinned to the window top');
     assert.equal(
@@ -395,7 +399,7 @@ try {
       );
     }
     if (!firstSound) {
-      await window.getByText('VoiceStudio', { exact: true }).first().waitFor({ timeout: 120_000 });
+      await window.getByText(PRODUCT_NAME, { exact: true }).first().waitFor({ timeout: 120_000 });
     }
     if (existing) {
       const deadline = Date.now() + 120_000;
