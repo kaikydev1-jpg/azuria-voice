@@ -28,7 +28,7 @@ O workflow [Azúria Voice Windows](https://github.com/kaikydev1-jpg/azuria-voice
 - `.exe.blockmap` e `electron-stable-win32-x64.yml` usados pelo atualizador;
 - `SHA256SUMS.txt`.
 
-Para publicar uma nova versão, altere a versão canônica no `package.json` da raiz e mantenha os espelhos `pyproject.toml` e `backend/core/version.py` iguais. Execute as verificações e envie o código para `main`. Em Actions, execute o workflow com **publish = true**. Ele cria `v<versão>` e publica os arquivos no seu repositório; recusa substituir uma release já existente.
+Para publicar uma nova versão, altere a versão canônica no `package.json` da raiz e mantenha os espelhos `pyproject.toml` e `backend/core/version.py` iguais. Execute as verificações e envie o código para `main`. Em Actions, execute o workflow com **publish = true** e **run_tests = true**. A opção `run_tests = false` permite reconstruir um pacote quando os testes já passaram para o mesmo código da aplicação; mantenha-a ativada para novas alterações de código. Ele cria `v<versão>` e publica os arquivos no seu repositório; recusa substituir uma release já existente.
 
 Mantenha o manifesto, o instalador e o blockmap na mesma release. O aplicativo instalado usa esse manifesto para encontrar a próxima versão sem trocar seus caminhos de dados. Os workflows de publicação herdados foram mantidos para consulta e execução manual apenas no repositório original; a distribuição Windows desta edição usa `azuria-windows.yml`. As verificações genéricas de segurança continuam ativas neste repositório.
 

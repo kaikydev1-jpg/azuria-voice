@@ -3,8 +3,15 @@ name: Azúria Voice Windows
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/workflows/azuria-windows.yml'
+      - 'docs/**'
   workflow_dispatch:
     inputs:
+      run_tests:
+        description: Run full tests (keep enabled for application source changes)
+        type: boolean
+        default: true
       publish:
         description: Publish this version to GitHub Releases
         type: boolean
@@ -51,7 +58,22 @@ jobs:
       - name: Install locked dependencies
         run: bun install --frozen-lockfile
       - name: Validate Electron
+        if: github.event_name != 'workflow_dispatch' || inputs.run_tests == true
         run: bun run check:electron
+      - name: Build source already covered by a passing test run
+        if: github.event_name == 'workflow_dispatch' && inputs.run_tests == false
+        shell: pwsh
+        run: |
+          node scripts/validate_store_foundation.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          bun run typecheck
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          bun run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          bun run build:web
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node electron/tests/packaging-contract.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build Windows installer
         working-directory: electron
         shell: pwsh
