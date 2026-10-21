@@ -2,6 +2,11 @@
 
 Esta distribuição usa o código do VoiceStudio 0.5.7, commit `28bf2c7a83b8a64836297340c52a45d716684aed`. A marca musical, as cores e os endereços de distribuição são próprios. As funções e os contratos dos motores permanecem na base original.
 
+A revisão de segurança e as pendências conhecidas estão no
+[relatório de 21/10/2026](security/2026-10-21-audit.md), com as correções no
+[PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
+nova versão instalada.
+
 ## Instalar no Windows
 
 1. Abra [Releases](https://github.com/kaikydev1-jpg/azuria-voice/releases) e baixe `Azuria-Voice-Electron-<versão>-win-x64.exe` e `SHA256SUMS.txt`.
@@ -23,7 +28,7 @@ O código conserva o suporte da base original, mas o pacote configurado nesta ed
 | Mac Intel | Interface com backend remoto; o backend local não é suportado, inclusive pelo código-fonte. |
 | Linux x64 com desktop X11/Wayland | Suporte desktop da base preservado; Azúria disponível pelo código-fonte até publicarmos e validarmos um pacote nativo. |
 
-Para executar pelo código-fonte em uma plataforma com backend local, instale Git, Node.js 22+, Bun 1.4.2, uv e Rust/Cargo com a toolchain nativa do sistema. A compilação do helper também exige as ferramentas nativas: Xcode Command Line Tools no macOS; compilador C/C++, `pkg-config` e bibliotecas de desenvolvimento de áudio/janelas no Linux; Visual Studio Build Tools com C++/Windows SDK no Windows.
+Para executar pelo código-fonte em uma plataforma com backend local, instale Git, Node.js 22.18+ (22.x), 24.11+ (24.x) ou 26+, Bun 1.4.2, uv e Rust/Cargo com a toolchain nativa do sistema. A compilação do helper também exige as ferramentas nativas: Xcode Command Line Tools no macOS; compilador C/C++, `pkg-config` e bibliotecas de desenvolvimento de áudio/janelas no Linux; Visual Studio Build Tools com C++/Windows SDK no Windows.
 
 ```bash
 git clone https://github.com/kaikydev1-jpg/azuria-voice.git
@@ -57,7 +62,7 @@ Para publicar uma nova versão, altere a versão canônica no `package.json` da 
 
 Mantenha o manifesto, o instalador e o blockmap na mesma release. O aplicativo instalado usa esse manifesto para encontrar a próxima versão sem trocar seus caminhos de dados. Os workflows de publicação herdados foram mantidos para consulta e execução manual apenas no repositório original; a distribuição Windows desta edição usa `azuria-windows.yml`. As verificações genéricas de segurança continuam ativas neste repositório.
 
-Para compilar localmente, instale Git, Node.js 22+, Bun 1.4.2, Rust e Visual Studio Build Tools com C++/Windows SDK, então execute `bun install --frozen-lockfile` e `bun run dist -- --win --x64`. Os scripts de validação de pacote e de primeira execução estão em `electron/tests/`.
+Para compilar localmente, instale Git, Node.js 22.18+ (22.x), 24.11+ (24.x) ou 26+, Bun 1.4.2, Rust e Visual Studio Build Tools com C++/Windows SDK, então execute `bun install --frozen-lockfile` e `bun run dist -- --win --x64`. Os scripts de validação de pacote e de primeira execução estão em `electron/tests/`.
 
 ## Atualização de segurança 0.5.8
 

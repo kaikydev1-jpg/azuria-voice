@@ -36,6 +36,9 @@ tools keep working unchanged whichever gate is set.
 
 ## Share PIN
 
+The PIN is installed before the LAN listener accepts requests and remains active
+until that listener stops, including cancelled or failed startup.
+
 The PIN is the lightweight, in-app path: flip on **Network** sharing (footer
 **Local** pill → **Network**, or **Settings → Sharing & Remote Access**) and the
 app generates a fresh **6-digit PIN** for that session. It is regenerated every

@@ -366,6 +366,14 @@ def is_ready(engine_id: str, *, import_check: bool = True) -> bool:
     return installed and configured
 
 
+class ArgosLanguageError(ValueError):
+    """An authored language-validation message safe for the translation UI."""
+
+    def __init__(self, public_message: str):
+        super().__init__(public_message)
+        self.public_message = public_message
+
+
 def argos_lang_code(value: str) -> str:
     """Return the base language token used by Argos package metadata.
 
@@ -385,7 +393,7 @@ def argos_lang_code(value: str) -> str:
         parts[0] in {"zh", "zho", "cmn"} and
         any(part in {"hant", "tw", "hk", "mo"} for part in parts[1:])
     ):
-        raise ValueError("Argos does not provide Traditional Chinese; choose NLLB for this script")
+        raise ArgosLanguageError("Argos does not provide Traditional Chinese; choose NLLB for this script")
     named = _ARGOS_NAME_ALIASES.get(key)
     if named:
         return named
@@ -395,7 +403,7 @@ def argos_lang_code(value: str) -> str:
     if named:
         return named
     if not re.fullmatch(r"[a-z]{2,3}", code):
-        raise ValueError("Choose a valid source and target language")
+        raise ArgosLanguageError("Choose a valid source and target language")
     return code
 
 

@@ -17,6 +17,92 @@ import pytest
 from services import network_share as ns
 
 
+def test_share_requires_pin_before_listener_accepts_its_first_request(monkeypatch):
+    from fastapi import FastAPI
+    import httpx
+    from main import NetworkAccessMiddleware
+
+    async def exercise():
+        app = FastAPI()
+        app.add_middleware(NetworkAccessMiddleware)
+
+        @app.get('/private')
+        def private():
+            return {'secret': 'local data'}
+
+        first_responses = []
+
+        class Server:
+            def __init__(self, _config):
+                self.started = False
+                self.should_exit = False
+
+            async def serve(self):
+                transport = httpx.ASGITransport(app=app, client=('192.168.1.99', 50000))
+                async with httpx.AsyncClient(transport=transport, base_url='http://localhost') as client:
+                    first_responses.append(await client.get('/private'))
+                self.started = True
+                while not self.should_exit:
+                    await asyncio.sleep(0)
+
+        monkeypatch.setattr(ns, '_runtime', ns._ShareRuntime())
+        monkeypatch.setattr(ns.uvicorn, 'Server', Server)
+        monkeypatch.setattr(ns, '_find_free_port', lambda *_: 3901)
+        monkeypatch.setattr(ns, 'lan_ipv4_addresses', lambda: ['192.168.1.42'])
+        try:
+            state = await ns.enable(app)
+            assert state.enabled
+            assert first_responses[0].status_code == 401
+            assert first_responses[0].json() == {'detail': 'PIN required'}
+        finally:
+            await ns.disable(app)
+
+    asyncio.run(exercise())
+
+
+def test_cancelling_share_startup_closes_listener_before_clearing_pin(monkeypatch):
+    async def exercise():
+        app = SimpleNamespace(state=SimpleNamespace())
+        accepting = asyncio.Event()
+        stopped = asyncio.Event()
+        observations = []
+
+        class Server:
+            def __init__(self, _config):
+                self.started = False
+                self.should_exit = False
+
+            async def serve(self):
+                accepting.set()
+                while not self.should_exit:
+                    await asyncio.sleep(0)
+                observations.append(getattr(app.state, 'network_share', None))
+                stopped.set()
+
+        monkeypatch.setattr(ns, '_runtime', ns._ShareRuntime())
+        monkeypatch.setattr(ns.uvicorn, 'Server', Server)
+        monkeypatch.setattr(ns, '_find_free_port', lambda *_: 3901)
+        monkeypatch.setattr(ns, 'lan_ipv4_addresses', lambda: ['192.168.1.42'])
+        enabling = asyncio.create_task(ns.enable(app))
+        try:
+            await accepting.wait()
+            serving = ns._runtime.task
+            enabling.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await enabling
+            assert stopped.is_set(), 'cancellation left a LAN listener running'
+            assert observations[0].pin
+            assert not ns.get_state().enabled
+            assert app.state.network_share.pin is None
+        finally:
+            # Clean up even when the regression leaves the server untracked.
+            if not serving.done():
+                serving.cancel()
+            await asyncio.gather(serving, return_exceptions=True)
+
+    asyncio.run(exercise())
+
+
 @pytest.mark.parametrize('second_operation', ['enable', 'disable'])
 def test_overlapping_lifecycle_calls_leave_no_listener_or_mcp_hosts(monkeypatch, second_operation):
     from services import network_share as ns

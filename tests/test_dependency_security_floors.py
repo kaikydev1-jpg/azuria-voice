@@ -19,7 +19,7 @@ PYTHON_FLOORS = {
     # still flags fixed releases; this floor is the real guard.
     "lightning": "2.6.6",
     "mako": "1.4.2",
-    "mcp": "1.28.1",
+    "mcp": "1.30.0",
     "msgpack": "1.2.1",
     "multidict": "6.9.1",
     "nltk": "3.10.0",

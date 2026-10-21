@@ -242,8 +242,11 @@ async def test_outer_abandonment_terminates_owned_sidecar(tmp_path, monkeypatch,
                 work = run_on_gpu_pool_guarded(lambda: backend.generate('hang'), executor=executor, timeout=0.5)
             with pytest.raises(TimeoutError):
                 await work
-            assert backend._proc is not None
-            await asyncio.wait_for(asyncio.to_thread(backend._proc.wait, timeout=5), timeout=6)
-            assert backend._proc.poll() is not None
+            # The receive worker may clear _proc while we wait for shutdown.
+            # Keep the owned process handle so cleanup cannot race the assertion.
+            proc = backend._proc
+            assert proc is not None
+            await asyncio.wait_for(asyncio.to_thread(proc.wait, timeout=5), timeout=6)
+            assert proc.poll() is not None
         finally:
             backend.shutdown()
