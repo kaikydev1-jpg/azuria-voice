@@ -240,6 +240,16 @@ _NLLB_BATCH_SIZE_ENV = "OMNIVOICE_NLLB_BATCH_SIZE"
 _NLLB_MAX_BATCH_SIZE = 32
 
 
+def _segment_failure(engine: str, error: BaseException) -> str:
+    """Fixed per-segment failure text; engine exceptions can carry local paths."""
+    from core.public_errors import public_failure
+
+    return public_failure(
+        logger, f"{engine} segment translation failed", error,
+        response="Translation failed for this segment. Retry or choose another engine.",
+    )
+
+
 def _nllb_batch_size() -> int:
     """Bound NLLB forward-pass width; explicit overrides remain available."""
     configured = os.environ.get(_NLLB_BATCH_SIZE_ENV, "").strip()
@@ -458,8 +468,12 @@ async def dub_translate(req: TranslateRequest):
                         else:
                             _nllb_device = "cpu"
                 except Exception as e:
-                    logger.exception("NLLB model load failed")
-                    return [{"id": seg.id, "text": seg.text, "error": f"Model load error: {str(e)}"} for seg in req.segments]
+                    from core.public_errors import public_failure
+                    error = public_failure(
+                        logger, "NLLB model load failed", e,
+                        response="Could not load the NLLB model. Repair the model and retry.",
+                    )
+                    return [{"id": seg.id, "text": seg.text, "error": error} for seg in req.segments]
 
                 from services.performance_profiles import translation_decode_defaults
 
@@ -537,7 +551,7 @@ async def dub_translate(req: TranslateRequest):
                                 results_by_index[index] = {
                                     "id": seg.id,
                                     "text": seg.text,
-                                    "error": str(batch_error),
+                                    "error": _segment_failure("NLLB", batch_error),
                                 }
                                 continue
                             # A single unusually long row must not sink its
@@ -560,7 +574,7 @@ async def dub_translate(req: TranslateRequest):
                                     results_by_index[index] = {
                                         "id": seg.id,
                                         "text": seg.text,
-                                        "error": str(row_error),
+                                        "error": _segment_failure("NLLB", row_error),
                                     }
                             continue
                         for (index, seg), translated_text in zip(batch, translated_texts):
@@ -870,6 +884,9 @@ async def dub_translate(req: TranslateRequest):
                 )
 
             def _translate_argos():
+                from core.stanza_safety import install_stanza_checkpoint_guard
+
+                install_stanza_checkpoint_guard()
                 import argostranslate.translate
 
                 from_code = pack_status["source_lang"]
@@ -889,7 +906,7 @@ async def dub_translate(req: TranslateRequest):
                         )
                         results.append({"id": seg.id, "text": translated_text})
                     except Exception as e:
-                        results.append({"id": seg.id, "text": seg.text, "error": str(e)})
+                        results.append({"id": seg.id, "text": seg.text, "error": _segment_failure("Argos", e)})
                 return results
 
             translated = await loop.run_in_executor(_cpu_pool, _translate_argos)

@@ -107,6 +107,41 @@ def test_argos_package_failure_withholds_private_diagnostics(monkeypatch, failur
     assert b"/srv/private" not in response.body
 
 
+def test_argos_segment_failure_withholds_private_diagnostics(monkeypatch):
+    from api.routers.dub_translate import dub_translate
+    from schemas.requests import TranslateRequest
+
+    _fake_argos(monkeypatch)
+    pack = types.SimpleNamespace(from_code="en", to_code="es")
+    monkeypatch.setattr(sys.modules["argostranslate.package"], "get_installed_packages", lambda: [pack])
+
+    def translate(text, *_codes):
+        if text == "boom":
+            raise RuntimeError(_PRIVATE)
+        return "hola"
+
+    monkeypatch.setattr(sys.modules["argostranslate.translate"], "translate", translate, raising=False)
+    result = asyncio.run(dub_translate(TranslateRequest(
+        provider="argos", source_lang="en", target_lang="es",
+        segments=[{"id": "ok", "text": "hello"}, {"id": "bad", "text": "boom"}],
+    )))
+    rows = {row["id"]: row for row in result["translated"]}
+    assert rows["ok"] == {"id": "ok", "text": "hola"}
+    assert rows["bad"]["text"] == "boom"
+    assert rows["bad"]["error"] == "Translation failed for this segment. Retry or choose another engine."
+    assert "private-canary" not in json.dumps(result)
+
+
+def test_segment_failure_logs_class_without_message(caplog):
+    from api.routers.dub_translate import _segment_failure
+
+    with caplog.at_level(logging.ERROR):
+        message = _segment_failure("NLLB", RuntimeError(_PRIVATE))
+    assert "private-canary" not in message
+    assert "class=RuntimeError" in caplog.text
+    assert "private-canary" not in caplog.text
+
+
 @pytest.mark.parametrize("lang, expected", [
     ("zh-TW", "Argos does not provide Traditional Chinese; choose NLLB for this script"),
     ("invalid!", "Choose a valid source and target language"),

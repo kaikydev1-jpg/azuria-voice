@@ -42,6 +42,7 @@ Atualização de segurança do Azúria Voice para Windows. Instale a nova versã
 **Highlights**
 
 - Preview iOS and Android companion apps for your own VoiceStudio
+- Azúria Voice: modelos Stanza da tradução Argos só carregam pesos, sem desserialização insegura (#11)
 
 ### Added
 
@@ -50,6 +51,9 @@ Atualização de segurança do Azúria Voice para Windows. Instale a nova versã
 
 ### Fixed
 
+- Azúria Voice: a tradução Argos recusa checkpoints Stanza que exigiriam desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
+- Azúria Voice: falhas por segmento da tradução NLLB e Argos não expõem mais diagnósticos internos (#11)
+- Azúria Voice: referência da API atualizada, corrigindo o aviso de `@ai-sdk/provider-utils` (#11)
 - Older synthesized takes play again with accurate play/pause controls after a newer generation (#3102)
 - Generation-complete notifications appear above the workspace instead of covering synthesis controls (#3102)
 - Generated speech no longer starts and ends with silence, and `[pause]` markers give exactly the pause you asked for (Raw preset and explicit durations untouched) (#3080)
