@@ -358,8 +358,24 @@ jobs:
             \( -iname '*Azu*' -o -iname '*Electron*' \) \
             -exec cp {} "$EVIDENCE/crash-reports/" \; 2>/dev/null || true
           ls -la "$EVIDENCE/crash-reports"
-          for report in "$EVIDENCE"/crash-reports/*; do
-            if [ -f "$report" ]; then head -c 6000 "$report"; echo; fi
+          for report in "$EVIDENCE"/crash-reports/*.ips; do
+            [ -f "$report" ] || continue
+            # .ips = one JSON header line + a JSON body; print the crash reason
+            # and the faulting thread with image names instead of raw offsets.
+            python3 -I - "$report" <<'PY' || true
+          import json, sys
+          header, body = open(sys.argv[1], encoding='utf-8').read().split('\n', 1)
+          report = json.loads(body)
+          for key in ('exception', 'termination', 'asi', 'ktriageinfo', 'vmRegionInfo'):
+              if key in report:
+                  print(f'{key}: {json.dumps(report[key])[:3000]}')
+          images = report.get('usedImages', [])
+          thread = report['threads'][report.get('faultingThread', 0)]
+          print('faulting thread:', thread.get('name'), thread.get('queue'))
+          for frame in thread.get('frames', [])[:40]:
+              image = images[frame['imageIndex']] if frame.get('imageIndex', -1) < len(images) else {}
+              print(f"  {image.get('name', '?'):<28} +{frame.get('imageOffset')} {frame.get('symbol', '')}")
+          PY
           done
           # Launch the app once without Playwright to tell an app crash from a
           # harness crash, then keep the unified log around the launch.
@@ -376,6 +392,25 @@ jobs:
             status=0; wait "$app_pid" || status=$?
             echo "direct launch exit status: $status" | tee -a "$EVIDENCE/direct-launch.log"
             tail -n 120 "$EVIDENCE/direct-launch.log"
+            echo "== Electron as plain Node (RunAsNode):"
+            ELECTRON_RUN_AS_NODE=1 "$MAC_APP_EXE" -e 'console.log("node ok", process.versions.electron, process.arch)' || echo "run-as-node exit $?"
+            # Same bundle re-signed ad hoc without entitlements: tells a crash
+            # caused by the signature/entitlements from one in the app itself.
+            PLAIN_ROOT=$(mktemp -d)
+            PLAIN_APP="$PLAIN_ROOT/$(basename "${MAC_APP_EXE%/Contents/MacOS/*}")"
+            ditto "${MAC_APP_EXE%/Contents/MacOS/*}" "$PLAIN_APP"
+            codesign --force --deep --sign - "$PLAIN_APP" 2>&1 | tail -n 2
+            "$PLAIN_APP/Contents/MacOS/$(basename "$MAC_APP_EXE")" --user-data-dir="$(mktemp -d)" --lang=en-US \
+              > "$EVIDENCE/plain-signature-launch.log" 2>&1 &
+            plain_pid=$!
+            sleep 25
+            if kill -0 "$plain_pid" 2>/dev/null; then
+              echo "plain-signature launch: still running after 25s"
+              kill "$plain_pid" 2>/dev/null || true
+            fi
+            status=0; wait "$plain_pid" || status=$?
+            echo "plain-signature launch exit status: $status"
+            tail -n 40 "$EVIDENCE/plain-signature-launch.log"
           fi
           log show --last 10m --style compact \
             --predicate 'process BEGINSWITH "Az" OR eventMessage CONTAINS[c] "zria Voice"' \
