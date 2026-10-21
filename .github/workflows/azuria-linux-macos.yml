@@ -276,7 +276,7 @@ jobs:
             VOICESTUDIO_PACKAGED_EXE="$APPIMAGE" VOICESTUDIO_SCREENSHOT="$EVIDENCE/setup-appimage.png" xvfb-run -a node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-appimage.log"
             VOICESTUDIO_PACKAGED_EXE="$DEB_BIN" xvfb-run -a node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-deb.log"
           else
-            VOICESTUDIO_PACKAGED_EXE="$MAC_APP_EXE" VOICESTUDIO_SCREENSHOT="$EVIDENCE/setup-dmg.png" node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-dmg.log"
+            ELECTRON_ENABLE_LOGGING=1 VOICESTUDIO_PACKAGED_EXE="$MAC_APP_EXE" VOICESTUDIO_SCREENSHOT="$EVIDENCE/setup-dmg.png" node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-dmg.log"
           fi
       - name: Remove the .deb installation
         if: runner.os == 'Linux'
@@ -345,6 +345,18 @@ jobs:
             electron/release/electron-stable-*.yml
             electron/release/SHA256SUMS.txt
             evidence/
+      - name: Collect macOS crash reports
+        if: failure() && runner.os == 'macOS'
+        run: |
+          mkdir -p "$EVIDENCE/crash-reports"
+          find "$HOME/Library/Logs/DiagnosticReports" /Library/Logs/DiagnosticReports \
+            -maxdepth 1 -type f -newer "$GITHUB_WORKSPACE/package.json" \
+            \( -iname '*Azu*' -o -iname '*Electron*' \) \
+            -exec cp {} "$EVIDENCE/crash-reports/" \; 2>/dev/null || true
+          ls -la "$EVIDENCE/crash-reports"
+          for report in "$EVIDENCE"/crash-reports/*; do
+            [ -f "$report" ] && head -c 6000 "$report" && echo
+          done
       - name: Save failure diagnostics
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
