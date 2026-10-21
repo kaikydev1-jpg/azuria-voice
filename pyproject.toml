@@ -306,6 +306,9 @@ url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [tool.uv]
+# Argos 1.11 pins vulnerable Stanza 1.10.1 (GHSA-v5jw-96jm-7h2c).
+# Remove this override when Argos permits the upstream security fix.
+override-dependencies = ["stanza>=1.12.2"]
 default-groups = ["dev", "cuda"]
 conflicts = [[{ group = "cpu" }, { group = "cuda" }]]
 constraint-dependencies = [

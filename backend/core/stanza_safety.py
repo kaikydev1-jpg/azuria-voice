@@ -4,7 +4,8 @@ Stanza <= 1.12.1 (GHSA-v5jw-96jm-7h2c) retries several model loaders with
 ``torch.load(..., weights_only=False)`` after PyTorch's secure unpickler
 rejects a file, and its lemma classifier calls ``torch.load`` without the
 flag. A crafted checkpoint can then execute code. Argos Translate 1.11 pins
-Stanza 1.10.1, so the fixed release cannot be resolved alongside it yet.
+Stanza 1.10.1; the project overrides that pin with the fixed Stanza release.
+This guard remains an additional protection alongside the dependency floor.
 
 The guard applies the policy of the upstream fix (1.12.2 raises instead of
 falling back) to calls made from Stanza modules only. Every other
