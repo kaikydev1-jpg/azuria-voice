@@ -7,6 +7,18 @@ A revisão de segurança e as pendências conhecidas estão no
 [PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
 nova versão instalada.
 
+## Atualização 0.5.9
+
+A versão 0.5.9 leva as correções do PR #9 ao instalador Windows: proteção do
+PIN desde o início do compartilhamento LAN, mensagens de erro sem diagnósticos
+privados e sessões MCP com limite e expiração. O aplicativo sincroniza o ambiente
+Python existente; não é necessário apagar modelos, vozes ou configurações.
+Os avisos de dependências ainda pendentes constam no relatório de segurança.
+
+O workflow Windows também valida pull requests com a verificação
+**Tests (backend + frontend)**: backend e regressões de segurança em modo offline,
+testes de frontend, compilação e verificação do instalador.
+
 ## Instalar no Windows
 
 1. Abra [Releases](https://github.com/kaikydev1-jpg/azuria-voice/releases) e baixe `Azuria-Voice-Electron-<versão>-win-x64.exe` e `SHA256SUMS.txt`.
