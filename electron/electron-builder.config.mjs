@@ -203,6 +203,11 @@ export default {
     ...(adhocSignMac ? { identity: '-' } : {}),
     notarize: notarizeMac,
     extendInfo: {
+      // electron-builder writes the executable and helper bundle names in NFD
+      // but CFBundleName in NFC. Electron finds its helpers through
+      // CFBundleName, so an accented name ("Azúria") traps at launch unless
+      // both use the same form. Finder shows CFBundleDisplayName, unchanged.
+      CFBundleName: PRODUCT_NAME.normalize('NFD'),
       NSMicrophoneUsageDescription: readFileSync(resolve(here, 'build/Info.plist'), 'utf8')
         .match(/<key>NSMicrophoneUsageDescription<\/key>\s*<string>([^<]+)<\/string>/)[1]
         .replaceAll('__APP_PRODUCT_NAME__', PRODUCT_NAME),

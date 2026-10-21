@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import './locale-encoding.mjs';
 import config from '../electron-builder.config.mjs';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -118,6 +118,11 @@ assert.equal(
   'Linux window and desktop entry share one identity',
 );
 assert(config.mac.extendInfo.NSMicrophoneUsageDescription.includes(PRODUCT_NAME));
+assert.equal(
+  config.mac.extendInfo.CFBundleName,
+  PRODUCT_NAME.normalize('NFD'),
+  'macOS CFBundleName uses the NFD form electron-builder gives the executable and helpers',
+);
 for (const entitlementFile of [config.mac.entitlements, config.mac.entitlementsInherit]) {
   const entitlements = readFileSync(resolve(root, entitlementFile), 'utf8');
   assert.match(entitlements, /<key>com\.apple\.security\.device\.audio-input<\/key>\s*<true\s*\/>/);
@@ -238,6 +243,28 @@ if (artifactRequested) {
     await verifyLinuxLibraries(resolve(artifactResources, 'native/voicestudio-desktop-bridge'));
   }
   assert(existsSync(artifactExecutable), 'Packaged VoiceStudio executable');
+  if (process.platform === 'darwin') {
+    // Electron resolves its helpers from CFBundleName; the names on disk must
+    // match it byte for byte (NFC vs NFD traps at launch).
+    const plistValue = (plist, key) => {
+      const read = spawnSync('plutil', ['-extract', key, 'raw', plist], { encoding: 'utf8' });
+      assert.equal(read.status, 0, `${plist} has ${key}\n${read.stderr}`);
+      return read.stdout.replace(/\n$/, '');
+    };
+    const bundleName = plistValue(resolve(artifactRoot, 'Info.plist'), 'CFBundleName');
+    assert.equal(
+      plistValue(resolve(artifactRoot, 'Info.plist'), 'CFBundleExecutable'),
+      bundleName,
+      'macOS executable name matches CFBundleName byte for byte',
+    );
+    const helpers = readdirSync(resolve(artifactRoot, 'Frameworks')).filter((name) =>
+      name.normalize('NFC').startsWith(`${PRODUCT_NAME} Helper`),
+    );
+    assert(helpers.length > 0, 'Packaged macOS helper apps');
+    for (const helper of helpers) {
+      assert(helper.startsWith(`${bundleName} Helper`), `Helper ${helper} matches CFBundleName`);
+    }
+  }
   assert(
     existsSync(
       resolve(

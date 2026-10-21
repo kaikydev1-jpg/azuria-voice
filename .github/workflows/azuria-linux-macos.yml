@@ -351,6 +351,7 @@ jobs:
             evidence/
       - name: Collect macOS crash reports
         if: failure() && runner.os == 'macOS'
+        timeout-minutes: 15
         run: |
           mkdir -p "$EVIDENCE/crash-reports"
           find "$HOME/Library/Logs/DiagnosticReports" /Library/Logs/DiagnosticReports \
@@ -387,7 +388,7 @@ jobs:
             sleep 25
             if kill -0 "$app_pid" 2>/dev/null; then
               echo "direct launch: still running after 25s" | tee -a "$EVIDENCE/direct-launch.log"
-              kill "$app_pid" 2>/dev/null || true
+              kill "$app_pid" 2>/dev/null || true; sleep 5; kill -9 "$app_pid" 2>/dev/null || true
             fi
             status=0; wait "$app_pid" || status=$?
             echo "direct launch exit status: $status" | tee -a "$EVIDENCE/direct-launch.log"
@@ -416,7 +417,7 @@ jobs:
               trace_pid=$!
               sleep 20
               alive=no
-              if kill -0 "$trace_pid" 2>/dev/null; then alive=yes; kill "$trace_pid" 2>/dev/null || true; fi
+              if kill -0 "$trace_pid" 2>/dev/null; then alive=yes; kill "$trace_pid" 2>/dev/null || true; sleep 5; kill -9 "$trace_pid" 2>/dev/null || true; fi
               status=0; wait "$trace_pid" || status=$?
               echo "== trace $variant: alive after 20s=$alive exit=$status"
               grep -E '^\[trace|supervisor|Error' "$trace_log" | tail -n "$([ "$variant" = full ] && echo 80 || echo 12)" || true
@@ -450,7 +451,7 @@ jobs:
               "$2" --user-data-dir="$(mktemp -d)" --lang=en-US > "$log" 2>&1 &
               pid=$!
               sleep 20
-              if kill -0 "$pid" 2>/dev/null; then alive=yes; kill "$pid" 2>/dev/null || true; fi
+              if kill -0 "$pid" 2>/dev/null; then alive=yes; kill "$pid" 2>/dev/null || true; sleep 5; kill -9 "$pid" 2>/dev/null || true; fi
               wait "$pid" || status=$?
               echo "== bundle $1: alive after 20s=$alive exit=$status"
               tail -n 5 "$log"

@@ -53,6 +53,7 @@ Atualização de segurança do Azúria Voice para Windows. Instale a nova versã
 ### Fixed
 
 - Azúria Voice: Stanza 1.12.2+ forçado na tradução Argos, corrigindo a desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
+- Azúria Voice: o app do macOS não fecha mais ao abrir por causa do acento no nome (CFBundleName na mesma forma Unicode dos arquivos) (#12)
 - Azúria Voice: a tradução Argos recusa checkpoints Stanza que exigiriam desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
 - Azúria Voice: falhas por segmento da tradução NLLB e Argos não expõem mais diagnósticos internos (#11)
 - Azúria Voice: referência da API atualizada, corrigindo o aviso de `@ai-sdk/provider-utils` (#11)
