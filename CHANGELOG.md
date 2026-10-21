@@ -9,6 +9,24 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 `package.json` is the maintained app-version source of truth; Electron package
 metadata and the backend fallback mirror it.
 
+## [0.5.8] — 2026-10-21
+
+Atualização de segurança do Azúria Voice para Windows. Instale a nova versão para atualizar o ambiente local, mantendo suas configurações e os modelos já baixados.
+
+**Highlights**
+
+- Processamento de imagens com Pillow 13.0.0 (#6)
+- Certificados HTTPS atualizados com certifi 2026.10.19 (#6)
+- Dependências da demonstração antiga em Gradio retiradas (#6)
+
+### Fixed
+
+- Exige Pillow 13.0.0 e certifi 2026.10.19 para proteger o processamento de imagens e atualizar as autoridades de certificação (#6) — thanks @dependabot[bot]!
+
+### Changed
+
+- Retira a demonstração antiga em Gradio e mantém o aplicativo Electron, a API e o cliente da integração SoniTranslate (#6)
+
 ## [Unreleased]
 
 **Highlights**

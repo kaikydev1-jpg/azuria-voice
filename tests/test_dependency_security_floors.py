@@ -9,8 +9,9 @@ from packaging.version import Version
 
 PYTHON_FLOORS = {
     "aiohttp": "3.14.3",
+    # GHSA-6q48-6c7w-9gw2: remove compromised emSign roots.
+    "certifi": "2026.10.19",
     "cryptography": "50.0.0",
-    "gradio": "6.15.1",
     # Hydra instantiate and logging-config callable resolution, fixed in 1.3.7.
     "hydra-core": "1.3.7",
     # GHSA-qqmf-gpg7-g8gw: checkpoint _instantiator code execution, fixed in
@@ -22,7 +23,8 @@ PYTHON_FLOORS = {
     "msgpack": "1.2.1",
     "multidict": "6.9.1",
     "nltk": "3.10.0",
-    "pillow": "12.3.0",
+    # GHSA-8g5g-8vmr-9782 and the Pillow 13 decoder/encoder fixes.
+    "pillow": "13.0.0",
     "protobuf": "5.29.6",
     "pydantic-settings": "2.14.2",
     "pygments": "2.20.0",
