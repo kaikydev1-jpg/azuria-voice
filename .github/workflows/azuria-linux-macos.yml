@@ -462,6 +462,15 @@ jobs:
               try_launch ascii-name "$EXP/ascii/Azuria Voice.app/Contents/MacOS/Azuria Voice"; } || echo "ascii rename failed"
             { ditto "$SOURCE_BUNDLE" "$EXP/folder/Azuria Voice.app" &&
               try_launch ascii-folder-only "$EXP/folder/Azuria Voice.app/Contents/MacOS/$(basename "$MAC_APP_EXE")"; } || echo "folder rename failed"
+            # electron-builder writes file names in NFD but CFBundleName in NFC,
+            # and Electron finds its helpers through CFBundleName.
+            mkdir "$EXP/nfd"
+            NFD_APP="$EXP/nfd/$(basename "$SOURCE_BUNDLE")"
+            ditto "$SOURCE_BUNDLE" "$NFD_APP"
+            plutil -replace CFBundleName -string "$(basename "$MAC_APP_EXE")" "$NFD_APP/Contents/Info.plist"
+            codesign --force --deep --sign - "$NFD_APP" >/dev/null 2>&1
+            echo "CFBundleName bytes: original $(/usr/libexec/PlistBuddy -c 'Print :CFBundleName' "$SOURCE_BUNDLE/Contents/Info.plist" | od -An -tx1 | tr -d ' \n'), executable $(basename "$MAC_APP_EXE" | od -An -tx1 | tr -d ' \n')"
+            try_launch nfd-bundle-name "$NFD_APP/Contents/MacOS/$(basename "$MAC_APP_EXE")" || echo "nfd launch failed"
             STOCK=$(find node_modules electron/node_modules -path '*/electron/dist/Electron.app' -type d -print -quit 2>/dev/null || true)
             if [ -n "$STOCK" ]; then
               ditto "$STOCK" "$EXP/stock/Electron.app"
