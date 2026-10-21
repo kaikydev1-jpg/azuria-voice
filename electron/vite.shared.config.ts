@@ -43,6 +43,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/shared/test/setup.js'],
+    // Slow CI hosts (the macOS Intel runner) raise vitest's 5s per-test budget.
+    testTimeout: Number(process.env.VOICESTUDIO_TEST_TIMEOUT_MS) || 5_000,
     include: ['src/shared/**/*.test.{js,jsx,ts,tsx}'],
     css: false,
   },

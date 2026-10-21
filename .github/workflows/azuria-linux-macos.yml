@@ -57,7 +57,9 @@ jobs:
             local_runtime: true
             optional: false
           - label: macOS arm64
-            runner: macos-15
+            # macos-15 arm64 jobs were repeatedly dropped for GitHub capacity
+            # ("not acquired by Runner"); macos-14 is the same native arm64 class.
+            runner: macos-14
             platform: darwin
             arch: arm64
             target: aarch64-apple-darwin
@@ -85,6 +87,8 @@ jobs:
       VOICESTUDIO_UPDATE_CHANNEL: electron-stable-${{ matrix.platform }}-${{ matrix.arch }}
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       EVIDENCE: ${{ github.workspace }}/evidence
+      # The Intel runner runs jsdom suites several times slower than the others.
+      VOICESTUDIO_TEST_TIMEOUT_MS: ${{ matrix.optional && '30000' || '' }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:

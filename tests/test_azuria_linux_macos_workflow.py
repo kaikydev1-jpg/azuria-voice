@@ -35,7 +35,7 @@ def test_primary_targets_run_natively_and_independently():
     assert strategy["fail-fast"] == "false"
     legs = {(leg["platform"], leg["arch"]): leg for leg in strategy["matrix"]["include"]}
     assert legs[("linux", "x64")]["runner"] == "ubuntu-24.04"
-    assert legs[("darwin", "arm64")]["runner"] == "macos-15"
+    assert legs[("darwin", "arm64")]["runner"] == "macos-14"
     for key in (("linux", "x64"), ("darwin", "arm64")):
         assert legs[key]["optional"] == "false"
         assert legs[key]["local_runtime"] == "true"
