@@ -46,6 +46,7 @@ Atualização de segurança do Azúria Voice para Windows. Instale a nova versã
 
 ### Added
 
+- Azúria Voice: pacotes de teste Linux x64 (AppImage e .deb) e macOS Apple Silicon (.dmg e .zip, assinatura ad hoc) compilados e testados no GitHub Actions (#12)
 - Preview iOS and Android companion apps: drive your own VoiceStudio from your phone (speak, voices and cloning, dubbing, dictation) after pairing by QR code; build from source for now ([guide](docs/mobile.md)) (#2965)
 - Smart Fit speed limits: set the fastest and slowest speed dubbing may apply to a line, from the Timing section (#3026) — thanks @MoonDragon-MD!
 
