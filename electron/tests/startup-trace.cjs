@@ -2,7 +2,8 @@
 // call written to stderr synchronously before it runs. A native startup trap
 // prints no message and no JS stack, so the last logged call names the culprit.
 // AZURIA_TRACE_SKIP=app.setName,... turns the listed calls into no-ops that
-// return true (a skipped single-instance lock counts as held) to test a suspect; AZURIA_TRACE_MAIN=bare opens a blank window without the app code.
+// return true (a skipped single-instance lock counts as held) to test a suspect;
+// AZURIA_TRACE_MAIN=bare opens a blank window without the app code.
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
