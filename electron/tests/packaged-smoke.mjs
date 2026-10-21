@@ -84,6 +84,7 @@ const app = await electron.launch({
   executablePath,
   args: [
     '--user-data-dir=' + profile,
+    '--lang=en-US',
     ...(wayland ? ['--ozone-platform=wayland'] : []),
     ...(Number.isFinite(scaleFactor) && scaleFactor > 0
       ? [`--force-device-scale-factor=${scaleFactor}`]
@@ -139,6 +140,12 @@ try {
   const errors = [];
   window.on('pageerror', (error) => errors.push(error.message));
   await window.waitForURL('app://voicestudio/**');
+  const localeChanged = await window.evaluate(() => {
+    if (localStorage.getItem('voicestudio.locale') === 'en') return false;
+    localStorage.setItem('voicestudio.locale', 'en');
+    return true;
+  });
+  if (localeChanged) await window.reload();
   if (firstSound) {
     const resumed = await window.evaluate(() => {
       const complete = localStorage.getItem('voicestudio.setup.complete.v1') === '1';
@@ -455,6 +462,11 @@ try {
   }
 } catch (error) {
   const windows = app.windows();
+  if (windows[0]) {
+    console.error('Renderer text:', await windows[0].locator('body').innerText().catch(() => 'No renderer text'));
+    if (process.env.VOICESTUDIO_SCREENSHOT)
+      await windows[0].screenshot({ path: process.env.VOICESTUDIO_SCREENSHOT }).catch(() => {});
+  }
   if (windows[0])
     console.error(
       await windows[0]

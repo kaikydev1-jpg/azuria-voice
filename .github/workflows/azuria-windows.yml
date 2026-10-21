@@ -75,6 +75,7 @@ jobs:
           node electron/tests/packaging-contract.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build Windows installer
+        id: package
         working-directory: electron
         shell: pwsh
         env:
@@ -93,8 +94,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify packaged startup
         working-directory: electron
+        env:
+          VOICESTUDIO_SCREENSHOT: ${{ github.workspace }}/electron/release/startup.png
         run: node tests/packaged-smoke.mjs --setup
       - name: Write SHA-256 checksums
+        id: checksums
+        if: always() && steps.package.outcome == 'success'
         shell: pwsh
         run: |
           $assets = @(Get-ChildItem electron/release -File | Where-Object { $_.Name -like 'Azuria-Voice-Electron-*.exe*' -or $_.Name -eq 'electron-stable-win32-x64.yml' })
@@ -102,6 +107,7 @@ jobs:
           $lines = $assets | Sort-Object Name | ForEach-Object { "{0}  {1}" -f (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name }
           $lines | Set-Content electron/release/SHA256SUMS.txt -Encoding utf8NoBOM
       - name: Save installer, updater feed and checksums
+        if: always() && steps.package.outcome == 'success' && steps.checksums.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: Azuria-Voice-Windows-x64
@@ -112,6 +118,13 @@ jobs:
             electron/release/Azuria-Voice-Electron-*.exe.blockmap
             electron/release/electron-stable-win32-x64.yml
             electron/release/SHA256SUMS.txt
+      - name: Save startup diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Azuria-Voice-startup-diagnostics
+          path: electron/release/startup.png
+          if-no-files-found: warn
 
   publish:
     if: github.event_name == 'workflow_dispatch' && inputs.publish == true

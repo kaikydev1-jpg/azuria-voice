@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
@@ -11,10 +12,32 @@ describe('installAppIdentity', () => {
   it('names Electron internals consistently', () => {
     const setName = vi.fn();
 
-    installAppIdentity({ setName });
+    installAppIdentity({ setName, userAgentFallback: 'Mozilla/5.0 Electron/44.3.0' });
 
     expect(setName).toHaveBeenCalledOnce();
     expect(setName).toHaveBeenCalledWith('Azúria Voice');
+  });
+
+  it('keeps custom-protocol request headers ASCII after setting an accented display name', () => {
+    const application = {
+      userAgentFallback: 'Mozilla/5.0 Electron/44.3.0',
+      // Electron derives its default User-Agent from setName before windows exist.
+      setName: vi.fn((name: string) => {
+        application.userAgentFallback =
+          `Mozilla/5.0 ${name.replaceAll(' ', '')}/0.5.7 Electron/44.3.0`;
+      }),
+    };
+
+    installAppIdentity(application);
+
+    expect(application.setName).toHaveBeenCalledWith('Azúria Voice');
+    expect(application.userAgentFallback).toMatch(/^[\x20-\x7e]+$/);
+    const request = new Request('app://voicestudio/assets/index.js', {
+      headers: { 'User-Agent': application.userAgentFallback },
+    });
+    expect(request.headers.get('user-agent')).toBe(
+      'Mozilla/5.0 AzuriaVoice/0.5.7 Electron/44.3.0',
+    );
   });
 
   it('defines the complete native macOS menu with Azúria Voice app labels', () => {

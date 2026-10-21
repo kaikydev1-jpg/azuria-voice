@@ -3,9 +3,14 @@ import { PRODUCT_NAME } from '../../../config/app-config.mjs';
 
 export const DESKTOP_APP_NAME = PRODUCT_NAME;
 
-/** Set before Electron creates the native application menu. */
-export function installAppIdentity(application: Pick<App, 'setName'>): void {
+/** Set before Electron creates sessions, windows or the native application menu. */
+export function installAppIdentity(application: Pick<App, 'setName' | 'userAgentFallback'>): void {
   application.setName(DESKTOP_APP_NAME);
+  // Chromium derives this header from the accented display name. Its custom
+  // protocol bridge requires ASCII header values or renderer assets cannot load.
+  application.userAgentFallback = application.userAgentFallback
+    .normalize('NFKD')
+    .replace(/[^\x20-\x7e]/g, '');
 }
 
 export function createMacApplicationMenuTemplate(): MenuItemConstructorOptions[] {
