@@ -32,6 +32,8 @@ PYTHON_FLOORS = {
     "pytorch-lightning": "2.6.6",
     "python-multipart": "0.0.31",
     "starlette": "1.3.1",
+    # GHSA-v5jw-96jm-7h2c: reject unsafe checkpoint unpickling fallbacks.
+    "stanza": "1.12.2",
     "transformers": "5.10.0",
     "yt-dlp": "2026.7.4",
 }
