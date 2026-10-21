@@ -9,17 +9,11 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 `package.json` is the maintained app-version source of truth; Electron package
 metadata and the backend fallback mirror it.
 
-## [0.5.10] — 2026-10-21
-
-Mais segurança na tradução do Azúria Voice para Windows. Esta versão corrige o carregamento de modelos Stanza no Argos e evita expor diagnósticos internos nas falhas de tradução. Instale sobre a versão atual para manter modelos, vozes, projetos e configurações; o aplicativo sincroniza o ambiente local.
+## [Unreleased]
 
 **Highlights**
 
-- Tradução Argos com Stanza 1.12.2 e proteção adicional ao carregar modelos (#11)
-- Falhas de tradução NLLB e Argos com mensagens públicas sem diagnósticos privados (#11)
-- Referência da API atualizada e pendências de segurança documentadas (#11)
-
-O histórico da base VoiceStudio abaixo é preservado; as novidades desta distribuição são as correções identificadas com (#11).
+- Preview iOS and Android companion apps for your own VoiceStudio
 
 ### Added
 
@@ -28,10 +22,6 @@ O histórico da base VoiceStudio abaixo é preservado; as novidades desta distri
 
 ### Fixed
 
-- Azúria Voice: Stanza 1.12.2+ forçado na tradução Argos, corrigindo a desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
-- Azúria Voice: a tradução Argos recusa checkpoints Stanza que exigiriam desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
-- Azúria Voice: falhas por segmento da tradução NLLB e Argos não expõem mais diagnósticos internos (#11)
-- Azúria Voice: referência da API atualizada, corrigindo o aviso de `@ai-sdk/provider-utils` (#11)
 - Older synthesized takes play again with accurate play/pause controls after a newer generation (#3102)
 - Generation-complete notifications appear above the workspace instead of covering synthesis controls (#3102)
 - Generated speech no longer starts and ends with silence, and `[pause]` markers give exactly the pause you asked for (Raw preset and explicit durations untouched) (#3080)
@@ -69,6 +59,23 @@ O histórico da base VoiceStudio abaixo é preservado; as novidades desta distri
 - New `mobile` workflow builds and tests both phone apps; a contract test fails when their theme or API description drifts from the desktop app (#2965)
 
 - Gallery preview fallback smoke no longer flakes when a slower runner reads the playing clip in several byte ranges (#3018)
+
+## [0.5.10] — 2026-10-21
+
+Mais segurança na tradução do Azúria Voice para Windows. Esta versão corrige o carregamento de modelos Stanza no Argos e evita expor diagnósticos internos nas falhas de tradução. Instale sobre a versão atual para manter modelos, vozes, projetos e configurações; o aplicativo sincroniza o ambiente local.
+
+**Highlights**
+
+- Tradução Argos com Stanza 1.12.2 e proteção adicional ao carregar modelos (#11)
+- Falhas de tradução NLLB e Argos com mensagens públicas sem diagnósticos privados (#11)
+- Referência da API atualizada e pendências de segurança documentadas (#11)
+
+### Fixed
+
+- Azúria Voice: Stanza 1.12.2+ forçado na tradução Argos, corrigindo a desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
+- Azúria Voice: a tradução Argos recusa checkpoints Stanza que exigiriam desserialização insegura (GHSA-v5jw-96jm-7h2c) (#11)
+- Azúria Voice: falhas por segmento da tradução NLLB e Argos não expõem mais diagnósticos internos (#11)
+- Azúria Voice: referência da API atualizada, corrigindo o aviso de `@ai-sdk/provider-utils` (#11)
 
 ## [0.5.9] — 2026-10-21
 

@@ -17,6 +17,13 @@ def test_release_notes_preserve_portuguese_and_exclude_adjacent_versions(tmp_pat
     assert release_notes("0.5.9", changelog) == "Proteção da voz e sessões.\n"
 
 
+def test_0510_notes_exclude_inherited_unreleased_backlog():
+    changelog = Path(__file__).resolve().parents[1] / "CHANGELOG.md"
+    notes = release_notes("0.5.10", changelog)
+    entries = [line for line in notes.splitlines() if line.startswith("- ")]
+    assert entries and all("(#11)" in line for line in entries)
+
+
 @pytest.mark.parametrize("content", ["## [0.5.8]\nOld\n", "## [0.5.9]\n\n## [0.5.8]\nOld\n"])
 def test_release_notes_refuse_missing_or_empty_version(tmp_path, content):
     changelog = tmp_path / "CHANGELOG.md"
