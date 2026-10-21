@@ -59,11 +59,11 @@ Mantenha o manifesto, o instalador e o blockmap na mesma release. O aplicativo i
 
 Para compilar localmente, instale Git, Node.js 22+, Bun 1.4.2, Rust e Visual Studio Build Tools com C++/Windows SDK, então execute `bun install --frozen-lockfile` e `bun run dist -- --win --x64`. Os scripts de validação de pacote e de primeira execução estão em `electron/tests/`.
 
-## Manutenção de segurança após a versão 0.5.7
+## Atualização de segurança 0.5.8
 
 O código atualizado exige Pillow 13.0.0 e certifi 2026.10.19 para corrigir, respectivamente, o aviso crítico GHSA-8g5g-8vmr-9782 e a lista de autoridades de certificação do aviso GHSA-6q48-6c7w-9gw2. A antiga demonstração `omnivoice-demo` em Gradio deixou de integrar o pacote: o servidor Gradio exigia Pillow abaixo de 13. O aplicativo Electron, a API e os motores de voz permanecem; `gradio-client` continua disponível para a integração remota SoniTranslate. O extra `ui` conserva apenas as dependências do cliente remoto.
 
-Essas mudanças no código-fonte não substituem o instalador já publicado como 0.5.7 nem atualizam automaticamente um ambiente Python existente. As cópias históricas da demonstração no código não são uma interface suportada desta distribuição.
+Use o instalador Windows 0.5.8 ou atualize o checkout e sincronize o ambiente com o novo lockfile. O instalador 0.5.7 já publicado permanece intacto e não contém essas mudanças. As cópias históricas da demonstração no código não são uma interface suportada desta distribuição.
 
 ## Licenças e serviços
 

@@ -25,7 +25,7 @@
 - [x] Raise `PYTHON_FLOORS` in `tests/test_dependency_security_floors.py` for Pillow to 13.0.0 and add certifi 2026.10.19. Update `tests/test_video_context.py` to require the secure runtime floor. Run these tests first and confirm the vulnerable lock fails.
 - [x] Change `pyproject.toml` to require the patched versions; run `uv lock --upgrade-package pillow --upgrade-package certifi`. If resolution fails, inspect the conflicting requirement before deciding on a compatibility change.
 - [x] Install only the patched packages in the development test environment, run the dependency/image tests and the relevant TLS/network tests, and perform an actual HTTPS request with verification enabled.
-- [ ] Update the distribution security guide and changelog, inspect all changes, commit and push onto the existing Dependabot PR branch. Read review comments and wait for Security analysis.
+- [x] Update the distribution security guide and changelog, inspect all changes, commit and push onto the existing Dependabot PR branch. Read review comments and wait for Security analysis.
 - [ ] Integrate only under the repository merge protocol. The inherited `Tests (backend + frontend)` job is limited to the upstream repository; if it cannot run here, obtain a concrete owner exception after presenting the verified PR instead of silently bypassing that requirement.
 
 ## Execution ledger
@@ -37,3 +37,5 @@
 - Owner approved retiring the legacy Gradio demo to enable the Pillow security update. `gradio-client` stays a default dependency for SoniTranslate.
 - Verification: 73 targeted dependency/image/network tests passed; 509 backend/cover/sidecar tests passed, 9 skipped; verified HTTPS returned 200 with the patched certifi bundle. Use Python 3.11 and UTF-8 for these Windows checks.
 - `uv lock --check` and a frozen CPU sync dry run passed. Only Pillow and certifi versions changed versus main; nine dependencies belonging to the retired demo were removed.
+
+- Maintainer explicitly authorized the one-off PR #6 merge-protocol exception after Security passes, and authorized generating, publishing and installing Windows 0.5.8. Version mirrors were updated together; 29 dependency/version/image/changelog checks passed after the bump.
