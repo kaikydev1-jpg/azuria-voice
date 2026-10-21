@@ -9,6 +9,15 @@ from pathlib import Path
 from urllib.parse import urlparse
 from check_electron_release_assets import verify_release
 
+def release_notes(version, changelog_path=Path("CHANGELOG.md")):
+    """Require the authored UTF-8 notes for the exact release version."""
+    section = re.search(rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## |\Z)",
+                        changelog_path.read_text(encoding="utf-8"), re.M | re.S)
+    if not section or not section[1].strip():
+        raise ValueError("Write versioned CHANGELOG notes before release")
+    return section[1].strip() + "\n"
+
+
 def validate_sunset(manifest, tag):
     if manifest.get("version") != tag.removeprefix("v"):
         raise ValueError("Tauri version must match sunset tag")
@@ -45,12 +54,7 @@ def prepare(assets, tag, sunset_tag=None):
     if sunset_tag:
         for name in ("latest.json", "latest-user.json"):
             validate_sunset(json.loads((assets / name).read_text()), sunset_tag)
-    section = re.search(rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## |\Z)",
-                        Path("CHANGELOG.md").read_text(), re.M | re.S)
-    if not section or not section[1].strip():
-        raise ValueError("Write versioned CHANGELOG notes before release")
-    notes = section[1].strip() + "\n"
-    (assets / "RELEASE_NOTES.md").write_text(notes)
+    (assets / "RELEASE_NOTES.md").write_text(release_notes(version), encoding="utf-8")
     (assets / "SHA256SUMS.txt").write_text("\n".join(
         f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}" for p in sorted(files)
         if p.name not in {"SHA256SUMS.txt", "RELEASE_NOTES.md"}) + "\n")

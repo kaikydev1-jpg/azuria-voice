@@ -9,7 +9,9 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 `package.json` is the maintained app-version source of truth; Electron package
 metadata and the backend fallback mirror it.
 
-## [Unreleased]
+## [0.5.9] — 2026-10-21
+
+Atualização de segurança do Azúria Voice para Windows. O instalador preserva suas configurações e modelos; o ambiente local é sincronizado pelo aplicativo.
 
 **Highlights**
 
