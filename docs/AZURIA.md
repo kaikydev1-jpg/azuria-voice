@@ -12,6 +12,31 @@ Esta distribuição usa o código do VoiceStudio 0.5.7, commit `28bf2c7a83b8a648
 
 Instaladores sem certificado de assinatura podem mostrar o editor como desconhecido no Windows. A compilação aceita os segredos opcionais `ELECTRON_WINDOWS_CSC_LINK` e `ELECTRON_WINDOWS_CSC_KEY_PASSWORD` para um certificado próprio. Não use credenciais ou a identidade comercial dos mantenedores originais.
 
+## macOS, Linux e execução pelo código-fonte
+
+O código conserva o suporte da base original, mas o pacote configurado nesta edição é o Windows `.exe`; esse arquivo não instala no macOS nem no Linux. As verificações desta edição foram executadas no Windows. Ainda não compilamos nem testamos pacotes nativos do Azúria Voice em macOS/Linux.
+
+| Plataforma | Suporte da base e situação desta edição |
+| --- | --- |
+| Windows x64 | Workflow de instalador NSIS e verificações locais disponíveis. |
+| Mac com Apple Silicon, macOS 13.3+ | Backend local suportado pela base; Azúria disponível pelo código-fonte até publicarmos e validarmos um pacote nativo. |
+| Mac Intel | Interface com backend remoto; o backend local não é suportado, inclusive pelo código-fonte. |
+| Linux x64 com desktop X11/Wayland | Suporte desktop da base preservado; Azúria disponível pelo código-fonte até publicarmos e validarmos um pacote nativo. |
+
+Para executar pelo código-fonte em uma plataforma com backend local, instale Git, Node.js 22+, Bun 1.4.2, uv e Rust/Cargo com a toolchain nativa do sistema. A compilação do helper também exige as ferramentas nativas: Xcode Command Line Tools no macOS; compilador C/C++, `pkg-config` e bibliotecas de desenvolvimento de áudio/janelas no Linux; Visual Studio Build Tools com C++/Windows SDK no Windows.
+
+```bash
+git clone https://github.com/kaikydev1-jpg/azuria-voice.git
+cd azuria-voice
+bun install --frozen-lockfile
+bun run setup:api
+bun run dev
+```
+
+No Mac Intel, pule `bun run setup:api`, execute `VOICESTUDIO_SKIP_BACKEND=1 bun run dev` e configure a conexão com um backend em outra máquina suportada. Os modelos e ambientes continuam exigindo configuração e downloads próprios.
+
+Os guias de [macOS](install/macos.md) e [Linux](install/linux.md) detalham os requisitos da base. São guias históricos: seus links e nomes de arquivos de download apontam para VoiceStudio original, não para pacotes Azúria. Os scripts de download automático deste repositório dependem de o pacote da plataforma existir na própria [release Azúria](https://github.com/kaikydev1-jpg/azuria-voice/releases); mudar a marca não cria esses arquivos.
+
 ## Dados e modelos
 
 O perfil Electron usa o nome estável **Azúria Voice**. O ambiente local fica no local escolhido pelo assistente. O backend conserva os diretórios e as variáveis de compatibilidade OmniVoice, incluindo `OMNIVOICE_DATA_DIR`, `OMNIVOICE_CACHE_DIR` e `OMNIVOICE_ENGINES_DIR`.
