@@ -66,8 +66,8 @@ when updating:
 
 | Content | Default Windows location |
 | --- | --- |
-| Electron preferences, browser storage and runtime location | `%APPDATA%\Azúria Voice` |
-| Managed Python project/environment | `%APPDATA%\Azúria Voice\runtime\project` |
+| Electron preferences, browser storage and runtime location | `%APPDATA%\Azuria Voice` |
+| Managed Python project/environment | `%APPDATA%\Azuria Voice\runtime\project` |
 | Runtime download cache and managed Python | Adjacent `runtime\.uv-cache` and `runtime\.python` |
 | Voices, generated files, settings database and engine environments | `%APPDATA%\OmniVoice` |
 | Hugging Face model cache | `%LOCALAPPDATA%\OmniVoice\hf_cache` |

@@ -39,7 +39,7 @@ Os guias de [macOS](install/macos.md) e [Linux](install/linux.md) detalham os re
 
 ## Dados e modelos
 
-O perfil Electron usa o nome estável **Azúria Voice**. O ambiente local fica no local escolhido pelo assistente. O backend conserva os diretórios e as variáveis de compatibilidade OmniVoice, incluindo `OMNIVOICE_DATA_DIR`, `OMNIVOICE_CACHE_DIR` e `OMNIVOICE_ENGINES_DIR`.
+O perfil físico Electron usa o nome estável ASCII **Azuria Voice** (`%APPDATA%\Azuria Voice` no Windows). A interface, os menus, o título e o Sobre mantêm **Azúria Voice**. O nome interno sem acento evita falhas de bibliotecas nativas de fala ao abrir dados do ambiente. Para um ambiente escolhido manualmente, prefira um caminho sem acentos, como `C:\AzuriaVoice`. O ambiente local fica no local escolhido pelo assistente. O backend conserva os diretórios e as variáveis de compatibilidade OmniVoice, incluindo `OMNIVOICE_DATA_DIR`, `OMNIVOICE_CACHE_DIR` e `OMNIVOICE_ENGINES_DIR`.
 
 Mantenha `config/app.json` e os caminhos persistentes estáveis nas próximas versões; não acrescente a versão ao nome do perfil ou aos diretórios de modelos. Instale uma atualização sobre o mesmo aplicativo sem apagar o perfil, o ambiente ou os caches. O atualizador usa somente `kaikydev1-jpg/azuria-voice`.
 

@@ -5,9 +5,11 @@ export const DESKTOP_APP_NAME = PRODUCT_NAME;
 
 /** Set before Electron creates sessions, windows or the native application menu. */
 export function installAppIdentity(application: Pick<App, 'setName' | 'userAgentFallback'>): void {
-  application.setName(DESKTOP_APP_NAME);
-  // Chromium derives this header from the accented display name. Its custom
-  // protocol bridge requires ASCII header values or renderer assets cannot load.
+  // Electron derives the default user-data directory from this internal name.
+  // Native speech dependencies cannot read model data under accented paths.
+  application.setName(DESKTOP_APP_NAME.normalize('NFKD').replace(/[^\x20-\x7e]/g, ''));
+  // Cached or metadata-derived User-Agent values must remain ASCII too, or
+  // Chromium's custom protocol bridge cannot load renderer assets.
   application.userAgentFallback = application.userAgentFallback
     .normalize('NFKD')
     .replace(/[^\x20-\x7e]/g, '');
