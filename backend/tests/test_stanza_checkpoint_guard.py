@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import importlib.metadata
 import pickle
+import types
 
 import pytest
 
@@ -37,10 +38,26 @@ def unguarded_load(monkeypatch):
     return original
 
 
-def _stanza_caller(source: str):
-    namespace = {"__name__": "stanza.models.fake_loader", "torch": torch}
-    exec(compile(source, "<stanza-fake>", "exec"), namespace)
-    return namespace["load"]
+def _stanza_caller(func):
+    """Rebind ``func`` so its frames report a Stanza module as their caller."""
+    return types.FunctionType(
+        func.__code__, {**func.__globals__, "__name__": "stanza.models.fake_loader"}
+    )
+
+
+def _load_with_unsafe_fallback(path):
+    try:
+        return torch.load(path, weights_only=True)
+    except pickle.UnpicklingError:
+        return torch.load(path, weights_only=False)
+
+
+def _load_without_flag(path):
+    return torch.load(path)
+
+
+def _load_weights_only(path):
+    return torch.load(path, lambda storage, loc: storage, weights_only=True)
 
 
 def _save(tmp_path, obj, name="checkpoint.pt"):
@@ -51,13 +68,7 @@ def _save(tmp_path, obj, name="checkpoint.pt"):
 
 def test_stanza_fallback_to_unsafe_unpickling_is_refused(tmp_path, unguarded_load):
     path = _save(tmp_path, {"payload": _Payload()})
-    load = _stanza_caller(
-        "def load(path):\n"
-        "    try:\n"
-        "        return torch.load(path, weights_only=True)\n"
-        "    except __import__('pickle').UnpicklingError:\n"
-        "        return torch.load(path, weights_only=False)\n"
-    )
+    load = _stanza_caller(_load_with_unsafe_fallback)
     load(path)
     assert _HITS == ["executed"], "control: the unguarded fallback runs the payload"
 
@@ -70,7 +81,7 @@ def test_stanza_fallback_to_unsafe_unpickling_is_refused(tmp_path, unguarded_loa
 
 def test_stanza_call_without_weights_only_flag_is_forced_safe(tmp_path, unguarded_load):
     path = _save(tmp_path, {"payload": _Payload()})
-    load = _stanza_caller("def load(path):\n    return torch.load(path)\n")
+    load = _stanza_caller(_load_without_flag)
     stanza_safety.install_stanza_checkpoint_guard()
     with pytest.raises(pickle.UnpicklingError):
         load(path)
@@ -79,9 +90,7 @@ def test_stanza_call_without_weights_only_flag_is_forced_safe(tmp_path, unguarde
 
 def test_weights_only_stanza_checkpoint_still_loads(tmp_path, unguarded_load):
     path = _save(tmp_path, {"weights": torch.ones(2), "config": {"lang": "en"}})
-    load = _stanza_caller(
-        "def load(path):\n    return torch.load(path, lambda s, loc: s, weights_only=True)\n"
-    )
+    load = _stanza_caller(_load_weights_only)
     stanza_safety.install_stanza_checkpoint_guard()
     data = load(path)
     assert torch.equal(data["weights"], torch.ones(2))
