@@ -9,40 +9,17 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 `package.json` is the maintained app-version source of truth; Electron package
 metadata and the backend fallback mirror it.
 
-## [0.5.9] — 2026-10-21
+## [0.5.10] — 2026-10-21
 
-Atualização de segurança do Azúria Voice para Windows. O instalador preserva suas configurações e modelos; o ambiente local é sincronizado pelo aplicativo.
-
-**Highlights**
-
-- Proteção do PIN durante inicialização e cancelamento do compartilhamento LAN (#9)
-- Diagnósticos privados preservados nas falhas da API e sessões MCP limitadas (#9)
-- Dependências de desenvolvimento corrigidas e pendências de segurança documentadas (#9)
-
-## [0.5.8] — 2026-10-21
-
-Atualização de segurança do Azúria Voice para Windows. Instale a nova versão para atualizar o ambiente local, mantendo suas configurações e os modelos já baixados.
+Mais segurança na tradução do Azúria Voice para Windows. Esta versão corrige o carregamento de modelos Stanza no Argos e evita expor diagnósticos internos nas falhas de tradução. Instale sobre a versão atual para manter modelos, vozes, projetos e configurações; o aplicativo sincroniza o ambiente local.
 
 **Highlights**
 
-- Processamento de imagens com Pillow 13.0.0 (#6)
-- Certificados HTTPS atualizados com certifi 2026.10.19 (#6)
-- Dependências da demonstração antiga em Gradio retiradas (#6)
+- Tradução Argos com Stanza 1.12.2 e proteção adicional ao carregar modelos (#11)
+- Falhas de tradução NLLB e Argos com mensagens públicas sem diagnósticos privados (#11)
+- Referência da API atualizada e pendências de segurança documentadas (#11)
 
-### Fixed
-
-- Exige Pillow 13.0.0 e certifi 2026.10.19 para proteger o processamento de imagens e atualizar as autoridades de certificação (#6) — thanks @dependabot[bot]!
-
-### Changed
-
-- Retira a demonstração antiga em Gradio e mantém o aplicativo Electron, a API e o cliente da integração SoniTranslate (#6)
-
-## [Unreleased]
-
-**Highlights**
-
-- Preview iOS and Android companion apps for your own VoiceStudio
-- Azúria Voice: modelos Stanza da tradução Argos só carregam pesos, sem desserialização insegura (#11)
+O histórico da base VoiceStudio abaixo é preservado; as novidades desta distribuição são as correções identificadas com (#11).
 
 ### Added
 
@@ -92,6 +69,34 @@ Atualização de segurança do Azúria Voice para Windows. Instale a nova versã
 - New `mobile` workflow builds and tests both phone apps; a contract test fails when their theme or API description drifts from the desktop app (#2965)
 
 - Gallery preview fallback smoke no longer flakes when a slower runner reads the playing clip in several byte ranges (#3018)
+
+## [0.5.9] — 2026-10-21
+
+Atualização de segurança do Azúria Voice para Windows. O instalador preserva suas configurações e modelos; o ambiente local é sincronizado pelo aplicativo.
+
+**Highlights**
+
+- Proteção do PIN durante inicialização e cancelamento do compartilhamento LAN (#9)
+- Diagnósticos privados preservados nas falhas da API e sessões MCP limitadas (#9)
+- Dependências de desenvolvimento corrigidas e pendências de segurança documentadas (#9)
+
+## [0.5.8] — 2026-10-21
+
+Atualização de segurança do Azúria Voice para Windows. Instale a nova versão para atualizar o ambiente local, mantendo suas configurações e os modelos já baixados.
+
+**Highlights**
+
+- Processamento de imagens com Pillow 13.0.0 (#6)
+- Certificados HTTPS atualizados com certifi 2026.10.19 (#6)
+- Dependências da demonstração antiga em Gradio retiradas (#6)
+
+### Fixed
+
+- Exige Pillow 13.0.0 e certifi 2026.10.19 para proteger o processamento de imagens e atualizar as autoridades de certificação (#6) — thanks @dependabot[bot]!
+
+### Changed
+
+- Retira a demonstração antiga em Gradio e mantém o aplicativo Electron, a API e o cliente da integração SoniTranslate (#6)
 
 ## [0.5.7] — 2026-10-17
 
