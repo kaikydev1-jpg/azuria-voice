@@ -355,8 +355,28 @@ jobs:
             -exec cp {} "$EVIDENCE/crash-reports/" \; 2>/dev/null || true
           ls -la "$EVIDENCE/crash-reports"
           for report in "$EVIDENCE"/crash-reports/*; do
-            [ -f "$report" ] && head -c 6000 "$report" && echo
+            if [ -f "$report" ]; then head -c 6000 "$report"; echo; fi
           done
+          # Launch the app once without Playwright to tell an app crash from a
+          # harness crash, then keep the unified log around the launch.
+          if [ -n "${MAC_APP_EXE:-}" ]; then
+            ELECTRON_ENABLE_LOGGING=1 ELECTRON_ENABLE_STACK_DUMPING=1 \
+              "$MAC_APP_EXE" --user-data-dir="$(mktemp -d)" --lang=en-US \
+              > "$EVIDENCE/direct-launch.log" 2>&1 &
+            app_pid=$!
+            sleep 25
+            if kill -0 "$app_pid" 2>/dev/null; then
+              echo "direct launch: still running after 25s" | tee -a "$EVIDENCE/direct-launch.log"
+              kill "$app_pid" 2>/dev/null || true
+            fi
+            status=0; wait "$app_pid" || status=$?
+            echo "direct launch exit status: $status" | tee -a "$EVIDENCE/direct-launch.log"
+            tail -n 120 "$EVIDENCE/direct-launch.log"
+          fi
+          log show --last 10m --style compact \
+            --predicate 'process BEGINSWITH "Az" OR eventMessage CONTAINS[c] "zria Voice"' \
+            > "$EVIDENCE/unified-log.txt" 2>&1 || true
+          grep -i -E "fault|crash|trap|signal|denied|codesign|cs_|amfi|fatal" "$EVIDENCE/unified-log.txt" | tail -n 80 || true
       - name: Save failure diagnostics
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
