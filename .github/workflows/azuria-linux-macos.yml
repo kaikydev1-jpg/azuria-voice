@@ -392,6 +392,51 @@ jobs:
             status=0; wait "$app_pid" || status=$?
             echo "direct launch exit status: $status" | tee -a "$EVIDENCE/direct-launch.log"
             tail -n 120 "$EVIDENCE/direct-launch.log"
+            echo "== Traced launch (logs each Electron API call before the crash):"
+            TRACE_JS="$RUNNER_TEMP/electron-trace.cjs"
+            cat > "$TRACE_JS" <<'JS'
+          const fs = require('node:fs');
+          const t0 = Date.now();
+          const log = (m) => fs.writeSync(2, `[trace +${Date.now() - t0}ms] ${m}\n`);
+          const electron = require('electron');
+          const wrap = (label, target) => {
+            if (!target) return;
+            const seen = new Set();
+            for (let proto = target; proto && proto !== Object.prototype; proto = Object.getPrototypeOf(proto)) {
+              for (const key of Object.getOwnPropertyNames(proto)) {
+                if (seen.has(key) || key === 'constructor') continue;
+                seen.add(key);
+                const desc = Object.getOwnPropertyDescriptor(proto, key);
+                if (desc.get || desc.set) {
+                  Object.defineProperty(target, key, {
+                    configurable: true,
+                    get: desc.get && (() => { log(`${label}.${key} get`); return desc.get.call(target); }),
+                    set: desc.set && ((v) => { log(`${label}.${key} set`); desc.set.call(target, v); }),
+                  });
+                } else if (typeof desc.value === 'function' && !['emit', 'on', 'once', 'listeners'].includes(key)) {
+                  const fn = desc.value;
+                  target[key] = function (...args) { log(`${label}.${key}()`); return fn.apply(this, args); };
+                }
+              }
+            }
+          };
+          wrap('app', electron.app);
+          wrap('app.dock', electron.app.dock);
+          wrap('Menu', electron.Menu);
+          wrap('nativeImage', electron.nativeImage);
+          wrap('protocol', electron.protocol);
+          for (const event of ['will-finish-launching', 'ready', 'browser-window-created', 'web-contents-created', 'quit'])
+            electron.app.on(event, () => log(`event ${event}`));
+          log('trace installed');
+          JS
+            NODE_OPTIONS="--require $TRACE_JS" "$MAC_APP_EXE" --user-data-dir="$(mktemp -d)" --lang=en-US \
+              > "$EVIDENCE/traced-launch.log" 2>&1 &
+            trace_pid=$!
+            sleep 25
+            kill "$trace_pid" 2>/dev/null || true
+            status=0; wait "$trace_pid" || status=$?
+            echo "traced launch exit status: $status"
+            grep -E '^\[trace|supervisor|Error|error' "$EVIDENCE/traced-launch.log" | tail -n 80 || true
             echo "== Electron as plain Node (RunAsNode):"
             ELECTRON_RUN_AS_NODE=1 "$MAC_APP_EXE" -e 'console.log("node ok", process.versions.electron, process.arch)' || echo "run-as-node exit $?"
             # Same bundle re-signed ad hoc without entitlements: tells a crash
