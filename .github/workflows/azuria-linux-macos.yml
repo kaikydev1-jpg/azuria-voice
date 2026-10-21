@@ -423,23 +423,54 @@ jobs:
             done
             echo "== Electron as plain Node (RunAsNode):"
             ELECTRON_RUN_AS_NODE=1 "$MAC_APP_EXE" -e 'console.log("node ok", process.versions.electron, process.arch)' || echo "run-as-node exit $?"
-            # Same bundle re-signed ad hoc without entitlements: tells a crash
-            # caused by the signature/entitlements from one in the app itself.
-            PLAIN_ROOT=$(mktemp -d)
-            PLAIN_APP="$PLAIN_ROOT/$(basename "${MAC_APP_EXE%/Contents/MacOS/*}")"
-            ditto "${MAC_APP_EXE%/Contents/MacOS/*}" "$PLAIN_APP"
-            codesign --force --deep --sign - "$PLAIN_APP" 2>&1 | tail -n 2
-            "$PLAIN_APP/Contents/MacOS/$(basename "$MAC_APP_EXE")" --user-data-dir="$(mktemp -d)" --lang=en-US \
-              > "$EVIDENCE/plain-signature-launch.log" 2>&1 &
-            plain_pid=$!
-            sleep 25
-            if kill -0 "$plain_pid" 2>/dev/null; then
-              echo "plain-signature launch: still running after 25s"
-              kill "$plain_pid" 2>/dev/null || true
+            # The trap fires before `ready` even with a blank main (above), so
+            # test the bundle itself: the same app renamed to an ASCII name
+            # (executable, helpers and CFBundleName), only its folder renamed,
+            # and the stock Electron.app under its own and the accented name.
+            rename_bundle() { # source.app destination-dir new-name
+              local src=$1 name=$3 old app helper suffix new
+              old=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$src/Contents/Info.plist")
+              app="$2/$name.app"
+              ditto "$src" "$app"
+              mv "$app/Contents/MacOS/$old" "$app/Contents/MacOS/$name"
+              plutil -replace CFBundleExecutable -string "$name" "$app/Contents/Info.plist"
+              plutil -replace CFBundleName -string "$name" "$app/Contents/Info.plist"
+              for helper in "$app/Contents/Frameworks/$old Helper"*.app; do
+                suffix=${helper##*/"$old Helper"}; suffix=${suffix%.app}
+                new="$app/Contents/Frameworks/$name Helper$suffix.app"
+                mv "$helper" "$new"
+                mv "$new/Contents/MacOS/$old Helper$suffix" "$new/Contents/MacOS/$name Helper$suffix"
+                plutil -replace CFBundleExecutable -string "$name Helper$suffix" "$new/Contents/Info.plist"
+                plutil -replace CFBundleName -string "$name Helper$suffix" "$new/Contents/Info.plist"
+              done
+              codesign --force --deep --sign - "$app" >/dev/null 2>&1
+            }
+            try_launch() { # label executable
+              local log="$EVIDENCE/bundle-${1}.log" pid alive=no status=0
+              "$2" --user-data-dir="$(mktemp -d)" --lang=en-US > "$log" 2>&1 &
+              pid=$!
+              sleep 20
+              if kill -0 "$pid" 2>/dev/null; then alive=yes; kill "$pid" 2>/dev/null || true; fi
+              wait "$pid" || status=$?
+              echo "== bundle $1: alive after 20s=$alive exit=$status"
+              tail -n 5 "$log"
+            }
+            SOURCE_BUNDLE="${MAC_APP_EXE%/Contents/MacOS/*}"
+            EXP=$(mktemp -d)
+            mkdir "$EXP/ascii" "$EXP/folder" "$EXP/stock" "$EXP/stock-accented"
+            { rename_bundle "$SOURCE_BUNDLE" "$EXP/ascii" "Azuria Voice" &&
+              try_launch ascii-name "$EXP/ascii/Azuria Voice.app/Contents/MacOS/Azuria Voice"; } || echo "ascii rename failed"
+            { ditto "$SOURCE_BUNDLE" "$EXP/folder/Azuria Voice.app" &&
+              try_launch ascii-folder-only "$EXP/folder/Azuria Voice.app/Contents/MacOS/$(basename "$MAC_APP_EXE")"; } || echo "folder rename failed"
+            STOCK=$(find node_modules electron/node_modules -path '*/electron/dist/Electron.app' -type d -print -quit 2>/dev/null || true)
+            if [ -n "$STOCK" ]; then
+              ditto "$STOCK" "$EXP/stock/Electron.app"
+              try_launch stock-electron "$EXP/stock/Electron.app/Contents/MacOS/Electron"
+              { rename_bundle "$STOCK" "$EXP/stock-accented" "$(basename "$MAC_APP_EXE")" &&
+                try_launch stock-electron-accented "$EXP/stock-accented/$(basename "$MAC_APP_EXE").app/Contents/MacOS/$(basename "$MAC_APP_EXE")"; } || echo "stock rename failed"
+            else
+              echo "stock Electron.app not installed"
             fi
-            status=0; wait "$plain_pid" || status=$?
-            echo "plain-signature launch exit status: $status"
-            tail -n 40 "$EVIDENCE/plain-signature-launch.log"
           fi
           log show --last 10m --style compact \
             --predicate 'process BEGINSWITH "Az" OR eventMessage CONTAINS[c] "zria Voice"' \
