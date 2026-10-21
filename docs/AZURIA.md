@@ -81,6 +81,11 @@ execução também trazem `SHA256SUMS.txt`, manifestos e os registros dos testes
 Enquanto a próxima versão não estiver definida, o rótulo interno dos pacotes é
 a versão atual do `package.json`; identifique o teste pelo commit.
 
+Com o rótulo `publish-test-prerelease` no mesmo pull request, depois que todas
+as validações passam, o rascunho vira um pré-lançamento público com tag
+`test-linux-macos-<commit>`. Ele nunca é marcado como latest: a versão estável e
+os feeds de atualização continuam apontando para a release oficial.
+
 O workflow roda os testes de backend e segurança sem rede e com cache Hugging
 Face vazio, os testes do frontend, as validações do Electron, os contratos de
 empacotamento e atualização, a abertura do pacote instalado, a instalação real

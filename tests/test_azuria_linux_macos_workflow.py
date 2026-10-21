@@ -52,7 +52,7 @@ def test_only_the_draft_job_can_write_and_it_never_publishes():
     assert _DRAFT["permissions"] == {"contents": "write"}
     script = _steps(_DRAFT)["Create or refresh the unpublished test draft"]["run"]
     assert "--draft --prerelease --latest=false" in script
-    assert "--draft=false" not in _TEXT and "--latest " not in script
+    assert "--draft=false" not in script and "--latest " not in script
     assert "git tag" not in _TEXT and "git push" not in _TEXT
     assert 'TAG="test-linux-macos-$SHORT"' in script
     assert "Refusing to touch a published release" in script
@@ -99,3 +99,15 @@ def test_draft_only_carries_fully_validated_legs():
     assert "validated.txt" in validate
     assert "--targets" in validate and "linux-x64,darwin-arm64" in validate
     assert "sha256sum -c SHA256SUMS.txt" in validate
+
+
+def test_only_a_maintainer_label_publishes_and_never_as_latest():
+    publish = _WORKFLOW["jobs"]["publish-test-prerelease"]
+    assert publish["needs"] == "test-draft"
+    assert publish["permissions"] == {"contents": "write"}
+    assert "'publish-test-prerelease'" in publish["if"]
+    assert "github.event_name == 'pull_request'" in publish["if"]
+    script = _steps(publish)["Publish the validated draft as a prerelease (never latest)"]["run"]
+    assert "--draft=false --prerelease --latest=false" in script
+    assert 'test "$(gh api "repos/$GH_REPO/releases/latest" --jq .tag_name)" = "$LATEST_BEFORE"' in script
+    assert _TEXT.count("--draft=false") == 1

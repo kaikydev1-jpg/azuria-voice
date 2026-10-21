@@ -575,3 +575,53 @@ jobs:
           test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
           if gh api "repos/$GH_REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then echo "A draft must not create a tag"; exit 1; fi
           echo "Draft: $(gh release view "$TAG" --json url --jq .url)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  publish-test-prerelease:
+    name: Publish the test prerelease (maintainer label)
+    needs: test-draft
+    # Only when a maintainer adds the label; a prerelease is never "latest",
+    # so the stable release and its updater feeds stay untouched.
+    if: >-
+      needs.test-draft.result == 'success' && github.event_name == 'pull_request' &&
+      contains(github.event.pull_request.labels.*.name, 'publish-test-prerelease')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Publish the validated draft as a prerelease (never latest)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          SHORT=${SOURCE_SHA:0:12}
+          TAG="test-linux-macos-$SHORT"
+          LATEST_BEFORE=$(gh api "repos/$GH_REPO/releases/latest" --jq .tag_name)
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          VERSION=$(gh release view "$TAG" --json assets --jq '.assets[].name' |
+            sed -n 's/^Azuria-Voice-Electron-\(.*\)-linux-x64\.AppImage$/\1/p')
+          test -n "$VERSION"
+          cat > notes.md <<EOF
+          Pré-lançamento de teste do Azúria Voice para **Linux** e **macOS**, compilado e testado no GitHub Actions a partir do commit \`$SOURCE_SHA\`. Não é a versão estável: o Windows continua em [$LATEST_BEFORE](https://github.com/$GH_REPO/releases/tag/$LATEST_BEFORE), e este pré-lançamento não entra na atualização automática.
+
+          | Sistema | Arquivo | Como instalar |
+          | --- | --- | --- |
+          | Linux x64 | \`Azuria-Voice-Electron-$VERSION-linux-x64.AppImage\` | Dê permissão de execução (\`chmod +x\`) e abra. |
+          | Linux x64 (Debian/Ubuntu) | \`Azuria-Voice-Electron-$VERSION-linux-x64.deb\` | \`sudo apt install ./Azuria-Voice-Electron-$VERSION-linux-x64.deb\`. Para atualizar, instale o .deb novo. |
+          | macOS Apple Silicon (M1 ou mais novo) | \`Azuria-Voice-Electron-$VERSION-mac-arm64.dmg\` (ou .zip) | Arraste o app para Aplicativos. |
+          | macOS Intel | \`Azuria-Voice-Electron-$VERSION-mac-x64.zip\`, quando presente | Só a interface, ligada a um backend em outro computador; o backend local exige Apple Silicon. |
+
+          **macOS:** assinatura ad hoc, sem Developer ID nem notarização da Apple. Na primeira abertura o macOS bloqueia o app: abra **Ajustes do Sistema → Privacidade e Segurança** e clique em **Abrir Mesmo Assim** para o Azúria Voice. Isso vale só para este app; não desative o Gatekeeper. Sem assinatura da Apple, baixe as versões novas por esta página.
+
+          **Testado no GitHub Actions:** testes do backend e do frontend. Linux e Mac Apple Silicon: instalação do pacote, abertura do app, conexão com a API local, instalação real do ambiente Python, geração de voz com o modelo pequeno KittenTTS e desligamento do backend. Mac Intel: compilação e abertura da interface.
+
+          **Não testado:** GPU (os testes rodam em CPU), o aviso do Gatekeeper num Mac real e o Mac Intel ligado a um backend remoto.
+
+          Conferência: \`SHA256SUMS.txt\`. Execução: $RUN_URL
+          EOF
+          gh release edit "$TAG" --draft=false --prerelease --latest=false \
+            --title "Azúria Voice $VERSION Linux e macOS (pré-lançamento de teste, $SHORT)" --notes-file notes.md
+          test "$(gh release view "$TAG" --json isPrerelease --jq .isPrerelease)" = true
+          test "$(gh api "repos/$GH_REPO/releases/latest" --jq .tag_name)" = "$LATEST_BEFORE"
+          echo "Prerelease: $(gh release view "$TAG" --json url --jq .url)" | tee -a "$GITHUB_STEP_SUMMARY"
