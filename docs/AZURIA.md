@@ -40,7 +40,7 @@ O instalador publicado desta edição continua sendo o Windows `.exe`; ele não 
 | --- | --- |
 | Windows x64 | Workflow de instalador NSIS e verificações locais disponíveis. |
 | Mac com Apple Silicon, macOS 13.3+ | Backend local suportado. Pacotes de teste `.dmg`/`.zip` com assinatura ad hoc, compilados e testados em runner macOS arm64. |
-| Mac Intel | Somente interface com backend remoto; o backend local não é suportado, inclusive pelo código-fonte. Pacote de teste opcional, verificado nesse modo. |
+| Mac Intel | Somente interface com backend remoto; o backend local não é suportado, inclusive pelo código-fonte. Pacote de teste opcional, apenas `.zip`, verificado nesse modo. |
 | Linux x64 com desktop X11/Wayland | Pacotes de teste AppImage e `.deb`, compilados e testados em runner Ubuntu 24.04 x64. Linux ARM64 não é oferecido. |
 
 Para executar pelo código-fonte em uma plataforma com backend local, instale Git, Node.js 22.18+ (22.x), 24.11+ (24.x) ou 26+, Bun 1.4.2, uv e Rust/Cargo com a toolchain nativa do sistema. A compilação do helper também exige as ferramentas nativas: Xcode Command Line Tools no macOS; compilador C/C++, `pkg-config` e bibliotecas de desenvolvimento de áudio/janelas no Linux; Visual Studio Build Tools com C++/Windows SDK no Windows.

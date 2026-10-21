@@ -84,6 +84,11 @@ def test_macos_is_ad_hoc_signed_without_apple_credentials():
     for secret in ("CSC_LINK", "APPLE_ID", "APPLE_APP_SPECIFIC_PASSWORD", "APPLE_TEAM_ID"):
         assert f"secrets.{secret}" not in _TEXT
         assert f"secrets.ELECTRON_MACOS" not in _TEXT
+    build = _steps(_PACKAGE)["Build packages (ad hoc signing on macOS, never published)"]
+    # Without it electron-builder skips ad hoc signing on pull requests and
+    # ships Electron's stale signature ("code has no resources").
+    assert build["env"]["CSC_FOR_PULL_REQUEST"] == "true"
+    assert "unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID" in build["run"]
     verify = _steps(_PACKAGE)["Verify macOS ad hoc signature, DMG and ZIP"]["run"]
     assert "grep -qx 'Signature=adhoc'" in verify
     assert "codesign --verify --deep --strict" in verify

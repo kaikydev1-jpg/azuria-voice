@@ -69,7 +69,9 @@ jobs:
             platform: darwin
             arch: x64
             target: x86_64-apple-darwin
-            flags: --mac --x64
+            # dmgbuild's alias writer overflows on this runner's 64-bit file
+            # IDs; the remote-backend interface ships as the updater ZIP only.
+            flags: --mac zip --x64
             # PyTorch publishes no macOS x86_64 wheels for this lock.
             local_runtime: false
             optional: true
@@ -172,6 +174,12 @@ jobs:
       - name: Build packages (ad hoc signing on macOS, never published)
         id: package
         working-directory: electron
+        env:
+          # electron-builder skips all signing on pull requests, leaving the
+          # stock Electron signature invalid ("damaged" on download). This job
+          # has no signing secrets, so forcing it only applies the ad hoc
+          # identity from electron-builder.config.mjs.
+          CSC_FOR_PULL_REQUEST: 'true'
         run: |
           # No Developer ID: electron-builder.config.mjs signs macOS ad hoc.
           unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
@@ -238,20 +246,26 @@ jobs:
             spctl --assess --type execute --verbose=2 "$app" 2>&1 || echo "Gatekeeper assessment: rejected (expected without Developer ID/notarization)"
           }
           {
-            hdiutil verify "$DMG"
-            MOUNT=$(mktemp -d)
-            hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG"
-            SOURCE_APP=$(find "$MOUNT" -maxdepth 1 -name '*.app' -type d -print -quit)
-            test -n "$SOURCE_APP"
-            APP="$INSTALL_ROOT/$(basename "$SOURCE_APP")"
             mkdir -p "$INSTALL_ROOT"
-            ditto "$SOURCE_APP" "$APP"
-            hdiutil detach "$MOUNT"
-            echo "== DMG bundle: $(basename "$APP")"; check_bundle "$APP"
             ZIP_ROOT=$(mktemp -d)
             ditto -x -k "$ZIP" "$ZIP_ROOT"
             ZIP_APP=$(find "$ZIP_ROOT" -maxdepth 1 -name '*.app' -type d -print -quit)
+            test -n "$ZIP_APP"
             echo "== ZIP bundle (updater payload)"; check_bundle "$ZIP_APP"
+            if [ "${{ matrix.arch }}" = arm64 ]; then
+              hdiutil verify "$DMG"
+              MOUNT=$(mktemp -d)
+              hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG"
+              SOURCE_APP=$(find "$MOUNT" -maxdepth 1 -name '*.app' -type d -print -quit)
+              test -n "$SOURCE_APP"
+              APP="$INSTALL_ROOT/$(basename "$SOURCE_APP")"
+              ditto "$SOURCE_APP" "$APP"
+              hdiutil detach "$MOUNT"
+              echo "== DMG bundle: $(basename "$APP")"; check_bundle "$APP"
+            else
+              APP="$INSTALL_ROOT/$(basename "$ZIP_APP")"
+              ditto "$ZIP_APP" "$APP"
+            fi
             echo "MAC_APP_EXE=$APP/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")" >> "$GITHUB_ENV"
           } 2>&1 | tee "$EVIDENCE/macos-signature.txt"
       - name: Packaged first-run screen (setup controls only)
@@ -378,9 +392,10 @@ jobs:
             (cd "$dir/electron/release" && sha256sum -c SHA256SUMS.txt)
             find "$dir/electron/release" -maxdepth 1 -type f ! -name SHA256SUMS.txt -exec cp {} release-assets/ \;
             tar -czf "release-assets/evidence-$key-$SHORT.tar.gz" -C "$dir" evidence
-            if [ "$key" = darwin-x64 ]; then targets="$targets,darwin-x64"; fi
           done
-          # Same contract as a release, limited to the targets this workflow builds.
+          # Same contract as a release, limited to the targets this workflow
+          # requires. An Intel ZIP, when present, is still hash-checked below
+          # through its manifest, but it has no DMG and is never required.
           python3 scripts/prepare_electron_release.py --assets release-assets --tag "v$VERSION" --targets "$targets" --no-notes
           cat release-assets/SHA256SUMS.txt
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
@@ -398,7 +413,7 @@ jobs:
           Rascunho de teste, não publicado, do commit \`$SOURCE_SHA\`. Não é uma versão estável:
           sem tag, sem marcação latest e fora dos feeds de atualização.
 
-          - Alvos: $TARGETS (Intel Mac apenas como interface com backend remoto, quando presente).
+          - Alvos: $TARGETS (e, quando presente, o .zip do Mac Intel apenas como interface com backend remoto).
           - Rótulo de versão interno: $VERSION (versão da próxima entrega ainda não definida).
           - macOS: assinatura ad hoc, sem Developer ID nem notarização.
           - Execução: $RUN_URL

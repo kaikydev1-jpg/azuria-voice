@@ -445,14 +445,12 @@ try {
         if (!response.ok)
           throw new Error(`Generate returned ${response.status}: ${new TextDecoder().decode(bytes)}`);
         const view = new DataView(bytes.buffer);
-        const history = await (await fetch('/api/history')).json();
         return {
           size: bytes.byteLength,
           riff: new TextDecoder('ascii').decode(bytes.slice(0, 4)),
           wave: new TextDecoder('ascii').decode(bytes.slice(8, 12)),
           channels: view.getUint16(22, true),
           sampleRate: view.getUint32(24, true),
-          historyEngine: Array.isArray(history) ? history[0]?.engine : undefined,
         };
       });
       assert.equal(proof.riff, 'RIFF');
@@ -460,7 +458,7 @@ try {
       assert(proof.size > 24_000, `Generated WAV is too short: ${proof.size} bytes`);
       assert(proof.sampleRate > 0 && proof.channels > 0, JSON.stringify(proof));
       console.log(
-        `PASS: packaged ${process.platform}-${targetArch} runtime generated a ${proof.size}-byte ${proof.sampleRate} Hz WAV with ${generationModel} (history engine: ${proof.historyEngine ?? 'unknown'})`,
+        `PASS: packaged ${process.platform}-${targetArch} runtime generated a ${proof.size}-byte ${proof.sampleRate} Hz WAV with ${generationModel}`,
       );
     }
     if (existing) {
