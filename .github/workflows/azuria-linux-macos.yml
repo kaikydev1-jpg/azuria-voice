@@ -392,51 +392,35 @@ jobs:
             status=0; wait "$app_pid" || status=$?
             echo "direct launch exit status: $status" | tee -a "$EVIDENCE/direct-launch.log"
             tail -n 120 "$EVIDENCE/direct-launch.log"
-            echo "== Traced launch (logs each Electron API call before the crash):"
-            TRACE_JS="$RUNNER_TEMP/electron-trace.cjs"
-            cat > "$TRACE_JS" <<'JS'
-          const fs = require('node:fs');
-          const t0 = Date.now();
-          const log = (m) => fs.writeSync(2, `[trace +${Date.now() - t0}ms] ${m}\n`);
-          const electron = require('electron');
-          const wrap = (label, target) => {
-            if (!target) return;
-            const seen = new Set();
-            for (let proto = target; proto && proto !== Object.prototype; proto = Object.getPrototypeOf(proto)) {
-              for (const key of Object.getOwnPropertyNames(proto)) {
-                if (seen.has(key) || key === 'constructor') continue;
-                seen.add(key);
-                const desc = Object.getOwnPropertyDescriptor(proto, key);
-                if (desc.get || desc.set) {
-                  Object.defineProperty(target, key, {
-                    configurable: true,
-                    get: desc.get && (() => { log(`${label}.${key} get`); return desc.get.call(target); }),
-                    set: desc.set && ((v) => { log(`${label}.${key} set`); desc.set.call(target, v); }),
-                  });
-                } else if (typeof desc.value === 'function' && !['emit', 'on', 'once', 'listeners'].includes(key)) {
-                  const fn = desc.value;
-                  target[key] = function (...args) { log(`${label}.${key}()`); return fn.apply(this, args); };
-                }
-              }
-            }
-          };
-          wrap('app', electron.app);
-          wrap('app.dock', electron.app.dock);
-          wrap('Menu', electron.Menu);
-          wrap('nativeImage', electron.nativeImage);
-          wrap('protocol', electron.protocol);
-          for (const event of ['will-finish-launching', 'ready', 'browser-window-created', 'web-contents-created', 'quit'])
-            electron.app.on(event, () => log(`event ${event}`));
-          log('trace installed');
-          JS
-            NODE_OPTIONS="--require $TRACE_JS" "$MAC_APP_EXE" --user-data-dir="$(mktemp -d)" --lang=en-US \
-              > "$EVIDENCE/traced-launch.log" 2>&1 &
-            trace_pid=$!
-            sleep 25
-            kill "$trace_pid" 2>/dev/null || true
-            status=0; wait "$trace_pid" || status=$?
-            echo "traced launch exit status: $status"
-            grep -E '^\[trace|supervisor|Error|error' "$EVIDENCE/traced-launch.log" | tail -n 80 || true
+            # An unpacked copy whose entry logs each Electron call before it
+            # runs (electron/tests/startup-trace.cjs), then the same copy with
+            # one suspect call stubbed out, then a blank window without the app.
+            TRACE_ROOT=$(mktemp -d)
+            TRACE_APP="$TRACE_ROOT/$(basename "${MAC_APP_EXE%/Contents/MacOS/*}")"
+            ditto "${MAC_APP_EXE%/Contents/MacOS/*}" "$TRACE_APP"
+            RES="$TRACE_APP/Contents/Resources"
+            ASAR_PKG=$(find node_modules electron/node_modules -path '*/@electron/asar/package.json' -print -quit 2>/dev/null || true)
+            node -e 'const [pkg, archive, dest] = process.argv.slice(1); require(require("node:path").dirname(require("node:path").resolve(pkg))).extractAll(archive, dest)' \
+              "$ASAR_PKG" "$RES/app.asar" "$RES/app"
+            mv "$RES/app.asar" "$TRACE_ROOT/app.asar"
+            cp electron/tests/startup-trace.cjs "$RES/app/startup-trace.cjs"
+            node -e 'const fs = require("node:fs"); const f = process.argv[1]; const p = JSON.parse(fs.readFileSync(f, "utf8")); p.main = "startup-trace.cjs"; fs.writeFileSync(f, JSON.stringify(p))' "$RES/app/package.json"
+            codesign --force --deep --sign - "$TRACE_APP" 2>&1 | tail -n 1
+            TRACE_EXE="$TRACE_APP/Contents/MacOS/$(basename "$MAC_APP_EXE")"
+            for variant in full skip:app.userAgentFallback skip:app.setName skip:app.requestSingleInstanceLock bare; do
+              trace_skip=""; trace_main=""
+              case $variant in skip:*) trace_skip=${variant#skip:} ;; bare) trace_main=bare ;; esac
+              trace_log="$EVIDENCE/trace-${variant//[:.]/-}.log"
+              AZURIA_TRACE_SKIP="$trace_skip" AZURIA_TRACE_MAIN="$trace_main" \
+                "$TRACE_EXE" --user-data-dir="$(mktemp -d)" --lang=en-US > "$trace_log" 2>&1 &
+              trace_pid=$!
+              sleep 20
+              alive=no
+              if kill -0 "$trace_pid" 2>/dev/null; then alive=yes; kill "$trace_pid" 2>/dev/null || true; fi
+              status=0; wait "$trace_pid" || status=$?
+              echo "== trace $variant: alive after 20s=$alive exit=$status"
+              grep -E '^\[trace|supervisor|Error' "$trace_log" | tail -n "$([ "$variant" = full ] && echo 80 || echo 12)" || true
+            done
             echo "== Electron as plain Node (RunAsNode):"
             ELECTRON_RUN_AS_NODE=1 "$MAC_APP_EXE" -e 'console.log("node ok", process.versions.electron, process.arch)' || echo "run-as-node exit $?"
             # Same bundle re-signed ad hoc without entitlements: tells a crash
