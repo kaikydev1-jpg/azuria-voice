@@ -163,7 +163,7 @@ def test_completed_transcription_replays_without_running_asr(tmp_path, monkeypat
 
 def test_transcribe_stream_surfaces_model_load_failure(tmp_path, monkeypatch):
     """Regression #255: when the model fails to load, the SSE transcribe stream
-    must emit a structured `error` event carrying the real cause — not silently
+    must emit a structured `error` event carrying recovery guidance — not silently
     drop the connection (the UI renders a dropped stream as a misleading generic
     "Transcribe stream dropped … Likely ASR backend failed to load").
 
@@ -204,7 +204,9 @@ def test_transcribe_stream_surfaces_model_load_failure(tmp_path, monkeypatch):
         dc._dub_jobs.pop(job_id, None)
 
     assert "event: error" in body, body
-    assert "CUDA driver init failed: simulated" in body, body
+    assert "could not be loaded" in body, body
+    assert '"error_class": "RuntimeError"' in body, body
+    assert "CUDA driver init failed: simulated" not in body, body
 
 
 def test_transcribe_stream_never_closes_without_terminal_event(
@@ -405,7 +407,7 @@ def test_transcribe_stream_surfaces_asr_load_failure_at_preflight(tmp_path, monk
     ASR backend failed to load").
 
     The preflight now eagerly calls ``backend.ensure_loaded()`` so the *real*
-    cause surfaces once, as a structured ``error`` event, ALWAYS followed by a
+    failure surfaces once, as a structured ``error`` event, ALWAYS followed by a
     terminal ``done`` (so the stream closes via a named event, never a raw
     drop the client can only render generically).
     """
@@ -455,10 +457,12 @@ def test_transcribe_stream_surfaces_asr_load_failure_at_preflight(tmp_path, monk
     finally:
         dc._dub_jobs.pop(job_id, None)
 
-    # Real cause surfaced as a structured error, not the generic "stream dropped".
+    # Recovery guidance and failure class arrive without private loader details.
     assert "event: error" in body, body
     assert "ASR backend initialization failed" in body, body
-    assert "libcudnn_ops_infer.so.8: simulated" in body, body
+    assert "Model Catalogue" in body, body
+    assert '"error_class": "RuntimeError"' in body, body
+    assert "libcudnn_ops_infer.so.8: simulated" not in body, body
     assert "stream dropped" not in body, body
     # And it must be followed by a terminal `done` so the client closes via a
     # named event — never a bare error+connection-drop (which races the
@@ -568,10 +572,11 @@ def test_transcribe_stream_sends_bytes_while_asr_loads(tmp_path, monkeypatch):
     # (b) Keepalives flowed during the slow load, before the terminal error.
     assert ": asr-load keepalive" in body, body
     assert body.index(": asr-load keepalive") < body.index("event: error"), body
-    # And the slow load's real failure still surfaces as the structured
+    # And the slow load's failure still surfaces as the structured
     # preflight error, followed by the terminal done.
     assert "ASR backend initialization failed" in body, body
-    assert "weights download interrupted: simulated" in body, body
+    assert '"error_class": "RuntimeError"' in body, body
+    assert "weights download interrupted: simulated" not in body, body
     err_idx = body.find("event: error")
     done_idx = body.find("event: done")
     assert done_idx > err_idx >= 0, f"error must be followed by terminal done: {body}"

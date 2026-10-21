@@ -6,6 +6,11 @@ and list your voices — locally, in a voice you choose per agent. The server is
 **mounted on the running backend** at `/mcp`, so there's nothing extra to
 start once VoiceStudio is open.
 
+Streamable HTTP retains at most 64 sessions and expires sessions after five
+minutes with no request or stream in flight. At capacity, a new session receives
+HTTP 503; existing sessions continue. Closing a session frees its slot. This
+requires MCP Python SDK 1.30 or later in the supported 1.x series.
+
 ## Tools
 
 | Tool | What it does |

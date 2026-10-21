@@ -17,12 +17,15 @@ for network connectivity before resuming queued operations.
 | Layer     | Choice                                                                                       |
 | --------- | -------------------------------------------------------------------------------------------- |
 | Shell     | Electron 44, electron-vite 6 (Vite 8 / Rolldown), electron-builder                           |
-| Toolchain | Vite+ (`vp` — vitest, oxlint, oxfmt), TypeScript 7 (tsgo), bun                               |
+| Toolchain | Vite+ (`vp` — oxlint, oxfmt), standalone Vitest 4, TypeScript 7 (tsgo), bun                |
 | UI        | React 19, Tailwind v4, shadcn v4 on **Base UI** (`base-nova`), lucide, sonner, wavesurfer.js |
 | Data      | TanStack Query, Router (hash history), Form, Store, Virtual, Pacer                           |
 | i18n      | i18next (`src/renderer/src/i18n/locales/*.json`) — no hardcoded UI text                      |
 
 ## Run it
+
+Use Node.js 22.18+ in the 22.x series, 24.11+ in the 24.x series, or 26+ for
+the Vite+ tooling. Unit tests use the standalone Vitest 4 executable.
 
 ```sh
 # From the repository root

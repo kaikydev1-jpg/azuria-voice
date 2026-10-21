@@ -1,4 +1,4 @@
-// Vite+ (`vp test` / `vp check`) config for the RENDERER unit tests only.
+// Standalone Vitest config for renderer/main tests; Vite+ handles lint/format.
 // The Electron dev/build pipeline lives in electron.vite.config.ts.
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';

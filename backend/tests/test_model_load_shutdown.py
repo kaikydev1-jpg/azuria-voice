@@ -324,7 +324,10 @@ def test_lifespan_shutdown_mid_load_is_clean_and_clears_sentinel(
         import main as main_mod
         from core import run_sentinel
         from core import device_caps
-        monkeypatch.setattr(device_caps, "detect_host_caps", lambda: types.SimpleNamespace(family="cpu"))
+        # Startup also reads probe_ok when the performance inventory is fresh.
+        # Use the real contract so this fixture works after module-cache purges.
+        cpu_caps = device_caps.HostCaps(family="cpu", available_families=("cpu",))
+        monkeypatch.setattr(device_caps, "detect_host_caps", lambda: cpu_caps)
 
         # The module object main's lifespan actually loads through — NOT the
         # module-level `mm` alias, which a sibling suite's sys.modules purge can
@@ -345,6 +348,9 @@ def test_lifespan_shutdown_mid_load_is_clean_and_clears_sentinel(
         monkeypatch.setattr(live_mm, "model", None)
         monkeypatch.setattr(live_mm, "_model_lock", asyncio.Lock())
         monkeypatch.setattr(live_mm, "_checkpoint_in_local_cache", lambda c: True)
+        # This test loads only its fake worker. A fresh module tree must not
+        # inherit (or persist) a real user's model-licence decision.
+        monkeypatch.setattr(live_mm, "_ensure_omnivoice_licence", lambda: None)
         monkeypatch.setenv("OMNIVOICE_PRELOAD_CAPTURE_ASR", "0")
         # A fresh import inherits nothing from the previous lifespan, but an
         # in-place one would: arm loads explicitly so a leaked shutdown flag

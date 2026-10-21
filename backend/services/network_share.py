@@ -214,48 +214,49 @@ async def _enable(app) -> ShareState:
     config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="warning")
     server = uvicorn.Server(config)
     server.install_signal_handlers = lambda: None  # never hijack signals in-process
+    # Publish the PIN before serve() can accept even its first request. Keep
+    # enabled=False until startup succeeds, but never expose an unguarded socket.
+    pending = ShareState(False, port, pin, lan_ipv4_addresses())
+    _runtime.state = pending
+    app.state.network_share = pending
+    _runtime.server = server
     _runtime.task = asyncio.create_task(server.serve())
-    for _ in range(100):  # ~5s for the socket to bind
-        if getattr(server, "started", False):
-            break
-        await asyncio.sleep(0.05)
-    if not getattr(server, "started", False):
+    try:
+        for _ in range(100):  # ~5s for the socket to bind
+            if getattr(server, "started", False):
+                break
+            if _runtime.task.done():
+                _runtime.task.result()  # surface startup failures without waiting
+                break
+            await asyncio.sleep(0.05)
+        if not getattr(server, "started", False):
+            raise RuntimeError("share listener failed to start")
+    except BaseException as startup_error:
         # Bind failed (e.g. the port was taken in the race after the
-        # free-port probe). Tear down and stay Local — never report enabled
-        # with a listener that isn't actually up (spec §7).
+        # free-port probe), timed out, or was cancelled. Retain the PIN until
+        # the serving task has stopped, including failed/cancelled startup.
         server.should_exit = True
         try:
             await asyncio.wait_for(asyncio.shield(_runtime.task), timeout=2)
-        except asyncio.CancelledError:
-            if _runtime.task.done():
-                _runtime.server = _runtime.task = None
-                _runtime.state = ShareState()
-            else:
-                _runtime.server = server
-                _runtime.state = ShareState(True, port, pin, lan_ipv4_addresses())
+        except BaseException:
+            # The original startup exception remains authoritative. A failed
+            # serving task is stopped; a hung one must stay tracked and gated.
+            pass
+        if _runtime.task.done():
+            _runtime.server = _runtime.task = None
+            _runtime.state = ShareState()
             app.state.network_share = _runtime.state
-            if _runtime.state.enabled:
-                _set_mcp_lan_hosts(app, _runtime.state.lan_addresses, enabled=True)
-            raise
-        except Exception as exc:
-            if _runtime.task.done():
-                _runtime.server = _runtime.task = None
-                _runtime.state = ShareState()
-                app.state.network_share = _runtime.state
-                raise RuntimeError("share listener failed to start") from exc
-            _runtime.server = server
-            _runtime.state = ShareState(True, port, pin, lan_ipv4_addresses())
-            app.state.network_share = _runtime.state
-            _set_mcp_lan_hosts(app, _runtime.state.lan_addresses, enabled=True)
+        else:
+            pending.enabled = True
+            _set_mcp_lan_hosts(app, pending.lan_addresses, enabled=True)
             logger.warning("Failed LAN listener startup could not be cleaned up")
+            if isinstance(startup_error, asyncio.CancelledError):
+                raise
             raise RuntimeError(
                 "LAN share listener could not be stopped. Retry Disable before enabling again."
-            ) from exc
-        _runtime.server = _runtime.task = None
-        raise RuntimeError("share listener failed to start")
-    _runtime.server = server
-    _runtime.state = ShareState(True, port, pin, lan_ipv4_addresses())
-    app.state.network_share = _runtime.state
+            ) from startup_error
+        raise
+    pending.enabled = True
     _set_mcp_lan_hosts(app, _runtime.state.lan_addresses, enabled=True)
     return _runtime.state
 

@@ -25,13 +25,13 @@
     "lint:fix": "vp lint --fix",
     "format": "vp fmt",
     "format:check": "vp fmt --check",
-    "test": "bun run locale:check && vp test --run && vp test --run --config vite.shared.config.ts",
-    "test:watch": "vp test",
+    "test": "bun run locale:check && vitest --run && vitest --run --config vite.shared.config.ts",
+    "test:watch": "vitest",
     "test:desktop-ui": "node tests/local-first.test.mjs && node tests/fake-health-backend.test.mjs && node tests/desktop-ui.test.mjs",
     "smoke:server": "vite --config tests/renderer-smoke.vite.config.mjs",
     "smoke:live-routes": "node tests/live-route-health.mjs",
     "smoke:account-live": "node tests/account-sign-in-live.mjs",
-    "check": "vp check",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
     "dist": "bun run build:web && electron-vite build && node tests/packaging-contract.mjs && electron-builder --config electron-builder.config.mjs --publish never && node --input-type=module -e \"if (process.platform === 'linux') await import('./scripts/embed-appimage-update.mjs')\" && node tests/update-package-contract.mjs",
     "dist:dir": "bun run build:web && electron-vite build && node tests/packaging-contract.mjs && electron-builder --config electron-builder.config.mjs --dir --publish never",
     "ui:add": "shadcn add"
@@ -106,8 +106,8 @@
     "jsdom": "^30.0.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.3.0",
-    "vite-plus": "^0.3.1",
+    "vite": "^8.3.5",
+    "vite-plus": "1.1.0",
     "vitest": "4.1.11"
   },
   "trustedDependencies": [

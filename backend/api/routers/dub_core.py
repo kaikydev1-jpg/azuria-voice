@@ -1413,9 +1413,12 @@ async def dub_transcribe_stream(
                         "transcribe preflight: model load failed (job=%s): %s",
                         log_safe(job_id), log_safe(e),
                     )
-                    from core.failure import build_failure
-                    f = build_failure(e, stage="transcribe-preflight", include_diagnostic=False)
-                    preflight_error = f["reason"] + (f" — {f['hint']}" if f.get("hint") else "")
+                    from core.public_errors import public_exception_response
+                    preflight_payload = public_exception_response(
+                        e, fallback="The preload TTS model could not be loaded. Check its weights in Model Catalogue and retry.",
+                    )
+                    preflight_payload["error_class"] = type(e).__name__
+                    preflight_error = preflight_payload["detail"]
                     _model = None
             if preflight_error is None:
                 asr_audio_target = job.get("vocals_path")
@@ -1530,11 +1533,12 @@ async def dub_transcribe_stream(
                             preflight_payload = e.detail()
                         except Exception as e:
                             logger.error("Transcription preflight ASR load failed")
-                            from core.failure import build_failure
-                            f = build_failure(e, stage="transcribe-preflight", include_diagnostic=False)
-                            preflight_error = "ASR backend initialization failed: " + f["reason"] + (
-                                f" — {f['hint']}" if f.get("hint") else ""
+                            from core.public_errors import public_exception_response
+                            preflight_payload = public_exception_response(
+                                e, fallback="ASR backend initialization failed. Check the selected engine's weights in Model Catalogue and retry.",
                             )
+                            preflight_payload["error_class"] = type(e).__name__
+                            preflight_error = preflight_payload["detail"]
                     scene_cuts = job.get("scene_cuts") or []
 
         if preflight_error:

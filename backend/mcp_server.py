@@ -443,6 +443,9 @@ def create_mcp_server(app=None):
     FastMCP = _ensure_mcp()
     mcp = FastMCP(
         "VoiceStudio",
+        # GHSA-84m7-p3x7-pcfv: retain bounded state for local agent clients.
+        max_sessions=64,
+        session_idle_timeout=300,
         instructions=(
             "AI-agent interface for VoiceStudio — voice cloning, "
             "voice design, and video dubbing in 646 languages."
