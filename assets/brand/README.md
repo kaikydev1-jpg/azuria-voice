@@ -27,12 +27,19 @@ no gradients, shadows, highlights, embedded raster images, or external assets.
 | Platform icon source, dark rounded tile | `app-icon.svg` |
 | Platform icon PNGs | `app-icon-{16,24,32,48,64,128,256,1024}.png` |
 | Contact sheet: light, dark, monochrome, small sizes | `preview.png` |
+| GitHub social preview, solid navy background | `social-preview.svg`, `social-preview.png` — 1280 × 640 |
 
 The wordmark reads **Azúria Voice**, including the acute accent. Its outlined
 distribution file contains actual vector glyph paths and works without installed
 fonts. The live text source uses Segoe UI: bold for “Azúria”, regular for “Voice”.
 It is editable in an SVG editor; install that font to retain identical typography.
 No font files are redistributed.
+
+The repository README uses the app tile icon. Upload `social-preview.png` in
+GitHub **Settings → General → Social preview** for shared repository links.
+This setting is separate from the account avatar. Regenerate this preview with
+`node scripts/brand/export-social.cjs`, using the same `sharp` requirement and
+`AZURIA_SHARP_MODULE` override described below.
 
 ## Application copies
 

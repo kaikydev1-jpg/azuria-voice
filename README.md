@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/logo.png" alt="Azúria Voice" width="96" />
+  <img src="assets/brand/app-icon-128.png" alt="Ícone do aplicativo Azúria Voice" width="96" height="96" />
   <h1>Azúria Voice</h1>
   <p>Clonagem de voz, criação de vozes, dublagem, ditado, transcrição e audiolivros, com identidade em prata e azul.</p>
   <p><a href="https://github.com/kaikydev1-jpg/azuria-voice/releases">Downloads</a> · <a href="docs/AZURIA.md">Guia desta distribuição</a> · <a href="LICENSE">AGPL-3.0</a></p>
@@ -49,6 +49,10 @@ Os artefatos ficam em `electron/release/`. O workflow `azuria-windows.yml` tamb�
 | Identidade visual | [Marca](docs/branding.md) · [SVG, PNG e ICO](assets/brand/README.md) |
 
 Documentos históricos e termos de terceiros podem mencionar VoiceStudio ou seus autores para preservar a procedência. Os guias originais descrevem recursos da base; os endereços de distribuição desta edição estão neste README e em `docs/AZURIA.md`.
+
+## Segurança e contribuições
+
+O repositório é público para consulta, forks e propostas por pull request. A integração na `main` fica sob controle de `@kaikydev1-jpg`. Consulte a [política de segurança](.github/SECURITY.md) para relatar vulnerabilidades em privado e as [proteções do repositório](docs/maintainers/azuria-repository-settings.md) para conhecer as regras e verificações.
 
 ## Licenças e créditos
 

@@ -1,5 +1,7 @@
 # Repository settings
 
+> Historical upstream configuration for `debpalash/VoiceStudio`. For this distribution, use [Azúria repository settings](azuria-repository-settings.md); do not apply the upstream CLA checks to `kaikydev1-jpg/azuria-voice`.
+
 GitHub stores these settings outside the repository, so no file or CI check can
 enforce them. Apply them once as a repository admin, then re-check them after
 changing workflow or job names. The `gh api` commands below assume an
