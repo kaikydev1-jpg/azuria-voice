@@ -9,6 +9,14 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 `package.json` is the maintained app-version source of truth; Electron package
 metadata and the backend fallback mirror it.
 
+## [Unreleased]
+
+**Highlights**
+
+- Proteção do PIN durante inicialização e cancelamento do compartilhamento LAN (#9)
+- Diagnósticos privados preservados nas falhas da API e sessões MCP limitadas (#9)
+- Dependências de desenvolvimento corrigidas e pendências de segurança documentadas (#9)
+
 ## [0.5.8] — 2026-10-21
 
 Atualização de segurança do Azúria Voice para Windows. Instale a nova versão para atualizar o ambiente local, mantendo suas configurações e os modelos já baixados.
