@@ -408,6 +408,11 @@ def argos_lang_code(value: str) -> str:
 
 
 def _configure_argos_cache() -> None:
+    # Argos sentence splitting loads Stanza checkpoints from installed packs;
+    # refuse Stanza's unsafe unpickling fallback before any pack is touched.
+    from core.stanza_safety import install_stanza_checkpoint_guard
+
+    install_stanza_checkpoint_guard()
     cache_dir = os.environ.get("OMNIVOICE_CACHE_DIR")
     if not cache_dir:
         return

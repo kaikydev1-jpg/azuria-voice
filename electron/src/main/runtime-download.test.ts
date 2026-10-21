@@ -114,6 +114,9 @@ it('does not start cancelled downloads', async () => {
 
 it.each([
   'ftp://private-user:private-pass@proxy.test',
+  // PAC fetchers (pac+ftp via get-uri/basic-ftp) must stay unreachable.
+  'pac+ftp://private-user:private-pass@proxy.test/proxy.pac',
+  'pac+https://private-user:private-pass@proxy.test/proxy.pac',
   'https://private-user:private-pass@[invalid',
 ])('does not expose credentials in invalid proxy errors', (proxy) => {
   expect(() => setupProxyForUrl('https://astral.sh', { HTTPS_PROXY: proxy })).toThrow(

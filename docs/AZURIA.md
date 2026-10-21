@@ -14,6 +14,9 @@ PIN desde o início do compartilhamento LAN, mensagens de erro sem diagnósticos
 privados e sessões MCP com limite e expiração. O aplicativo sincroniza o ambiente
 Python existente; não é necessário apagar modelos, vozes ou configurações.
 Os avisos de dependências ainda pendentes constam no relatório de segurança.
+A situação atual de cada um, depois da 0.5.9, está em
+[pendências de segurança](security/2026-10-21-followup.md); essas correções
+chegam ao instalador somente numa próxima versão.
 
 O workflow Windows também valida pull requests com a verificação
 **Tests (backend + frontend)**: backend e regressões de segurança em modo offline,
