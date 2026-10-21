@@ -7,6 +7,20 @@ A revisão de segurança e as pendências conhecidas estão no
 [PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
 nova versão instalada.
 
+## Atualização 0.5.10
+
+A versão 0.5.10 inclui as correções do
+[PR #11](https://github.com/kaikydev1-jpg/azuria-voice/pull/11): Stanza 1.12.2
+na tradução Argos, proteção adicional para checkpoints e mensagens de falha
+NLLB/Argos sem diagnósticos internos. A referência da API também foi atualizada.
+O Stanza corrigido foi validado no Windows com tradução real inglês → português.
+
+Instale sobre o Azúria Voice existente e mantenha o mesmo ambiente local.
+O aplicativo sincroniza as dependências sem exigir que você apague modelos,
+vozes, projetos ou configurações. Os avisos restantes de setuptools, Torch,
+Accelerate, NLTK e ferramentas JavaScript continuam documentados nas pendências;
+esta versão não declara ausência de vulnerabilidades.
+
 ## Atualização 0.5.9
 
 A versão 0.5.9 leva as correções do PR #9 ao instalador Windows: proteção do
@@ -15,8 +29,8 @@ privados e sessões MCP com limite e expiração. O aplicativo sincroniza o ambi
 Python existente; não é necessário apagar modelos, vozes ou configurações.
 Os avisos de dependências ainda pendentes constam no relatório de segurança.
 A situação atual de cada um, depois da 0.5.9, está em
-[pendências de segurança](security/2026-10-21-followup.md); essas correções
-chegam ao instalador somente numa próxima versão.
+[pendências de segurança](security/2026-10-21-followup.md). A versão 0.5.10
+leva ao instalador as correções do PR #11, conforme descrito acima.
 
 O workflow Windows também valida pull requests com a verificação
 **Tests (backend + frontend)**: backend e regressões de segurança em modo offline,
