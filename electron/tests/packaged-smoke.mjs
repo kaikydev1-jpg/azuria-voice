@@ -49,12 +49,18 @@ const keepProfile = process.env.VOICESTUDIO_KEEP_TEST_PROFILE === '1';
 const setup = process.argv.includes('--setup');
 const firstSound = process.argv.includes('--first-sound');
 const quitDuringStartup = process.argv.includes('--quit-during-startup');
+// Explicit integration step: downloads one small permissive model into the test
+// profile and synthesizes with it. Never part of the installers or unit tests.
+const generate = process.argv.includes('--generate');
+const generationModel = 'KittenML/kitten-tts-mini-0.8';
 const install = process.argv.includes('--install') || firstSound;
 const wayland = process.platform === 'linux' && process.env.VOICESTUDIO_TEST_WAYLAND === '1';
 const scaleFactor = Number(process.env.VOICESTUDIO_TEST_SCALE_FACTOR);
 const extractAndRun = process.env.APPIMAGE_EXTRACT_AND_RUN === '1';
 if (quitDuringStartup && !existing)
   throw new Error('--quit-during-startup requires VOICESTUDIO_TEST_PROFILE with a managed runtime');
+if (generate && (!existing || install))
+  throw new Error('--generate requires VOICESTUDIO_TEST_PROFILE with an installed runtime');
 const activate = (locator) =>
   extractAndRun || wayland ? locator.dispatchEvent('click') : locator.click();
 let env = { ...process.env };
@@ -71,8 +77,8 @@ if (setup || install || existing) {
     VOICESTUDIO_SKIP_BACKEND: '',
     HF_HOME: join(profile, 'hf-home'),
     HF_HUB_CACHE: join(profile, 'hf-home', 'hub'),
-    HF_HUB_OFFLINE: firstSound ? '0' : '1',
-    TRANSFORMERS_OFFLINE: firstSound ? '0' : '1',
+    HF_HUB_OFFLINE: firstSound || generate ? '0' : '1',
+    TRANSFORMERS_OFFLINE: firstSound || generate ? '0' : '1',
     UV_CACHE_DIR: join(profile, 'uv-cache'),
     OMNIVOICE_DATA_DIR: join(profile, 'data'),
     OMNIVOICE_PRELOAD_TTS_ASR: '0',
@@ -408,6 +414,55 @@ try {
     if (!firstSound) {
       await window.getByText(PRODUCT_NAME, { exact: true }).first().waitFor({ timeout: 120_000 });
     }
+    if (generate) {
+      await waitForReady(window, 300_000, 'Installed packaged runtime did not start');
+      const licence = await window.evaluate(async (repo) => {
+        const response = await fetch('/api/models/licenses/acceptance/' + repo);
+        return response.ok ? response.json() : { status: response.status };
+      }, generationModel);
+      // The generation model must need no licence acceptance: none is recorded here.
+      assert.equal(licence.required, false, JSON.stringify(licence));
+      await window.evaluate(async (repo) => {
+        const response = await fetch('/api/models/install', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repo_id: repo }),
+        });
+        if (!response.ok) throw new Error(`Model install returned ${response.status}`);
+      }, generationModel);
+      await waitForModelJob(
+        window,
+        generationModel,
+        Number(process.env.VOICESTUDIO_MODEL_TIMEOUT_MS) || 1_200_000,
+      );
+      const proof = await window.evaluate(async () => {
+        const form = new FormData();
+        form.set('text', 'Azuria Voice packaging test.');
+        form.set('engine', 'kittentts');
+        form.set('language', 'en');
+        const response = await fetch('/api/generate', { method: 'POST', body: form });
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        if (!response.ok)
+          throw new Error(`Generate returned ${response.status}: ${new TextDecoder().decode(bytes)}`);
+        const view = new DataView(bytes.buffer);
+        const history = await (await fetch('/api/history')).json();
+        return {
+          size: bytes.byteLength,
+          riff: new TextDecoder('ascii').decode(bytes.slice(0, 4)),
+          wave: new TextDecoder('ascii').decode(bytes.slice(8, 12)),
+          channels: view.getUint16(22, true),
+          sampleRate: view.getUint32(24, true),
+          historyEngine: Array.isArray(history) ? history[0]?.engine : undefined,
+        };
+      });
+      assert.equal(proof.riff, 'RIFF');
+      assert.equal(proof.wave, 'WAVE');
+      assert(proof.size > 24_000, `Generated WAV is too short: ${proof.size} bytes`);
+      assert(proof.sampleRate > 0 && proof.channels > 0, JSON.stringify(proof));
+      console.log(
+        `PASS: packaged ${process.platform}-${targetArch} runtime generated a ${proof.size}-byte ${proof.sampleRate} Hz WAV with ${generationModel} (history engine: ${proof.historyEngine ?? 'unknown'})`,
+      );
+    }
     if (existing) {
       const deadline = Date.now() + 120_000;
       for (;;) {
@@ -515,6 +570,49 @@ async function waitForRuntimeGate(window, timeout) {
     if (Date.now() >= deadline) throw new Error('Runtime setup gate timed out');
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
+}
+
+async function waitForReady(window, timeout, message) {
+  const deadline = Date.now() + timeout;
+  for (;;) {
+    const current = await window.evaluate(async () => window.voicestudio.backend.getStatus());
+    if (current.stage === 'ready') return;
+    if (['setup_required', 'failed', 'crashed', 'port_in_use'].includes(current.stage))
+      throw new Error(JSON.stringify(current));
+    assert(Date.now() < deadline, message);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+}
+
+async function waitForModelJob(window, repoId, timeout) {
+  const deadline = Date.now() + timeout;
+  let last = '';
+  while (Date.now() < deadline) {
+    const { job, installed } = await window.evaluate(async (repo) => {
+      const [jobsResponse, modelsResponse] = await Promise.all([
+        fetch('/api/models/install/status'),
+        fetch('/api/models'),
+      ]);
+      const jobs = jobsResponse.ok ? (await jobsResponse.json()).jobs : [];
+      const models = modelsResponse.ok ? (await modelsResponse.json()).models : [];
+      return {
+        job: jobs?.find((item) => item.repo_id === repo) ?? null,
+        installed: Boolean(models?.find((item) => item.repo_id === repo)?.installed),
+      };
+    }, repoId);
+    const summary = [job?.state, job?.phase, job?.bytes_done, job?.total_bytes]
+      .filter((value) => value !== undefined && value !== null)
+      .join(' ');
+    if (summary && summary !== last) {
+      console.log('Model:', summary);
+      last = summary;
+    }
+    if (job?.state === 'failed' || job?.state === 'cancelled')
+      throw new Error(`${repoId} installation ${job.state}: ${job.error || 'unknown error'}`);
+    if (installed && job?.state !== 'downloading') return;
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+  }
+  throw new Error(`${repoId} installation timed out`);
 }
 
 async function waitForSetupModels(window, timeout) {

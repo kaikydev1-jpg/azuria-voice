@@ -187,9 +187,36 @@ def test_release_preserves_authored_announcement_and_contributors(monkeypatch, t
     assets = tmp_path / "assets"
     assets.mkdir()
     for suffix in ("mac-arm64.dmg", "mac-x64.dmg", "linux-x64.deb"):
-        (assets / f"VoiceStudio-Electron-1.2.3-{suffix}").write_bytes(b"fixture")
+        (assets / f"Azuria-Voice-Electron-1.2.3-{suffix}").write_bytes(b"fixture")
     module.prepare(assets, "v1.2.3")
     assert (assets / "RELEASE_NOTES.md").read_text() == notes
+
+
+def test_partial_release_requires_only_the_selected_installers(monkeypatch, tmp_path):
+    """Linux/macOS test builds need their .deb/.dmg, not Windows or Intel files."""
+    import json
+    monkeypatch.syspath_prepend(str(ROOT / "scripts"))
+    spec = importlib.util.spec_from_file_location("release_subset_test", ROOT / "scripts/prepare_electron_release.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, "verify_release", lambda *args, **kwargs: None)
+    monkeypatch.chdir(tmp_path)
+    Path("package.json").write_text(json.dumps({"version": "1.2.3"}))
+    assets = tmp_path / "assets"
+    assets.mkdir()
+    targets = ["linux-x64", "darwin-arm64"]
+    assert module.required_installers(targets) == ["linux-x64.deb", "mac-arm64.dmg"]
+    (assets / "Azuria-Voice-Electron-1.2.3-linux-x64.deb").write_bytes(b"deb")
+    with pytest.raises(ValueError, match="mac-arm64.dmg"):
+        module.prepare(assets, "v1.2.3", targets=targets, notes=False)
+    (assets / "Azuria-Voice-Electron-1.2.3-mac-arm64.dmg").write_bytes(b"dmg")
+    module.prepare(assets, "v1.2.3", targets=targets, notes=False)
+    assert not (assets / "RELEASE_NOTES.md").exists()
+    sums = (assets / "SHA256SUMS.txt").read_text().splitlines()
+    assert [line.split("  ", 1)[1] for line in sums] == [
+        "Azuria-Voice-Electron-1.2.3-linux-x64.deb",
+        "Azuria-Voice-Electron-1.2.3-mac-arm64.dmg",
+    ]
 
 @pytest.fixture
 def validate_sunset(monkeypatch):

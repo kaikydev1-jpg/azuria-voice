@@ -152,3 +152,55 @@ def test_windows_arm64_payload_without_a_manifest_is_rejected(tmp_path: Path, su
     )
     with pytest.raises(ReleaseContractError, match="missing downloaded manifest"):
         verify_release(release, tmp_path, channel="stable", version="0.5.3")
+
+
+def _subset(release: dict, tmp_path: Path, keep: set[str]) -> dict:
+    """Drop every target outside ``keep`` from a fixture release."""
+    for target, (manifest_target, os_token, arch, extension) in TARGETS.items():
+        if target in keep:
+            continue
+        (tmp_path / f"electron-stable-{manifest_target}.yml").unlink()
+        prefix = f"Azuria-Voice-Electron-0.5.3-{os_token}-{arch}{extension}"
+        release["assets"] = [
+            a
+            for a in release["assets"]
+            if a["name"] != f"electron-stable-{manifest_target}.yml"
+            and not a["name"].startswith(prefix)
+        ]
+    return release
+
+
+def test_linux_and_apple_silicon_subset_passes_without_windows_or_intel(tmp_path: Path):
+    """A Linux/macOS packaging run must not need a Windows or Intel installer."""
+    keep = {"linux-x64", "darwin-arm64"}
+    release = _subset(_release(tmp_path), tmp_path, keep)
+    result = verify_release(
+        release, tmp_path, channel="stable", version="0.5.3", targets=sorted(keep)
+    )
+    assert {item.split(" -> ", 1)[0] for item in result} == {
+        "electron-stable-darwin-arm64-mac.yml",
+        "electron-stable-linux-x64-linux.yml",
+    }
+    # The full release contract still refuses the same partial set.
+    with pytest.raises(ReleaseContractError, match="missing downloaded manifest"):
+        verify_release(release, tmp_path, channel="stable", version="0.5.3")
+
+
+def test_every_selected_target_is_mandatory(tmp_path: Path):
+    release = _subset(_release(tmp_path), tmp_path, {"linux-x64"})
+    with pytest.raises(ReleaseContractError, match="darwin-arm64-mac"):
+        verify_release(
+            release,
+            tmp_path,
+            channel="stable",
+            version="0.5.3",
+            targets=["linux-x64", "darwin-arm64"],
+        )
+
+
+@pytest.mark.parametrize("targets", [["linux-arm64"], []])
+def test_unknown_or_empty_target_selection_fails_closed(tmp_path: Path, targets: list[str]):
+    with pytest.raises(ReleaseContractError, match="unknown or empty"):
+        verify_release(
+            _release(tmp_path), tmp_path, channel="stable", version="0.5.3", targets=targets
+        )

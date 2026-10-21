@@ -34,14 +34,14 @@ Instaladores sem certificado de assinatura podem mostrar o editor como desconhec
 
 ## macOS, Linux e execução pelo código-fonte
 
-O código conserva o suporte da base original, mas o pacote configurado nesta edição é o Windows `.exe`; esse arquivo não instala no macOS nem no Linux. As verificações desta edição foram executadas no Windows. Ainda não compilamos nem testamos pacotes nativos do Azúria Voice em macOS/Linux.
+O instalador publicado desta edição continua sendo o Windows `.exe`; ele não instala no macOS nem no Linux. O workflow [Azúria Voice Linux e macOS](https://github.com/kaikydev1-jpg/azuria-voice/actions/workflows/azuria-linux-macos.yml) compila e testa pacotes nativos de teste, descritos abaixo. Eles ainda não fazem parte de uma versão estável.
 
 | Plataforma | Suporte da base e situação desta edição |
 | --- | --- |
 | Windows x64 | Workflow de instalador NSIS e verificações locais disponíveis. |
-| Mac com Apple Silicon, macOS 13.3+ | Backend local suportado pela base; Azúria disponível pelo código-fonte até publicarmos e validarmos um pacote nativo. |
-| Mac Intel | Interface com backend remoto; o backend local não é suportado, inclusive pelo código-fonte. |
-| Linux x64 com desktop X11/Wayland | Suporte desktop da base preservado; Azúria disponível pelo código-fonte até publicarmos e validarmos um pacote nativo. |
+| Mac com Apple Silicon, macOS 13.3+ | Backend local suportado. Pacotes de teste `.dmg`/`.zip` com assinatura ad hoc, compilados e testados em runner macOS arm64. |
+| Mac Intel | Somente interface com backend remoto; o backend local não é suportado, inclusive pelo código-fonte. Pacote de teste opcional, verificado nesse modo. |
+| Linux x64 com desktop X11/Wayland | Pacotes de teste AppImage e `.deb`, compilados e testados em runner Ubuntu 24.04 x64. Linux ARM64 não é oferecido. |
 
 Para executar pelo código-fonte em uma plataforma com backend local, instale Git, Node.js 22.18+ (22.x), 24.11+ (24.x) ou 26+, Bun 1.4.2, uv e Rust/Cargo com a toolchain nativa do sistema. A compilação do helper também exige as ferramentas nativas: Xcode Command Line Tools no macOS; compilador C/C++, `pkg-config` e bibliotecas de desenvolvimento de áudio/janelas no Linux; Visual Studio Build Tools com C++/Windows SDK no Windows.
 
@@ -56,6 +56,47 @@ bun run dev
 No Mac Intel, pule `bun run setup:api`, execute `VOICESTUDIO_SKIP_BACKEND=1 bun run dev` e configure a conexão com um backend em outra máquina suportada. Os modelos e ambientes continuam exigindo configuração e downloads próprios.
 
 Os guias de [macOS](install/macos.md) e [Linux](install/linux.md) detalham os requisitos da base. São guias históricos: seus links e nomes de arquivos de download apontam para VoiceStudio original, não para pacotes Azúria. Os scripts de download automático deste repositório dependem de o pacote da plataforma existir na própria [release Azúria](https://github.com/kaikydev1-jpg/azuria-voice/releases); mudar a marca não cria esses arquivos.
+
+## Pacotes de teste para Linux e macOS
+
+Cada pull request com o rótulo `test-draft-release` (ou uma execução manual com
+**test_draft**) guarda os pacotes validados num rascunho de release chamado
+`test-linux-macos-<commit>`. O rascunho não é publicado, não cria tag, não é
+marcado como latest e não altera os feeds de atualização. Os artifacts da
+execução também trazem `SHA256SUMS.txt`, manifestos e os registros dos testes.
+Enquanto a próxima versão não estiver definida, o rótulo interno dos pacotes é
+a versão atual do `package.json`; identifique o teste pelo commit.
+
+O workflow roda os testes de backend e segurança sem rede e com cache Hugging
+Face vazio, os testes do frontend, as validações do Electron, os contratos de
+empacotamento e atualização, a abertura do pacote instalado, a instalação real
+do ambiente Python pelo aplicativo e o encerramento do backend. Numa etapa
+separada, baixa o modelo KittenTTS (Apache-2.0, cerca de 80 MB, sem aceite de
+licença) no perfil descartável do runner e gera um áudio curto. Os runners não
+têm GPU: o teste roda em CPU. CUDA, ROCm e MPS continuam selecionados pelo
+aplicativo conforme o computador.
+
+### Linux
+
+- **AppImage**: `chmod +x Azuria-Voice-Electron-<versão>-linux-x64.AppImage` e execute o arquivo. É o formato usado pelo atualizador do aplicativo; o `.AppImage.zsync` serve a atualizadores AppImage externos.
+- **.deb** (Debian/Ubuntu): `sudo apt install ./Azuria-Voice-Electron-<versão>-linux-x64.deb`. O `.deb` não se atualiza sozinho: instale o `.deb` da nova versão por cima.
+- Confira os arquivos com `sha256sum -c SHA256SUMS.txt`.
+
+### macOS (Apple Silicon)
+
+Os pacotes usam **assinatura ad hoc**, sem certificado Developer ID e sem
+notarização da Apple. Não é preciso conta Apple paga, mas o macOS bloqueia a
+primeira abertura de um aplicativo baixado:
+
+1. Abra o `.dmg` e arraste **Azúria Voice** para Aplicativos.
+2. Abra o aplicativo uma vez; o macOS avisa que não pode verificá-lo.
+3. Em **Ajustes do Sistema → Privacidade e Segurança**, clique em **Abrir Mesmo Assim** para o Azúria Voice e confirme.
+
+Essa aprovação vale só para este aplicativo; não desative o Gatekeeper. Sem
+notarização, a atualização automática do macOS pode recusar o pacote; nesse
+caso, baixe e instale o novo `.dmg`. O manifesto `electron-stable-darwin-arm64-mac.yml`
+aponta para o `.zip` da mesma versão. Num Mac Intel, use o pacote apenas como
+interface e configure um backend em outra máquina suportada.
 
 ## Dados e modelos
 
