@@ -7,6 +7,13 @@ A revisão de segurança e as pendências conhecidas estão no
 [PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
 nova versão instalada.
 
+## Atualização 0.5.11
+
+A versão 0.5.11 adiciona geração local de música e efeitos sonoros, com escolha de
+modelo, classe de licença visível e finalidade declarada conferida no servidor.
+Veja [Música e efeitos sonoros](music-and-sound-effects.md). Os pesos são baixados
+só quando você pedir e os runtimes ficam em ambientes isolados.
+
 ## Atualização 0.5.10
 
 A versão 0.5.10 inclui as correções do

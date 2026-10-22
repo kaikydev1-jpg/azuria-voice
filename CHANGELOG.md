@@ -62,6 +62,28 @@ metadata and the backend fallback mirror it.
 
 - Gallery preview fallback smoke no longer flakes when a slower runner reads the playing clip in several byte ranges (#3018)
 
+## [0.5.11] — 2026-10-22
+
+O Azúria Voice agora gera **música** e **efeitos sonoros** neste computador, sem nuvem. Você escolhe o modelo e a qualidade; o app mostra a classe de licença antes de baixar e de gerar, e confere a finalidade declarada (pessoal ou comercial) no servidor. Os pesos não vêm no instalador. Instale sobre a versão atual para manter modelos, vozes, projetos e configurações.
+
+**Highlights**
+
+- Música com ACE-Step (Apache-2.0) e MusicGen (somente não comercial)
+- Efeitos sonoros com Stable Audio Open (condições comerciais) e AudioLDM2 (somente não comercial)
+- Finalidade e licença conferidas no servidor, com proveniência gravada em cada take
+- Fila com progresso e cancelamento real; ambientes isolados que não mexem no Torch do app
+- Texto em 21 idiomas, API local e ferramentas MCP
+
+### Added
+
+- Azúria Voice: Ferramentas → Música e Efeitos sonoros, com perfis Rápido, Equilibrado, Alto e Personalizado (#16)
+- Azúria Voice: API `/audio-gen`, ferramentas MCP e exportação de WAV com arquivo de proveniência (#16)
+- Azúria Voice: histórico mostra o modelo, a revisão, a licença e a finalidade declarada de cada take (#16)
+
+### Docs
+
+- Guia [Música e efeitos sonoros](docs/music-and-sound-effects.md) com a tabela de licenças e as limitações conhecidas (#16)
+
 ## [0.5.10] — 2026-10-21
 
 Mais segurança na tradução do Azúria Voice para Windows. Esta versão corrige o carregamento de modelos Stanza no Argos e evita expor diagnósticos internos nas falhas de tradução. Instale sobre a versão atual para manter modelos, vozes, projetos e configurações; o aplicativo sincroniza o ambiente local.
