@@ -29,15 +29,6 @@ jobs:
           name: audiogen-metadata
           path: audiogen-metadata
           retention-days: 14
-      - name: Resumo dos três modelos principais
+      - name: Resumo ACE-Step e Stable Audio Open
         run: |
-          awk '/^## /{p=($0 ~ /ACE-Step\/ACE-Step-v1-3.5B|stable-audio-open-1.0|facebook\/musicgen-small|facebook\/musicgen-stereo-small/)} p' audiogen-metadata/summary.txt | cut -c1-320
-      - name: Trechos das licenças de uso comercial
-        run: |
-          cd audiogen-metadata/texts
-          for f in page__stability_ai_license.txt page__stability_ai_community_license_agreement.txt page__huggingface_co_stabilityai_stable_audio_open_1_0.txt; do
-            [ -f "$f" ] && { echo "=== $f"; grep -n -i -E "stable audio|commercial|revenue|1,000,000|\$1|register|affiliate|acceptable use|notice|powered by|output" "$f" | cut -c1-420 | head -45; }
-          done
-          for f in ACE-Step__ACE-Step-v1-3.5B__LICENSE* ace-step__ACE-Step__LICENSE; do
-            [ -f "$f" ] && echo "=== $f $(wc -l < "$f") linhas, $(head -c 80 "$f" | tr '\n' ' ')"
-          done
+          awk '/^## /{p=($0 ~ /ACE-Step\/ACE-Step-v1-3.5B|stable-audio-open-1.0/)} p' audiogen-metadata/summary.txt | cut -c1-320
