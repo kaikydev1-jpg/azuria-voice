@@ -107,10 +107,9 @@ def run_musicgen(req: dict, device: str, outdir: str) -> dict:
     path = model_req["path"]
     dtype = torch.float16 if device == "cuda" else torch.float32
     emit(event="stage", stage="loading")
-    processor = AutoProcessor.from_pretrained(path, local_files_only=True)
-    model = MusicgenForConditionalGeneration.from_pretrained(
-        path, local_files_only=True, torch_dtype=dtype
-    ).to(device).eval()
+    processor = AutoProcessor.from_pretrained(path, local_files_only=True)  # nosec B615 -- pinned local snapshot, offline
+    model = MusicgenForConditionalGeneration.from_pretrained(path, local_files_only=True, torch_dtype=dtype)  # nosec B615 -- pinned local snapshot, offline
+    model = model.to(device).eval()
     rate = int(model.config.audio_encoder.sampling_rate)
     frame_rate = int(model.config.audio_encoder.frame_rate)
     tokens = max(1, int(round(req["duration_s"] * frame_rate)))
@@ -154,9 +153,7 @@ def _diffusers_pipeline(req: dict, device: str, cls_name: str):
     model_req = req["model"]
     dtype = torch.float16 if device == "cuda" else torch.float32
     emit(event="stage", stage="loading")
-    pipe = getattr(diffusers, cls_name).from_pretrained(
-        model_req["path"], local_files_only=True, torch_dtype=dtype
-    )
+    pipe = getattr(diffusers, cls_name).from_pretrained(model_req["path"], local_files_only=True, torch_dtype=dtype)  # nosec B615 -- pinned local snapshot, offline
     return pipe.to(device)
 
 
