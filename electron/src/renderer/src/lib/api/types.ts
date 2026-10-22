@@ -51,6 +51,8 @@ export interface HistoryItem {
   starred: boolean | number | null;
   /** JSON `DesignRecipe` for Voice Design takes; null for other takes and older rows (#2389). */
   design_recipe?: string | null;
+  /** JSON provenance record for music / sound-effect takes; null for other takes and older rows. */
+  provenance?: string | null;
   /** Epoch seconds (SQLite REAL) on the wire; tolerate ISO strings too. */
   created_at: number | string;
 }

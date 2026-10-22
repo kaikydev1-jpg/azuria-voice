@@ -22,6 +22,7 @@ import { designDraftFromTake, writeDraft } from '@/features/design/design-draft'
 import { openTake } from '@/lib/store/takes';
 import { setCloneSetting } from '@/lib/store/clone-settings';
 import { formatRelative, formatSeconds } from './format';
+import { TakeProvenance } from './take-provenance';
 
 const NUMERIC_SETTINGS = [
   ['steps', 'clone.steps'],
@@ -41,6 +42,7 @@ export function TakeDetails({ item }: { item: HistoryItem }) {
   const settings = takeSettings(item);
   const voice = profiles.data?.find((profile) => profile.id === item.profile_id);
   const isDesign = item.mode === 'design';
+  const isAudioGen = item.mode === 'music' || item.mode === 'sfx';
   const ModeIcon = isDesign ? WandSparklesIcon : FingerprintIcon;
   const numericSettings = NUMERIC_SETTINGS.filter(([key]) => settings[key] !== undefined);
   const hasRecipe =
@@ -72,7 +74,14 @@ export function TakeDetails({ item }: { item: HistoryItem }) {
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-sm font-medium">
             <ModeIcon className="size-3.5 text-muted-foreground" aria-hidden="true" />
-            {voice?.name ?? t(isDesign ? 'projects.designed_voice' : 'projects.cloned_voice')}
+            {voice?.name ??
+              t(
+                isAudioGen
+                  ? `audiogen.${item.mode}.title`
+                  : isDesign
+                    ? 'projects.designed_voice'
+                    : 'projects.cloned_voice',
+              )}
           </p>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
@@ -159,7 +168,11 @@ export function TakeDetails({ item }: { item: HistoryItem }) {
           <WaveformPlayer src={audioUrl(item.audio_path)} source="history" height={64} />
         </div>
       )}
-      <SaveTakeProfile key={item.id + '-save'} item={item} />
+      {isAudioGen ? (
+        <TakeProvenance item={item} />
+      ) : (
+        <SaveTakeProfile key={item.id + '-save'} item={item} />
+      )}
       {voice && (
         <LockVoice
           locked={Boolean(voice.is_locked)}
@@ -177,9 +190,11 @@ export function TakeDetails({ item }: { item: HistoryItem }) {
             suggestedName={`voicestudio-${item.id}.wav`}
           />
         )}
-        <Button variant="outline" disabled={isGenerating} onClick={() => void reuse()}>
-          {t('clone.history_reuse')}
-        </Button>
+        {!isAudioGen && (
+          <Button variant="outline" disabled={isGenerating} onClick={() => void reuse()}>
+            {t('clone.history_reuse')}
+          </Button>
+        )}
       </div>
     </div>
   );

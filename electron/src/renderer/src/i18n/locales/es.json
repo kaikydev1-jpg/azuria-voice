@@ -3793,5 +3793,99 @@
       "remove_file": "Quitar",
       "no_matches": "Sin resultados para \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Música",
+      "desc": "Describe la música que quieres y genérala en este equipo."
+    },
+    "sfx": {
+      "title": "Efectos de sonido",
+      "desc": "Describe un efecto de sonido y genéralo en este equipo."
+    },
+    "local": "Funciona en local. Tras descargar el modelo no hace falta internet.",
+    "purpose": "¿Cómo vas a usar el audio?",
+    "purposes": {
+      "personal": "Personal / no comercial",
+      "commercial": "Comercial / monetizado"
+    },
+    "purposeNote": "Tu elección se comprueba con la licencia del modelo y se guarda con cada resultado. Es una declaración, no una licencia.",
+    "model": "Modelo",
+    "license": {
+      "commercial": "Uso comercial permitido — según la licencia",
+      "conditions": "Uso comercial con condiciones",
+      "noncommercial": "Solo uso no comercial",
+      "unconfirmed": "Permiso no confirmado"
+    },
+    "licenseNote": "Las etiquetas describen la licencia declarada de cada modelo. No son asesoramiento legal ni certifican tu resultado.",
+    "ready": "Listo",
+    "notInstalled": "No instalado",
+    "notForCommercial": "No disponible para uso comercial.",
+    "hardware": "Estimación: unos {{ram}} GB de RAM y {{vram}} GB de memoria de GPU. También funciona en CPU, más despacio.",
+    "conditionsText": "El uso comercial exige registrarse con el titular de la licencia y solo se aplica por debajo de {{amount}} USD de ingresos anuales.",
+    "officialTerms": "Leer los términos oficiales",
+    "acknowledge": "Entiendo estas condiciones y asumo la responsabilidad de cumplirlas.",
+    "installRuntime": "Instalar el entorno (unos {{size}} GB)",
+    "revisionMismatch": "Los archivos instalados difieren de la versión revisada. Vuelve a descargar el modelo.",
+    "downloadModel": "Descargar modelo ({{size}} GB)",
+    "gatedNote": "Este modelo te pide aceptar sus términos en Hugging Face e iniciar sesión con tu propio token en Ajustes.",
+    "installing": "Instalando… puede tardar varios minutos.",
+    "prompt": "Descripción (en inglés funciona mejor)",
+    "lyrics": "Letra (opcional)",
+    "quality": "Calidad",
+    "profiles": {
+      "fast": "Rápido",
+      "balanced": "Equilibrado",
+      "high": "Alto",
+      "custom": "Personalizado"
+    },
+    "duration": "Duración en segundos ({{min}}–{{max}})",
+    "variations": "Variaciones",
+    "seed": "Semilla (vacío = aleatoria)",
+    "device": "Dispositivo",
+    "devices": {
+      "auto": "Automático",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU de Apple (experimental)"
+    },
+    "preset": "Ajuste de contenido",
+    "presets": {
+      "none": "Ninguno",
+      "game_soundtrack": "Banda sonora de juego",
+      "monetized_video": "Vídeo monetizado",
+      "game_sfx": "Efecto de sonido de juego"
+    },
+    "generate": "Generar",
+    "cancel": "Cancelar",
+    "status": {
+      "queued": "En cola ({{ahead}} por delante)",
+      "preparing": "Preparando…",
+      "loading": "Cargando el modelo…",
+      "generating": "Generando…",
+      "saving": "Guardando…",
+      "done": "Hecho",
+      "failed": "Falló",
+      "cancelled": "Cancelado"
+    },
+    "errors": {
+      "out_of_memory": "Memoria insuficiente. Prueba la calidad Rápido, una duración menor o la CPU.",
+      "stalled": "El modelo dejó de responder y se detuvo.",
+      "timeout": "La generación tardó demasiado y se detuvo.",
+      "device_unavailable": "El dispositivo elegido no está disponible para este modelo.",
+      "generation_failed": "La generación falló."
+    },
+    "fellBack": "No se pudo usar la GPU; esta ejecución pasó a la CPU.",
+    "ranOn": "Generado en: {{device}}",
+    "downloadWav": "Descargar WAV",
+    "exportProvenance": "Exportar WAV + procedencia",
+    "provenance": {
+      "title": "Procedencia",
+      "revision": "Revisión",
+      "license": "Licencia",
+      "declaredUse": "Uso declarado",
+      "acknowledged": "condiciones reconocidas",
+      "notRecorded": "Procedencia no registrada para esta toma. No se presupone ningún modelo, licencia ni uso permitido."
+    }
   }
 }

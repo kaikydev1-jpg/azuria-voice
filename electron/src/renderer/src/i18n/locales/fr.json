@@ -3793,5 +3793,99 @@
       "remove_file": "Retirer",
       "no_matches": "Aucun résultat pour \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Musique",
+      "desc": "Décrivez la musique voulue et générez-la sur cet ordinateur."
+    },
+    "sfx": {
+      "title": "Effets sonores",
+      "desc": "Décrivez un effet sonore et générez-le sur cet ordinateur."
+    },
+    "local": "Fonctionne en local. Une fois le modèle téléchargé, aucune connexion n'est nécessaire.",
+    "purpose": "Comment allez-vous utiliser l'audio ?",
+    "purposes": {
+      "personal": "Personnel / non commercial",
+      "commercial": "Commercial / monétisé"
+    },
+    "purposeNote": "Votre choix est vérifié par rapport à la licence du modèle et enregistré avec chaque résultat. C'est une déclaration, pas une licence.",
+    "model": "Modèle",
+    "license": {
+      "commercial": "Usage commercial autorisé — selon la licence",
+      "conditions": "Usage commercial sous conditions",
+      "noncommercial": "Usage non commercial uniquement",
+      "unconfirmed": "Autorisation non confirmée"
+    },
+    "licenseNote": "Les étiquettes décrivent la licence déclarée de chaque modèle. Ce ne sont pas des conseils juridiques et elles ne certifient pas votre résultat.",
+    "ready": "Prêt",
+    "notInstalled": "Non installé",
+    "notForCommercial": "Non proposé pour un usage commercial.",
+    "hardware": "Estimation : environ {{ram}} Go de RAM et {{vram}} Go de mémoire GPU. Fonctionne aussi sur le CPU, plus lentement.",
+    "conditionsText": "L'usage commercial exige une inscription auprès du titulaire de la licence et ne s'applique que sous {{amount}} USD de revenus annuels.",
+    "officialTerms": "Lire les conditions officielles",
+    "acknowledge": "Je comprends ces conditions et je m'engage à les respecter.",
+    "installRuntime": "Installer l'environnement (environ {{size}} Go)",
+    "revisionMismatch": "Les fichiers installés diffèrent de la version examinée. Téléchargez à nouveau le modèle.",
+    "downloadModel": "Télécharger le modèle ({{size}} Go)",
+    "gatedNote": "Ce modèle demande d'accepter ses conditions sur Hugging Face et de se connecter avec votre propre jeton dans les réglages.",
+    "installing": "Installation… cela peut prendre plusieurs minutes.",
+    "prompt": "Description (l'anglais donne les meilleurs résultats)",
+    "lyrics": "Paroles (facultatif)",
+    "quality": "Qualité",
+    "profiles": {
+      "fast": "Rapide",
+      "balanced": "Équilibré",
+      "high": "Élevée",
+      "custom": "Personnalisé"
+    },
+    "duration": "Durée en secondes ({{min}}–{{max}})",
+    "variations": "Variations",
+    "seed": "Graine (vide = aléatoire)",
+    "device": "Appareil",
+    "devices": {
+      "auto": "Automatique",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU Apple (expérimental)"
+    },
+    "preset": "Préréglage de contenu",
+    "presets": {
+      "none": "Aucun",
+      "game_soundtrack": "Bande-son de jeu",
+      "monetized_video": "Vidéo monétisée",
+      "game_sfx": "Effet sonore de jeu"
+    },
+    "generate": "Générer",
+    "cancel": "Annuler",
+    "status": {
+      "queued": "En file d'attente ({{ahead}} devant)",
+      "preparing": "Préparation…",
+      "loading": "Chargement du modèle…",
+      "generating": "Génération…",
+      "saving": "Enregistrement…",
+      "done": "Terminé",
+      "failed": "Échec",
+      "cancelled": "Annulé"
+    },
+    "errors": {
+      "out_of_memory": "Mémoire insuffisante. Essayez la qualité Rapide, une durée plus courte ou le CPU.",
+      "stalled": "Le modèle ne répondait plus et a été arrêté.",
+      "timeout": "La génération a pris trop de temps et a été arrêtée.",
+      "device_unavailable": "L'appareil choisi n'est pas disponible pour ce modèle.",
+      "generation_failed": "La génération a échoué."
+    },
+    "fellBack": "Le GPU n'a pas pu être utilisé ; cette exécution est passée au CPU.",
+    "ranOn": "Généré sur : {{device}}",
+    "downloadWav": "Télécharger le WAV",
+    "exportProvenance": "Exporter WAV + provenance",
+    "provenance": {
+      "title": "Provenance",
+      "revision": "Révision",
+      "license": "Licence",
+      "declaredUse": "Usage déclaré",
+      "acknowledged": "conditions reconnues",
+      "notRecorded": "Provenance non enregistrée pour cette prise. Aucun modèle, licence ni usage autorisé n'est présumé."
+    }
   }
 }

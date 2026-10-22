@@ -3791,5 +3791,99 @@
       "remove_file": "제거",
       "no_matches": "\"{{query}}\"에 대한 결과가 없습니다."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "음악",
+      "desc": "원하는 음악을 설명하면 이 컴퓨터에서 생성합니다."
+    },
+    "sfx": {
+      "title": "효과음",
+      "desc": "효과음을 설명하면 이 컴퓨터에서 생성합니다."
+    },
+    "local": "로컬에서 실행됩니다. 모델을 내려받은 후에는 인터넷이 필요하지 않습니다.",
+    "purpose": "이 오디오를 어떻게 사용하시나요?",
+    "purposes": {
+      "personal": "개인용 / 비상업적",
+      "commercial": "상업용 / 수익화"
+    },
+    "purposeNote": "선택한 내용은 모델 라이선스와 대조되고 각 결과와 함께 저장됩니다. 이는 신고일 뿐 라이선스가 아닙니다.",
+    "model": "모델",
+    "license": {
+      "commercial": "상업적 사용 허용 — 라이선스에 따름",
+      "conditions": "조건부 상업적 사용",
+      "noncommercial": "비상업적 사용만 가능",
+      "unconfirmed": "허가 미확인"
+    },
+    "licenseNote": "라벨은 각 모델이 선언한 라이선스를 설명합니다. 법률 자문이 아니며 결과물을 보증하지 않습니다.",
+    "ready": "준비됨",
+    "notInstalled": "설치되지 않음",
+    "notForCommercial": "상업적 사용에는 제공되지 않습니다.",
+    "hardware": "예상: RAM 약 {{ram}}GB, GPU 메모리 {{vram}}GB. CPU에서도 실행되지만 더 느립니다.",
+    "conditionsText": "상업적 사용은 라이선스 제공자에게 등록해야 하며 연 매출이 {{amount}}달러 미만인 경우에만 적용됩니다.",
+    "officialTerms": "공식 약관 읽기",
+    "acknowledge": "이 조건을 이해했으며 준수할 책임이 있음을 확인합니다.",
+    "installRuntime": "런타임 설치(약 {{size}}GB)",
+    "revisionMismatch": "설치된 파일이 검토된 버전과 다릅니다. 모델을 다시 내려받으세요.",
+    "downloadModel": "모델 내려받기({{size}}GB)",
+    "gatedNote": "이 모델은 Hugging Face에서 약관에 동의하고 설정에서 본인의 토큰으로 로그인해야 합니다.",
+    "installing": "설치 중… 몇 분 걸릴 수 있습니다.",
+    "prompt": "설명(영어가 가장 좋습니다)",
+    "lyrics": "가사(선택)",
+    "quality": "품질",
+    "profiles": {
+      "fast": "빠름",
+      "balanced": "균형",
+      "high": "높음",
+      "custom": "사용자 지정"
+    },
+    "duration": "길이(초)({{min}}–{{max}})",
+    "variations": "변형",
+    "seed": "시드(비워 두면 무작위)",
+    "device": "장치",
+    "devices": {
+      "auto": "자동",
+      "cpu": "CPU",
+      "cuda": "GPU(CUDA)",
+      "mps": "Apple GPU(실험적)"
+    },
+    "preset": "콘텐츠 프리셋",
+    "presets": {
+      "none": "없음",
+      "game_soundtrack": "게임 사운드트랙",
+      "monetized_video": "수익화 영상",
+      "game_sfx": "게임 효과음"
+    },
+    "generate": "생성",
+    "cancel": "취소",
+    "status": {
+      "queued": "대기열({{ahead}}개 앞에 있음)",
+      "preparing": "준비 중…",
+      "loading": "모델 불러오는 중…",
+      "generating": "생성 중…",
+      "saving": "저장 중…",
+      "done": "완료",
+      "failed": "실패",
+      "cancelled": "취소됨"
+    },
+    "errors": {
+      "out_of_memory": "메모리가 부족합니다. 빠름 품질, 더 짧은 길이 또는 CPU를 사용해 보세요.",
+      "stalled": "모델이 응답하지 않아 중지되었습니다.",
+      "timeout": "생성이 너무 오래 걸려 중지되었습니다.",
+      "device_unavailable": "선택한 장치는 이 모델에서 사용할 수 없습니다.",
+      "generation_failed": "생성에 실패했습니다."
+    },
+    "fellBack": "GPU를 사용할 수 없어 이번 실행은 CPU로 전환되었습니다.",
+    "ranOn": "생성 장치: {{device}}",
+    "downloadWav": "WAV 내려받기",
+    "exportProvenance": "WAV + 출처 내보내기",
+    "provenance": {
+      "title": "출처",
+      "revision": "리비전",
+      "license": "라이선스",
+      "declaredUse": "신고된 용도",
+      "acknowledged": "조건 확인됨",
+      "notRecorded": "이 테이크의 출처가 기록되지 않았습니다. 어떤 모델, 라이선스, 허용된 용도도 가정하지 않습니다."
+    }
   }
 }

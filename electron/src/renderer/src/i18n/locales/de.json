@@ -3791,5 +3791,99 @@
       "remove_file": "Entfernen",
       "no_matches": "Keine Treffer für \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Musik",
+      "desc": "Beschreibe die gewünschte Musik und erzeuge sie auf diesem Computer."
+    },
+    "sfx": {
+      "title": "Soundeffekte",
+      "desc": "Beschreibe einen Soundeffekt und erzeuge ihn auf diesem Computer."
+    },
+    "local": "Läuft lokal. Nach dem Herunterladen des Modells ist kein Internet nötig.",
+    "purpose": "Wie wirst du das Audio verwenden?",
+    "purposes": {
+      "personal": "Privat / nicht kommerziell",
+      "commercial": "Kommerziell / monetarisiert"
+    },
+    "purposeNote": "Deine Auswahl wird mit der Lizenz des Modells abgeglichen und bei jedem Ergebnis gespeichert. Sie ist eine Erklärung, keine Lizenz.",
+    "model": "Modell",
+    "license": {
+      "commercial": "Kommerzielle Nutzung erlaubt — laut Lizenz",
+      "conditions": "Kommerzielle Nutzung mit Bedingungen",
+      "noncommercial": "Nur nicht kommerzielle Nutzung",
+      "unconfirmed": "Erlaubnis nicht bestätigt"
+    },
+    "licenseNote": "Die Bezeichnungen beschreiben die erklärte Lizenz des jeweiligen Modells. Sie sind keine Rechtsberatung und bescheinigen nichts für dein Ergebnis.",
+    "ready": "Bereit",
+    "notInstalled": "Nicht installiert",
+    "notForCommercial": "Nicht für kommerzielle Nutzung angeboten.",
+    "hardware": "Schätzung: etwa {{ram}} GB RAM und {{vram}} GB GPU-Speicher. Läuft auch auf der CPU, aber langsamer.",
+    "conditionsText": "Kommerzielle Nutzung erfordert eine Registrierung beim Lizenzgeber und gilt nur unterhalb von {{amount}} USD Jahresumsatz.",
+    "officialTerms": "Offizielle Bedingungen lesen",
+    "acknowledge": "Ich verstehe diese Bedingungen und übernehme die Verantwortung, sie einzuhalten.",
+    "installRuntime": "Laufzeitumgebung installieren (etwa {{size}} GB)",
+    "revisionMismatch": "Die installierten Dateien weichen von der geprüften Version ab. Lade das Modell erneut herunter.",
+    "downloadModel": "Modell herunterladen ({{size}} GB)",
+    "gatedNote": "Dieses Modell verlangt, dass du die Bedingungen bei Hugging Face akzeptierst und dich in den Einstellungen mit deinem eigenen Token anmeldest.",
+    "installing": "Wird installiert… das kann mehrere Minuten dauern.",
+    "prompt": "Beschreibung (Englisch funktioniert am besten)",
+    "lyrics": "Songtext (optional)",
+    "quality": "Qualität",
+    "profiles": {
+      "fast": "Schnell",
+      "balanced": "Ausgewogen",
+      "high": "Hoch",
+      "custom": "Benutzerdefiniert"
+    },
+    "duration": "Dauer in Sekunden ({{min}}–{{max}})",
+    "variations": "Variationen",
+    "seed": "Seed (leer = zufällig)",
+    "device": "Gerät",
+    "devices": {
+      "auto": "Automatisch",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple-GPU (experimentell)"
+    },
+    "preset": "Inhaltsvorgabe",
+    "presets": {
+      "none": "Keine",
+      "game_soundtrack": "Spiele-Soundtrack",
+      "monetized_video": "Monetarisiertes Video",
+      "game_sfx": "Spiele-Soundeffekt"
+    },
+    "generate": "Erzeugen",
+    "cancel": "Abbrechen",
+    "status": {
+      "queued": "In der Warteschlange ({{ahead}} davor)",
+      "preparing": "Wird vorbereitet…",
+      "loading": "Modell wird geladen…",
+      "generating": "Wird erzeugt…",
+      "saving": "Wird gespeichert…",
+      "done": "Fertig",
+      "failed": "Fehlgeschlagen",
+      "cancelled": "Abgebrochen"
+    },
+    "errors": {
+      "out_of_memory": "Nicht genug Speicher. Versuche die Qualität Schnell, eine kürzere Dauer oder die CPU.",
+      "stalled": "Das Modell reagierte nicht mehr und wurde beendet.",
+      "timeout": "Die Erzeugung dauerte zu lange und wurde beendet.",
+      "device_unavailable": "Das gewählte Gerät ist für dieses Modell nicht verfügbar.",
+      "generation_failed": "Die Erzeugung ist fehlgeschlagen."
+    },
+    "fellBack": "Die GPU konnte nicht verwendet werden; dieser Durchlauf nutzte die CPU.",
+    "ranOn": "Erzeugt auf: {{device}}",
+    "downloadWav": "WAV herunterladen",
+    "exportProvenance": "WAV + Herkunftsnachweis exportieren",
+    "provenance": {
+      "title": "Herkunftsnachweis",
+      "revision": "Revision",
+      "license": "Lizenz",
+      "declaredUse": "Erklärte Nutzung",
+      "acknowledged": "Bedingungen bestätigt",
+      "notRecorded": "Für diese Aufnahme ist kein Herkunftsnachweis gespeichert. Es wird kein Modell, keine Lizenz und keine erlaubte Nutzung angenommen."
+    }
   }
 }

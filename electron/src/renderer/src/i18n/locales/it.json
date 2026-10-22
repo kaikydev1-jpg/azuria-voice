@@ -3793,5 +3793,99 @@
       "remove_file": "Rimuovi",
       "no_matches": "Nessun risultato per \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Musica",
+      "desc": "Descrivi la musica che vuoi e generala su questo computer."
+    },
+    "sfx": {
+      "title": "Effetti sonori",
+      "desc": "Descrivi un effetto sonoro e generalo su questo computer."
+    },
+    "local": "Funziona in locale. Dopo aver scaricato il modello non serve internet.",
+    "purpose": "Come userai l'audio?",
+    "purposes": {
+      "personal": "Personale / non commerciale",
+      "commercial": "Commerciale / monetizzato"
+    },
+    "purposeNote": "La tua scelta viene verificata con la licenza del modello e salvata con ogni risultato. È una dichiarazione, non una licenza.",
+    "model": "Modello",
+    "license": {
+      "commercial": "Uso commerciale consentito — secondo la licenza",
+      "conditions": "Uso commerciale con condizioni",
+      "noncommercial": "Solo uso non commerciale",
+      "unconfirmed": "Permesso non confermato"
+    },
+    "licenseNote": "Le etichette descrivono la licenza dichiarata di ogni modello. Non sono consulenza legale e non certificano il tuo risultato.",
+    "ready": "Pronto",
+    "notInstalled": "Non installato",
+    "notForCommercial": "Non disponibile per uso commerciale.",
+    "hardware": "Stima: circa {{ram}} GB di RAM e {{vram}} GB di memoria GPU. Funziona anche su CPU, più lentamente.",
+    "conditionsText": "L'uso commerciale richiede la registrazione presso il titolare della licenza e vale solo sotto {{amount}} USD di ricavi annui.",
+    "officialTerms": "Leggi i termini ufficiali",
+    "acknowledge": "Comprendo queste condizioni e mi assumo la responsabilità di rispettarle.",
+    "installRuntime": "Installa l'ambiente (circa {{size}} GB)",
+    "revisionMismatch": "I file installati differiscono dalla versione verificata. Scarica di nuovo il modello.",
+    "downloadModel": "Scarica il modello ({{size}} GB)",
+    "gatedNote": "Questo modello richiede di accettare i suoi termini su Hugging Face e di accedere con il tuo token personale nelle Impostazioni.",
+    "installing": "Installazione in corso… può richiedere diversi minuti.",
+    "prompt": "Descrizione (l'inglese funziona meglio)",
+    "lyrics": "Testo (facoltativo)",
+    "quality": "Qualità",
+    "profiles": {
+      "fast": "Veloce",
+      "balanced": "Bilanciata",
+      "high": "Alta",
+      "custom": "Personalizzata"
+    },
+    "duration": "Durata in secondi ({{min}}–{{max}})",
+    "variations": "Variazioni",
+    "seed": "Seed (vuoto = casuale)",
+    "device": "Dispositivo",
+    "devices": {
+      "auto": "Automatico",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU Apple (sperimentale)"
+    },
+    "preset": "Preimpostazione contenuto",
+    "presets": {
+      "none": "Nessuna",
+      "game_soundtrack": "Colonna sonora di gioco",
+      "monetized_video": "Video monetizzato",
+      "game_sfx": "Effetto sonoro di gioco"
+    },
+    "generate": "Genera",
+    "cancel": "Annulla",
+    "status": {
+      "queued": "In coda ({{ahead}} davanti)",
+      "preparing": "Preparazione…",
+      "loading": "Caricamento del modello…",
+      "generating": "Generazione…",
+      "saving": "Salvataggio…",
+      "done": "Fatto",
+      "failed": "Non riuscito",
+      "cancelled": "Annullato"
+    },
+    "errors": {
+      "out_of_memory": "Memoria insufficiente. Prova la qualità Veloce, una durata minore o la CPU.",
+      "stalled": "Il modello ha smesso di rispondere ed è stato interrotto.",
+      "timeout": "La generazione ha impiegato troppo tempo ed è stata interrotta.",
+      "device_unavailable": "Il dispositivo scelto non è disponibile per questo modello.",
+      "generation_failed": "Generazione non riuscita."
+    },
+    "fellBack": "Non è stato possibile usare la GPU; questa esecuzione è passata alla CPU.",
+    "ranOn": "Generato su: {{device}}",
+    "downloadWav": "Scarica WAV",
+    "exportProvenance": "Esporta WAV + provenienza",
+    "provenance": {
+      "title": "Provenienza",
+      "revision": "Revisione",
+      "license": "Licenza",
+      "declaredUse": "Uso dichiarato",
+      "acknowledged": "condizioni riconosciute",
+      "notRecorded": "Provenienza non registrata per questa take. Non si presume alcun modello, licenza o uso consentito."
+    }
   }
 }

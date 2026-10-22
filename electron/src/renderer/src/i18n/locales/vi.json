@@ -3791,5 +3791,99 @@
       "remove_file": "Xóa",
       "no_matches": "Không có kết quả cho \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Âm nhạc",
+      "desc": "Mô tả bản nhạc bạn muốn và tạo ngay trên máy tính này."
+    },
+    "sfx": {
+      "title": "Hiệu ứng âm thanh",
+      "desc": "Mô tả một hiệu ứng âm thanh và tạo ngay trên máy tính này."
+    },
+    "local": "Chạy cục bộ. Sau khi tải mô hình, không cần internet.",
+    "purpose": "Bạn sẽ dùng âm thanh này như thế nào?",
+    "purposes": {
+      "personal": "Cá nhân / phi thương mại",
+      "commercial": "Thương mại / kiếm tiền"
+    },
+    "purposeNote": "Lựa chọn của bạn được đối chiếu với giấy phép của mô hình và lưu cùng mỗi kết quả. Đây là lời khai, không phải giấy phép.",
+    "model": "Mô hình",
+    "license": {
+      "commercial": "Được phép dùng thương mại — theo giấy phép",
+      "conditions": "Dùng thương mại có điều kiện",
+      "noncommercial": "Chỉ dùng phi thương mại",
+      "unconfirmed": "Chưa xác nhận quyền sử dụng"
+    },
+    "licenseNote": "Các nhãn mô tả giấy phép mà mỗi mô hình tuyên bố. Đây không phải tư vấn pháp lý và không bảo chứng cho kết quả của bạn.",
+    "ready": "Sẵn sàng",
+    "notInstalled": "Chưa cài đặt",
+    "notForCommercial": "Không cung cấp cho mục đích thương mại.",
+    "hardware": "Ước tính: khoảng {{ram}} GB RAM và {{vram}} GB bộ nhớ GPU. Cũng chạy được trên CPU, chậm hơn.",
+    "conditionsText": "Dùng thương mại cần đăng ký với bên cấp phép và chỉ áp dụng khi doanh thu hằng năm dưới {{amount}} USD.",
+    "officialTerms": "Đọc điều khoản chính thức",
+    "acknowledge": "Tôi hiểu các điều kiện này và chịu trách nhiệm tuân thủ.",
+    "installRuntime": "Cài môi trường chạy (khoảng {{size}} GB)",
+    "revisionMismatch": "Các tệp đã cài khác với phiên bản đã được rà soát. Hãy tải lại mô hình.",
+    "downloadModel": "Tải mô hình ({{size}} GB)",
+    "gatedNote": "Mô hình này yêu cầu bạn chấp nhận điều khoản trên Hugging Face và đăng nhập bằng token riêng của bạn trong Cài đặt.",
+    "installing": "Đang cài đặt… có thể mất vài phút.",
+    "prompt": "Mô tả (tiếng Anh cho kết quả tốt nhất)",
+    "lyrics": "Lời bài hát (tùy chọn)",
+    "quality": "Chất lượng",
+    "profiles": {
+      "fast": "Nhanh",
+      "balanced": "Cân bằng",
+      "high": "Cao",
+      "custom": "Tùy chỉnh"
+    },
+    "duration": "Thời lượng tính bằng giây ({{min}}–{{max}})",
+    "variations": "Biến thể",
+    "seed": "Seed (trống = ngẫu nhiên)",
+    "device": "Thiết bị",
+    "devices": {
+      "auto": "Tự động",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU Apple (thử nghiệm)"
+    },
+    "preset": "Mẫu nội dung",
+    "presets": {
+      "none": "Không có",
+      "game_soundtrack": "Nhạc nền game",
+      "monetized_video": "Video kiếm tiền",
+      "game_sfx": "Hiệu ứng âm thanh game"
+    },
+    "generate": "Tạo",
+    "cancel": "Hủy",
+    "status": {
+      "queued": "Đang xếp hàng (còn {{ahead}} lượt phía trước)",
+      "preparing": "Đang chuẩn bị…",
+      "loading": "Đang tải mô hình…",
+      "generating": "Đang tạo…",
+      "saving": "Đang lưu…",
+      "done": "Xong",
+      "failed": "Thất bại",
+      "cancelled": "Đã hủy"
+    },
+    "errors": {
+      "out_of_memory": "Không đủ bộ nhớ. Hãy thử chất lượng Nhanh, thời lượng ngắn hơn hoặc dùng CPU.",
+      "stalled": "Mô hình ngừng phản hồi và đã bị dừng.",
+      "timeout": "Quá trình tạo mất quá lâu và đã bị dừng.",
+      "device_unavailable": "Thiết bị đã chọn không khả dụng cho mô hình này.",
+      "generation_failed": "Tạo thất bại."
+    },
+    "fellBack": "Không dùng được GPU; lần chạy này chuyển sang CPU.",
+    "ranOn": "Được tạo trên: {{device}}",
+    "downloadWav": "Tải WAV",
+    "exportProvenance": "Xuất WAV + nguồn gốc",
+    "provenance": {
+      "title": "Nguồn gốc",
+      "revision": "Bản sửa đổi",
+      "license": "Giấy phép",
+      "declaredUse": "Mục đích đã khai",
+      "acknowledged": "đã xác nhận điều kiện",
+      "notRecorded": "Chưa ghi nguồn gốc cho bản này. Không giả định mô hình, giấy phép hay mục đích sử dụng được phép nào."
+    }
   }
 }

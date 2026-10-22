@@ -3791,5 +3791,99 @@
       "remove_file": "移除",
       "no_matches": "没有与“{{query}}”匹配的结果。"
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "音乐",
+      "desc": "描述想要的音乐，在这台电脑上生成。"
+    },
+    "sfx": {
+      "title": "音效",
+      "desc": "描述一种音效，在这台电脑上生成。"
+    },
+    "local": "在本地运行。模型下载后无需联网。",
+    "purpose": "你将如何使用这段音频？",
+    "purposes": {
+      "personal": "个人 / 非商业",
+      "commercial": "商业 / 变现"
+    },
+    "purposeNote": "你的选择会与模型的许可证核对，并随每个结果一起保存。这是一份声明，不是许可证。",
+    "model": "模型",
+    "license": {
+      "commercial": "允许商业使用 — 依据许可证",
+      "conditions": "有条件的商业使用",
+      "noncommercial": "仅限非商业使用",
+      "unconfirmed": "未确认许可"
+    },
+    "licenseNote": "标签说明各模型声明的许可证，不构成法律意见，也不为你的成果提供认证。",
+    "ready": "就绪",
+    "notInstalled": "未安装",
+    "notForCommercial": "不提供商业使用。",
+    "hardware": "预估：约 {{ram}} GB 内存和 {{vram}} GB GPU 显存。也可在 CPU 上运行，但更慢。",
+    "conditionsText": "商业使用需要向许可方注册，且仅适用于年收入低于 {{amount}} 美元的情况。",
+    "officialTerms": "阅读官方条款",
+    "acknowledge": "我已理解这些条件，并负责遵守。",
+    "installRuntime": "安装运行环境（约 {{size}} GB）",
+    "revisionMismatch": "已安装的文件与审核过的版本不一致。请重新下载模型。",
+    "downloadModel": "下载模型（{{size}} GB）",
+    "gatedNote": "此模型需要你在 Hugging Face 上接受其条款，并在设置中使用自己的令牌登录。",
+    "installing": "正在安装…可能需要几分钟。",
+    "prompt": "描述（英文效果最佳）",
+    "lyrics": "歌词（可选）",
+    "quality": "质量",
+    "profiles": {
+      "fast": "快速",
+      "balanced": "均衡",
+      "high": "高",
+      "custom": "自定义"
+    },
+    "duration": "时长（秒）（{{min}}–{{max}}）",
+    "variations": "变体",
+    "seed": "种子（留空 = 随机）",
+    "device": "设备",
+    "devices": {
+      "auto": "自动",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple GPU（实验性）"
+    },
+    "preset": "内容预设",
+    "presets": {
+      "none": "无",
+      "game_soundtrack": "游戏配乐",
+      "monetized_video": "变现视频",
+      "game_sfx": "游戏音效"
+    },
+    "generate": "生成",
+    "cancel": "取消",
+    "status": {
+      "queued": "排队中（前面还有 {{ahead}} 个）",
+      "preparing": "准备中…",
+      "loading": "正在加载模型…",
+      "generating": "正在生成…",
+      "saving": "正在保存…",
+      "done": "完成",
+      "failed": "失败",
+      "cancelled": "已取消"
+    },
+    "errors": {
+      "out_of_memory": "内存不足。请尝试“快速”质量、更短的时长或使用 CPU。",
+      "stalled": "模型停止响应，已被终止。",
+      "timeout": "生成耗时过长，已被终止。",
+      "device_unavailable": "所选设备不适用于此模型。",
+      "generation_failed": "生成失败。"
+    },
+    "fellBack": "无法使用 GPU，本次已改用 CPU。",
+    "ranOn": "生成设备：{{device}}",
+    "downloadWav": "下载 WAV",
+    "exportProvenance": "导出 WAV + 来源记录",
+    "provenance": {
+      "title": "来源记录",
+      "revision": "修订版本",
+      "license": "许可证",
+      "declaredUse": "声明的用途",
+      "acknowledged": "已确认条件",
+      "notRecorded": "此次生成未记录来源。不会假定任何模型、许可证或允许的用途。"
+    }
   }
 }

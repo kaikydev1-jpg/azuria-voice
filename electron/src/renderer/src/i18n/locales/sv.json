@@ -3791,5 +3791,99 @@
       "remove_file": "Ta bort",
       "no_matches": "Inga träffar för \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Musik",
+      "desc": "Beskriv musiken du vill ha och skapa den på den här datorn."
+    },
+    "sfx": {
+      "title": "Ljudeffekter",
+      "desc": "Beskriv en ljudeffekt och skapa den på den här datorn."
+    },
+    "local": "Körs lokalt. När modellen har laddats ned behövs inget internet.",
+    "purpose": "Hur ska du använda ljudet?",
+    "purposes": {
+      "personal": "Personligt / icke-kommersiellt",
+      "commercial": "Kommersiellt / intäktsgenererande"
+    },
+    "purposeNote": "Ditt val kontrolleras mot modellens licens och sparas med varje resultat. Det är en försäkran, inte en licens.",
+    "model": "Modell",
+    "license": {
+      "commercial": "Kommersiell användning tillåten — enligt licensen",
+      "conditions": "Kommersiell användning med villkor",
+      "noncommercial": "Endast icke-kommersiell användning",
+      "unconfirmed": "Tillstånd ej bekräftat"
+    },
+    "licenseNote": "Etiketterna beskriver varje modells angivna licens. De är inte juridisk rådgivning och intygar inte ditt resultat.",
+    "ready": "Redo",
+    "notInstalled": "Inte installerad",
+    "notForCommercial": "Erbjuds inte för kommersiell användning.",
+    "hardware": "Uppskattning: cirka {{ram}} GB RAM och {{vram}} GB GPU-minne. Fungerar även på CPU, men långsammare.",
+    "conditionsText": "Kommersiell användning kräver registrering hos licensgivaren och gäller bara under {{amount}} USD i årsintäkter.",
+    "officialTerms": "Läs de officiella villkoren",
+    "acknowledge": "Jag förstår villkoren och ansvarar för att följa dem.",
+    "installRuntime": "Installera körmiljön (cirka {{size}} GB)",
+    "revisionMismatch": "De installerade filerna skiljer sig från den granskade versionen. Ladda ned modellen igen.",
+    "downloadModel": "Ladda ned modellen ({{size}} GB)",
+    "gatedNote": "Modellen kräver att du godkänner dess villkor på Hugging Face och loggar in med din egen token i Inställningar.",
+    "installing": "Installerar… det kan ta flera minuter.",
+    "prompt": "Beskrivning (engelska fungerar bäst)",
+    "lyrics": "Text (valfritt)",
+    "quality": "Kvalitet",
+    "profiles": {
+      "fast": "Snabb",
+      "balanced": "Balanserad",
+      "high": "Hög",
+      "custom": "Anpassad"
+    },
+    "duration": "Längd i sekunder ({{min}}–{{max}})",
+    "variations": "Variationer",
+    "seed": "Seed (tomt = slumpmässigt)",
+    "device": "Enhet",
+    "devices": {
+      "auto": "Automatisk",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple-GPU (experimentell)"
+    },
+    "preset": "Innehållsförval",
+    "presets": {
+      "none": "Inget",
+      "game_soundtrack": "Spelmusik",
+      "monetized_video": "Intäktsgenererande video",
+      "game_sfx": "Spelljudeffekt"
+    },
+    "generate": "Skapa",
+    "cancel": "Avbryt",
+    "status": {
+      "queued": "I kön ({{ahead}} före)",
+      "preparing": "Förbereder…",
+      "loading": "Läser in modellen…",
+      "generating": "Skapar…",
+      "saving": "Sparar…",
+      "done": "Klart",
+      "failed": "Misslyckades",
+      "cancelled": "Avbrutet"
+    },
+    "errors": {
+      "out_of_memory": "Otillräckligt minne. Prova kvaliteten Snabb, en kortare längd eller CPU.",
+      "stalled": "Modellen slutade svara och stoppades.",
+      "timeout": "Skapandet tog för lång tid och stoppades.",
+      "device_unavailable": "Den valda enheten är inte tillgänglig för den här modellen.",
+      "generation_failed": "Skapandet misslyckades."
+    },
+    "fellBack": "GPU:n kunde inte användas; den här körningen föll tillbaka på CPU.",
+    "ranOn": "Skapad på: {{device}}",
+    "downloadWav": "Ladda ned WAV",
+    "exportProvenance": "Exportera WAV + ursprung",
+    "provenance": {
+      "title": "Ursprung",
+      "revision": "Revision",
+      "license": "Licens",
+      "declaredUse": "Angiven användning",
+      "acknowledged": "villkor bekräftade",
+      "notRecorded": "Ursprung ej registrerat för den här tagningen. Ingen modell, licens eller tillåten användning antas."
+    }
   }
 }

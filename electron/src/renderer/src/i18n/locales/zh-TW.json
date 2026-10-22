@@ -3791,5 +3791,99 @@
       "remove_file": "移除",
       "no_matches": "找不到符合「{{query}}」的結果。"
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "音樂",
+      "desc": "描述想要的音樂，在這部電腦上產生。"
+    },
+    "sfx": {
+      "title": "音效",
+      "desc": "描述一種音效，在這部電腦上產生。"
+    },
+    "local": "在本機執行。模型下載後不需要網際網路。",
+    "purpose": "你要如何使用這段音訊？",
+    "purposes": {
+      "personal": "個人 / 非商業",
+      "commercial": "商業 / 營利"
+    },
+    "purposeNote": "你的選擇會與模型的授權比對，並隨每個結果一併儲存。這是聲明，不是授權。",
+    "model": "模型",
+    "license": {
+      "commercial": "允許商業使用 — 依授權",
+      "conditions": "有條件的商業使用",
+      "noncommercial": "僅限非商業使用",
+      "unconfirmed": "未確認授權"
+    },
+    "licenseNote": "標籤說明各模型所聲明的授權，並非法律建議，也不為你的成果提供認證。",
+    "ready": "就緒",
+    "notInstalled": "未安裝",
+    "notForCommercial": "不提供商業使用。",
+    "hardware": "預估：約 {{ram}} GB 記憶體與 {{vram}} GB GPU 記憶體。也可在 CPU 上執行，但較慢。",
+    "conditionsText": "商業使用需向授權方註冊，且僅適用於年收入低於 {{amount}} 美元的情況。",
+    "officialTerms": "閱讀官方條款",
+    "acknowledge": "我已了解這些條件，並負責遵守。",
+    "installRuntime": "安裝執行環境（約 {{size}} GB）",
+    "revisionMismatch": "已安裝的檔案與審核過的版本不一致。請重新下載模型。",
+    "downloadModel": "下載模型（{{size}} GB）",
+    "gatedNote": "此模型需要你在 Hugging Face 上接受其條款，並在設定中使用自己的權杖登入。",
+    "installing": "正在安裝…可能需要幾分鐘。",
+    "prompt": "描述（英文效果最佳）",
+    "lyrics": "歌詞（選填）",
+    "quality": "品質",
+    "profiles": {
+      "fast": "快速",
+      "balanced": "均衡",
+      "high": "高",
+      "custom": "自訂"
+    },
+    "duration": "長度（秒）（{{min}}–{{max}}）",
+    "variations": "變化版本",
+    "seed": "種子（留空 = 隨機）",
+    "device": "裝置",
+    "devices": {
+      "auto": "自動",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple GPU（實驗性）"
+    },
+    "preset": "內容預設",
+    "presets": {
+      "none": "無",
+      "game_soundtrack": "遊戲配樂",
+      "monetized_video": "營利影片",
+      "game_sfx": "遊戲音效"
+    },
+    "generate": "產生",
+    "cancel": "取消",
+    "status": {
+      "queued": "排隊中（前面還有 {{ahead}} 個）",
+      "preparing": "準備中…",
+      "loading": "正在載入模型…",
+      "generating": "正在產生…",
+      "saving": "正在儲存…",
+      "done": "完成",
+      "failed": "失敗",
+      "cancelled": "已取消"
+    },
+    "errors": {
+      "out_of_memory": "記憶體不足。請嘗試「快速」品質、較短的長度或使用 CPU。",
+      "stalled": "模型停止回應，已被終止。",
+      "timeout": "產生耗時過長，已被終止。",
+      "device_unavailable": "所選裝置不適用於此模型。",
+      "generation_failed": "產生失敗。"
+    },
+    "fellBack": "無法使用 GPU，本次已改用 CPU。",
+    "ranOn": "產生裝置：{{device}}",
+    "downloadWav": "下載 WAV",
+    "exportProvenance": "匯出 WAV + 來源記錄",
+    "provenance": {
+      "title": "來源記錄",
+      "revision": "修訂版本",
+      "license": "授權",
+      "declaredUse": "聲明的用途",
+      "acknowledged": "已確認條件",
+      "notRecorded": "此次產生未記錄來源。不會假定任何模型、授權或允許的用途。"
+    }
   }
 }

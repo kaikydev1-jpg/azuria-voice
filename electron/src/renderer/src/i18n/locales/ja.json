@@ -3791,5 +3791,99 @@
       "remove_file": "削除",
       "no_matches": "「{{query}}」に一致する項目はありません。"
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "音楽",
+      "desc": "欲しい音楽を説明して、このコンピューターで生成します。"
+    },
+    "sfx": {
+      "title": "効果音",
+      "desc": "効果音を説明して、このコンピューターで生成します。"
+    },
+    "local": "ローカルで動作します。モデルをダウンロードした後はインターネットは不要です。",
+    "purpose": "この音声をどのように使いますか？",
+    "purposes": {
+      "personal": "個人利用／非営利",
+      "commercial": "商用／収益化"
+    },
+    "purposeNote": "選択内容はモデルのライセンスと照合され、結果ごとに保存されます。これは申告であり、ライセンスではありません。",
+    "model": "モデル",
+    "license": {
+      "commercial": "商用利用可 — ライセンスに従う",
+      "conditions": "条件付きで商用利用可",
+      "noncommercial": "非営利利用のみ",
+      "unconfirmed": "許可は未確認"
+    },
+    "licenseNote": "ラベルは各モデルが宣言しているライセンスを示すものです。法的助言ではなく、生成結果を保証するものでもありません。",
+    "ready": "準備完了",
+    "notInstalled": "未インストール",
+    "notForCommercial": "商用利用には提供されていません。",
+    "hardware": "目安：RAM 約{{ram}} GB、GPUメモリ {{vram}} GB。CPUでも動作しますが、遅くなります。",
+    "conditionsText": "商用利用にはライセンサーへの登録が必要で、年間収益が{{amount}}米ドル未満の場合のみ適用されます。",
+    "officialTerms": "公式の条件を読む",
+    "acknowledge": "これらの条件を理解し、遵守する責任を負います。",
+    "installRuntime": "ランタイムをインストール（約{{size}} GB）",
+    "revisionMismatch": "インストール済みのファイルが確認済みのバージョンと異なります。モデルを再ダウンロードしてください。",
+    "downloadModel": "モデルをダウンロード（{{size}} GB）",
+    "gatedNote": "このモデルは、Hugging Faceで利用条件に同意し、設定で自分のトークンでサインインする必要があります。",
+    "installing": "インストール中…数分かかる場合があります。",
+    "prompt": "説明（英語が最適）",
+    "lyrics": "歌詞（任意）",
+    "quality": "品質",
+    "profiles": {
+      "fast": "高速",
+      "balanced": "バランス",
+      "high": "高",
+      "custom": "カスタム"
+    },
+    "duration": "長さ（秒）（{{min}}～{{max}}）",
+    "variations": "バリエーション",
+    "seed": "シード（空欄＝ランダム）",
+    "device": "デバイス",
+    "devices": {
+      "auto": "自動",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple GPU（試験的）"
+    },
+    "preset": "コンテンツプリセット",
+    "presets": {
+      "none": "なし",
+      "game_soundtrack": "ゲームのサウンドトラック",
+      "monetized_video": "収益化動画",
+      "game_sfx": "ゲームの効果音"
+    },
+    "generate": "生成",
+    "cancel": "キャンセル",
+    "status": {
+      "queued": "待機中（前に{{ahead}}件）",
+      "preparing": "準備中…",
+      "loading": "モデルを読み込み中…",
+      "generating": "生成中…",
+      "saving": "保存中…",
+      "done": "完了",
+      "failed": "失敗",
+      "cancelled": "キャンセルしました"
+    },
+    "errors": {
+      "out_of_memory": "メモリが足りません。品質を高速にするか、長さを短くするか、CPUを試してください。",
+      "stalled": "モデルが応答しなくなったため停止しました。",
+      "timeout": "生成に時間がかかりすぎたため停止しました。",
+      "device_unavailable": "選択したデバイスはこのモデルでは使用できません。",
+      "generation_failed": "生成に失敗しました。"
+    },
+    "fellBack": "GPUを使用できなかったため、今回はCPUで実行しました。",
+    "ranOn": "生成に使用：{{device}}",
+    "downloadWav": "WAVをダウンロード",
+    "exportProvenance": "WAV＋来歴をエクスポート",
+    "provenance": {
+      "title": "来歴",
+      "revision": "リビジョン",
+      "license": "ライセンス",
+      "declaredUse": "申告された用途",
+      "acknowledged": "条件を確認済み",
+      "notRecorded": "このテイクの来歴は記録されていません。モデル、ライセンス、許可された用途は一切想定されません。"
+    }
   }
 }
