@@ -179,6 +179,11 @@ class OwnedPopen:
         except ProcessLookupError:
             # The owned group exited between the waitid probe and the signal.
             pass
+        except PermissionError:
+            # macOS answers EPERM, not ESRCH, when the group leader has just
+            # exited and is a zombie: the group is already gone.
+            if sys.platform != "darwin":
+                raise
 
     def poll(self) -> Optional[int]:
         with self._lock:
