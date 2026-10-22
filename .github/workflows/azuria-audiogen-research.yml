@@ -30,4 +30,4 @@ jobs:
           path: audiogen-metadata
           retention-days: 14
       - name: Digests completos e trechos de capacidades
-        run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata --evidence
+        run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata --evidence | tac
