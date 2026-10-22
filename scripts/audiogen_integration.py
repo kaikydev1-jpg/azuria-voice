@@ -37,12 +37,13 @@ def run(argv, **kw):
 def install_runtime(spec, venv: Path) -> Path:
     from services import sidecar_install as si
 
-    run(["uv", "venv", str(venv), *spec.venv_args])
+    run(["uv", "venv", "--no-config", str(venv), *spec.venv_args], cwd=venv.parent)
     py = si._venv_python(venv)
     target = list(spec.install_args)
     if spec.torch_pins:
         target += si._torch_pin_args(spec)
-    run(["uv", "pip", "install", "--python", str(py), *target])
+    # cwd fora do repo: o pyproject do app tem overrides de torchaudio que não valem aqui
+    run(["uv", "pip", "install", "--no-config", "--python", str(py), *target], cwd=venv.parent)
     return py
 
 
