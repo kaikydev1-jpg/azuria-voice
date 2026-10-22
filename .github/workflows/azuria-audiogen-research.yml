@@ -23,7 +23,17 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata | tee "$GITHUB_STEP_SUMMARY"
+      - run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata 
+      - name: Textos de licença legíveis (ACE-Step, Stable Audio Open, MusicGen, AudioLDM2)
+        run: |
+          cd audiogen-metadata/texts
+          for f in ACE-Step__ACE-Step-v1-3.5B__LICENSE* stabilityai__stable-audio-open-1.0__LICENSE* ace-step__ACE-Step__LICENSE facebookresearch__audiocraft__LICENSE_weights; do
+            [ -f "$f" ] && { echo "=== $f ($(sha256sum "$f" | cut -c1-16))"; head -c 9000 "$f"; echo; }
+          done
+          for f in stabilityai__stable-audio-open-1.0__README.md ACE-Step__ACE-Step-v1-3.5B__README.md; do
+            [ -f "$f" ] && { echo "=== $f"; grep -n -i -E "licen|commercial|gated|agree|revenue|\\$" "$f" | head -40; }
+          done
+          ls
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: audiogen-metadata

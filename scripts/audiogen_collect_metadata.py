@@ -96,6 +96,25 @@ def tree(repo: str, revision: str) -> list[dict]:
              "lfs_sha256": (r.get("lfs") or {}).get("oid"), "oid": r.get("oid")} for r in rows]
 
 
+def print_report(report: dict, out: Path) -> None:
+    """Compact, log-friendly view (the CI log is the only channel back to the sandbox)."""
+    for repo, e in report["models"].items():
+        print(f"## {repo} status={e.get('api_status')} sha={e.get('sha')} license={e.get('license')!r} "
+              f"name={e.get('license_name')!r} link={e.get('license_link')!r} gated={e.get('gated')!r} "
+              f"lib={e.get('library')} pipe={e.get('pipeline')}")
+        for f in e.get("files", []):
+            if f.get("type") == "file" and ((f.get("size") or 0) > 5_000_000 or f["path"].endswith(
+                    (".json", ".md", ".txt")) or f["path"].upper().startswith("LICENSE")):
+                print(f"   {f['path']} {f.get('size')} {(f.get('lfs_sha256') or '')[:16]}")
+        print("   texts:", {k: v["status"] for k, v in e.get("texts", {}).items()})
+    for package, d in report["pypi"].items():
+        print(f"pypi {package} {d.get('version')} py{d.get('requires_python')} license={d.get('license')!r}")
+    ace = report["pypi"].get("ace-step", {})
+    print("ace-step requires_dist:", json.dumps(ace.get("requires_dist")))
+    for key, d in report["github"].items():
+        print("github", key, d["status"], (d["sha256"] or "")[:16])
+
+
 def main(out: Path) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "texts").mkdir(exist_ok=True)
@@ -141,8 +160,7 @@ def main(out: Path) -> int:
         if s == 200:
             (out / "texts" / f"{repo.replace('/', '__')}__{path}").write_text(body, encoding="utf-8")
     (out / "metadata.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
-    print(json.dumps({m: {k: v for k, v in e.items() if k in ("sha", "license", "gated", "api_status")}
-                      for m, e in report["models"].items()}, indent=1))
+    print_report(report, out)
     return 0
 
 
