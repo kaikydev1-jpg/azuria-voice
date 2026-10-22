@@ -54,8 +54,33 @@ def _asset_map(release: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return mapped
 
 
+def select_targets(targets: list[str] | None = None) -> dict[str, tuple[str, str, str, str]]:
+    """Required update targets: every supported one, or an explicit subset.
+
+    A subset serves partial packaging runs (for example Linux and macOS while
+    the Windows installer comes from another workflow). Every selected target
+    is then mandatory; unknown names fail instead of being skipped.
+    """
+    if targets is None:
+        return dict(TARGETS)
+    known = {**TARGETS, **OPTIONAL_TARGETS}
+    unknown = sorted(set(targets) - known.keys())
+    if unknown or not targets:
+        raise ReleaseContractError(f"unknown or empty update targets: {', '.join(unknown)}")
+    return {target: known[target] for target in dict.fromkeys(targets)}
+
+
+def parse_targets(value: str | None) -> list[str] | None:
+    return [item.strip() for item in value.split(",") if item.strip()] if value else None
+
+
 def verify_release(
-    release: dict[str, Any], manifest_dir: Path, *, channel: str, version: str
+    release: dict[str, Any],
+    manifest_dir: Path,
+    *,
+    channel: str,
+    version: str,
+    targets: list[str] | None = None,
 ) -> list[str]:
     # Stable is the only Electron update feed; there is no `preview` release.
     if channel != "stable":
@@ -69,14 +94,16 @@ def verify_release(
         raise ReleaseContractError(f"{channel} release tag does not match {expected_tag}")
 
     assets = _asset_map(release)
+    required = select_targets(targets)
+    optional = OPTIONAL_TARGETS if targets is None else {}
     verified: list[str] = []
     for target, (manifest_target, os_token, arch, extension) in {
-        **TARGETS,
-        **OPTIONAL_TARGETS,
+        **required,
+        **optional,
     }.items():
         manifest_name = f"electron-{channel}-{manifest_target}.yml"
         manifest_path = manifest_dir / manifest_name
-        if target in OPTIONAL_TARGETS:
+        if target in optional:
             # Skip only when NOTHING of this target is published: an installer
             # or blockmap without its manifest is an incomplete release.
             payload = f"Azuria-Voice-Electron-{version}-{os_token}-{arch}{extension}"
@@ -133,10 +160,15 @@ def main() -> int:
     parser.add_argument("--manifest-dir", type=Path, required=True)
     parser.add_argument("--channel", choices=("stable",), required=True)
     parser.add_argument("--version", required=True)
+    parser.add_argument("--targets", help="comma-separated subset, e.g. linux-x64,darwin-arm64")
     args = parser.parse_args()
     release = json.loads(args.release_json.read_text(encoding="utf-8"))
     verified = verify_release(
-        release, args.manifest_dir, channel=args.channel, version=args.version
+        release,
+        args.manifest_dir,
+        channel=args.channel,
+        version=args.version,
+        targets=parse_targets(args.targets),
     )
     print(f"Electron {args.channel} release: {len(verified)} update targets verified")
     for item in verified:

@@ -1,0 +1,627 @@
+name: Azúria Voice Linux e macOS
+
+# Builds and tests the Linux x64 (AppImage + .deb) and macOS Apple Silicon
+# (.dmg + .zip, ad hoc signed) packages on native runners from one commit.
+# Never publishes: the optional test archive is a draft release without a tag.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      integration:
+        description: Install the real Python runtime and generate audio with a small test model
+        type: boolean
+        default: true
+      test_draft:
+        description: Archive the validated packages in an unpublished test draft release
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  # Unrelated labels must not cancel a running build of the same pull request.
+  group: azuria-linux-macos-${{ github.event.pull_request.number || github.ref }}-${{ github.event.action == 'labeled' && github.event.label.name != 'test-draft-release' && github.event.label.name || 'build' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # The PR head (not GitHub's synthetic merge commit), so every leg and the
+  # test draft describe one immutable commit.
+  SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  INTEGRATION: ${{ github.actor != 'dependabot[bot]' && (github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.integration)) }}
+
+jobs:
+  package:
+    name: Package (${{ matrix.label }})
+    if: github.event.action != 'labeled' || github.event.label.name == 'test-draft-release'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    # Intel Macs get the interface with a remote backend only; that leg must
+    # never block the two primary targets.
+    continue-on-error: ${{ matrix.optional }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Linux x64
+            runner: ubuntu-24.04
+            platform: linux
+            arch: x64
+            target: x86_64-unknown-linux-gnu
+            flags: --linux --x64
+            local_runtime: true
+            optional: false
+          - label: macOS arm64
+            # macos-15 arm64 jobs were repeatedly dropped for GitHub capacity
+            # ("not acquired by Runner"); macos-14 is the same native arm64 class.
+            runner: macos-14
+            platform: darwin
+            arch: arm64
+            target: aarch64-apple-darwin
+            flags: --mac --arm64
+            local_runtime: true
+            optional: false
+          - label: macOS Intel (remote backend)
+            runner: macos-15-intel
+            platform: darwin
+            arch: x64
+            target: x86_64-apple-darwin
+            # dmgbuild's alias writer overflows on this runner's 64-bit file
+            # IDs; the remote-backend interface ships as the updater ZIP only.
+            flags: --mac zip --x64
+            # PyTorch publishes no macOS x86_64 wheels for this lock.
+            local_runtime: false
+            optional: true
+    defaults:
+      run:
+        shell: bash
+    env:
+      UV_HTTP_TIMEOUT: '120'
+      UV_HTTP_RETRIES: '5'
+      VOICESTUDIO_RUST_TARGET: ${{ matrix.target }}
+      VOICESTUDIO_UPDATE_CHANNEL: electron-stable-${{ matrix.platform }}-${{ matrix.arch }}
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      EVIDENCE: ${{ github.workspace }}/evidence
+      # The Intel runner runs jsdom suites several times slower than the others.
+      VOICESTUDIO_TEST_TIMEOUT_MS: ${{ matrix.optional && '30000' || '' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          persist-credentials: false
+      - name: Confirm the native runner system and architecture
+        run: |
+          mkdir -p "$EVIDENCE"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          {
+            echo "commit: $SOURCE_SHA"
+            echo "runner: ${{ matrix.runner }}"
+            uname -a
+            if [ "$RUNNER_OS" = Linux ]; then
+              . /etc/os-release && echo "os: $PRETTY_NAME"
+              echo "dpkg architecture: $(dpkg --print-architecture)"
+              test "$(uname -m)" = x86_64
+            else
+              sw_vers
+              echo "cpu: $(sysctl -n machdep.cpu.brand_string)"
+              echo "hw.optional.arm64: $(sysctl -n hw.optional.arm64 2>/dev/null || echo 0)"
+              echo "rosetta translated: $(sysctl -n sysctl.proc_translated 2>/dev/null || echo 0)"
+              test "$(sysctl -n sysctl.proc_translated 2>/dev/null || echo 0)" = 0
+              if [ "${{ matrix.arch }}" = arm64 ]; then test "$(uname -m)" = arm64; else test "$(uname -m)" = x86_64; fi
+            fi
+            df -h "$GITHUB_WORKSPACE"
+          } | tee "$EVIDENCE/runner.txt"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: '1.4.2'
+      - uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: native/desktop-bridge -> target
+          key: azuria-${{ matrix.target }}
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: '0.12.13'
+          enable-cache: false
+      - name: Linux native dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libxdo-dev libxtst-dev libx11-dev libxkbcommon-dev libwayland-dev libssl-dev pkg-config xvfb zsync
+          # Ubuntu 24.04 blocks the unprivileged user namespaces Electron's
+          # sandbox needs; the app itself is never started with --no-sandbox.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Bundle pinned uv for the host architecture
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { mkdirSync, copyFileSync, chmodSync } from 'node:fs';
+          import { join } from 'node:path';
+          const expected = process.env.VOICESTUDIO_RUST_TARGET;
+          const targets = { 'linux-x64': 'x86_64-unknown-linux-gnu', 'darwin-arm64': 'aarch64-apple-darwin', 'darwin-x64': 'x86_64-apple-darwin' };
+          if (targets[`${process.platform}-${process.arch}`] !== expected) throw new Error('Runner architecture does not match package target');
+          const source = execFileSync('which', ['uv'], { encoding: 'utf8' }).trim().split(/\r?\n/)[0];
+          const dir = 'electron/build/uv';
+          mkdirSync(dir, { recursive: true });
+          const destination = join(dir, `uv-${expected}`);
+          copyFileSync(source, destination);
+          chmodSync(destination, 0o755);
+          NODE
+          file electron/build/uv/uv-* | tee "$EVIDENCE/bundled-uv.txt"
+      - name: Install locked dependencies
+        run: bun install --frozen-lockfile
+      - name: Install locked Python CPU test dependencies
+        if: matrix.local_runtime
+        run: bash scripts/uv-sync-retry.sh --frozen --python 3.11 --no-default-groups --group cpu --group dev
+      - name: Backend, security and packaging regressions (offline, empty HF cache)
+        if: matrix.local_runtime
+        env:
+          HF_HUB_OFFLINE: '1'
+          HF_HUB_CACHE: ${{ runner.temp }}/azuria-empty-hf-cache
+          OMNIVOICE_DISABLE_FILE_LOG: '1'
+          PYTHONUTF8: '1'
+        run: uv run --no-sync pytest backend/tests tests/test_python_security_flows.py tests/test_network_share.py tests/test_network_share_lifecycle.py tests/test_network_middleware.py tests/test_mcp_session_limits.py tests/test_dependency_security_floors.py tests/test_app_version.py tests/test_changelog_style.py tests/test_azuria_release_notes.py tests/test_electron_release_assets.py tests/test_azuria_linux_macos_workflow.py -q
+      - name: Shared frontend unit tests
+        run: bun run test:frontend
+      - name: Validate Electron
+        run: bun run check:electron
+      - name: Build packages (ad hoc signing on macOS, never published)
+        id: package
+        working-directory: electron
+        env:
+          # electron-builder skips all signing on pull requests, leaving the
+          # stock Electron signature invalid ("damaged" on download). This job
+          # has no signing secrets, so forcing it only applies the ad hoc
+          # identity from electron-builder.config.mjs.
+          CSC_FOR_PULL_REQUEST: 'true'
+        run: |
+          # No Developer ID: electron-builder.config.mjs signs macOS ad hoc.
+          unset CSC_LINK CSC_KEY_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
+          bun x electron-builder --config electron-builder.config.mjs ${{ matrix.flags }} --publish never
+          if [ "$RUNNER_OS" = Linux ]; then
+            # Final AppImage update metadata goes in before any hash is taken.
+            node scripts/embed-appimage-update.mjs
+          fi
+          node tests/packaging-contract.mjs --artifact
+          node tests/update-package-contract.mjs --platform ${{ matrix.platform }} --arch ${{ matrix.arch }} | tee "$EVIDENCE/update-contract.txt"
+      - name: Verify Linux AppImage, zsync and .deb
+        if: runner.os == 'Linux'
+        working-directory: electron/release
+        run: |
+          set -o pipefail
+          VERSION=$(node -p "require('../../package.json').version")
+          IMAGE="$PWD/Azuria-Voice-Electron-$VERSION-linux-x64.AppImage"
+          DEB="$PWD/Azuria-Voice-Electron-$VERSION-linux-x64.deb"
+          {
+            file "$IMAGE" "$DEB"
+            echo "AppImage update information: $("$IMAGE" --appimage-updateinformation)"
+            # Rebuild the AppImage from its own zsync control file: proves the
+            # control file describes the final bytes (no network is needed).
+            zsync -q -i "$IMAGE" -o "$RUNNER_TEMP/zsync-check.AppImage" "$IMAGE.zsync"
+            cmp "$IMAGE" "$RUNNER_TEMP/zsync-check.AppImage" && echo "zsync reconstruction: identical"
+            dpkg-deb --info "$DEB"
+            test "$(dpkg-deb --field "$DEB" Architecture)" = amd64
+            sudo apt-get install -y "$DEB"
+            PACKAGE=$(dpkg-deb --field "$DEB" Package)
+            dpkg -s "$PACKAGE" | grep -E '^(Package|Status|Version|Architecture):'
+            dpkg -L "$PACKAGE" > "$RUNNER_TEMP/deb-files.txt"
+            grep -E '\.desktop$|/azuria-voice-electron$|/resources/(tools/uv|native/voicestudio-desktop-bridge)$' "$RUNNER_TEMP/deb-files.txt"
+            BIN=$(grep -E '^/opt/.*/azuria-voice-electron$' "$RUNNER_TEMP/deb-files.txt")
+            test "$(wc -l <<<"$BIN")" -eq 1
+            file "$BIN" "$(dirname "$BIN")/resources/tools/uv" "$(dirname "$BIN")/resources/native/voicestudio-desktop-bridge"
+            echo "DEB_BIN=$BIN" >> "$GITHUB_ENV"
+            echo "DEB_PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
+            echo "APPIMAGE=$IMAGE" >> "$GITHUB_ENV"
+          } 2>&1 | tee "$EVIDENCE/linux-packages.txt"
+      - name: Verify macOS ad hoc signature, DMG and ZIP
+        if: runner.os == 'macOS'
+        working-directory: electron/release
+        run: |
+          set -o pipefail
+          VERSION=$(node -p "require('../../package.json').version")
+          DMG="$PWD/Azuria-Voice-Electron-$VERSION-mac-${{ matrix.arch }}.dmg"
+          ZIP="$PWD/Azuria-Voice-Electron-$VERSION-mac-${{ matrix.arch }}.zip"
+          INSTALL_ROOT="$RUNNER_TEMP/Applications"
+          check_bundle() {
+            local app="$1"
+            codesign --verify --deep --strict --verbose=2 "$app"
+            local details executable
+            details=$(codesign -dv --verbose=4 "$app" 2>&1)
+            grep -E '^(Identifier|Format|Signature|TeamIdentifier|Authority|CodeDirectory)' <<<"$details"
+            grep -qx 'Signature=adhoc' <<<"$details"
+            if grep -q '^Authority=' <<<"$details"; then echo 'Unexpected certificate authority'; exit 1; fi
+            test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")" = "$VERSION"
+            executable="$app/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Contents/Info.plist")"
+            for binary in "$executable" "$app/Contents/Resources/tools/uv" "$app/Contents/Resources/native/voicestudio-desktop-bridge"; do
+              test "$(lipo -archs "$binary")" = "$(uname -m)"
+              echo "$(basename "$binary"): $(lipo -archs "$binary")"
+            done
+            # Gatekeeper is expected to reject a non-notarized ad hoc bundle; record it.
+            spctl --assess --type execute --verbose=2 "$app" 2>&1 || echo "Gatekeeper assessment: rejected (expected without Developer ID/notarization)"
+          }
+          {
+            mkdir -p "$INSTALL_ROOT"
+            ZIP_ROOT=$(mktemp -d)
+            ditto -x -k "$ZIP" "$ZIP_ROOT"
+            ZIP_APP=$(find "$ZIP_ROOT" -maxdepth 1 -name '*.app' -type d -print -quit)
+            test -n "$ZIP_APP"
+            echo "== ZIP bundle (updater payload)"; check_bundle "$ZIP_APP"
+            if [ "${{ matrix.arch }}" = arm64 ]; then
+              hdiutil verify "$DMG"
+              MOUNT=$(mktemp -d)
+              hdiutil attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG"
+              SOURCE_APP=$(find "$MOUNT" -maxdepth 1 -name '*.app' -type d -print -quit)
+              test -n "$SOURCE_APP"
+              APP="$INSTALL_ROOT/$(basename "$SOURCE_APP")"
+              ditto "$SOURCE_APP" "$APP"
+              hdiutil detach "$MOUNT"
+              echo "== DMG bundle: $(basename "$APP")"; check_bundle "$APP"
+            else
+              APP="$INSTALL_ROOT/$(basename "$ZIP_APP")"
+              ditto "$ZIP_APP" "$APP"
+            fi
+            echo "MAC_APP_EXE=$APP/Contents/MacOS/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")" >> "$GITHUB_ENV"
+          } 2>&1 | tee "$EVIDENCE/macos-signature.txt"
+      - name: Packaged first-run screen (setup controls only)
+        working-directory: electron
+        run: |
+          set -o pipefail
+          if [ "$RUNNER_OS" = Linux ]; then
+            VOICESTUDIO_PACKAGED_EXE="$APPIMAGE" VOICESTUDIO_SCREENSHOT="$EVIDENCE/setup-appimage.png" xvfb-run -a node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-appimage.log"
+            VOICESTUDIO_PACKAGED_EXE="$DEB_BIN" xvfb-run -a node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-deb.log"
+          else
+            ELECTRON_ENABLE_LOGGING=1 VOICESTUDIO_PACKAGED_EXE="$MAC_APP_EXE" VOICESTUDIO_SCREENSHOT="$EVIDENCE/setup-dmg.png" node tests/packaged-smoke.mjs --setup 2>&1 | tee "$EVIDENCE/setup-dmg.log"
+          fi
+      - name: Remove the .deb installation
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get remove -y "$DEB_PACKAGE"
+          ! dpkg -s "$DEB_PACKAGE" >/dev/null 2>&1
+          test ! -e "$DEB_BIN"
+          echo "removed $DEB_PACKAGE" | tee -a "$EVIDENCE/linux-packages.txt"
+      - name: Free runner disk for the real runtime
+        if: env.INTEGRATION == 'true' && matrix.local_runtime && runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          df -h "$RUNNER_TEMP"
+      - name: Install the real Python runtime from the package (CPU runner)
+        if: env.INTEGRATION == 'true' && matrix.local_runtime
+        working-directory: electron
+        timeout-minutes: 40
+        env:
+          VOICESTUDIO_TEST_PROFILE: ${{ runner.temp }}/azuria-test-profile
+          VOICESTUDIO_RUNTIME_TIMEOUT_MS: '2100000'
+        run: |
+          set -o pipefail
+          mkdir -p "$VOICESTUDIO_TEST_PROFILE"
+          if [ "$RUNNER_OS" = Linux ]; then
+            VOICESTUDIO_PACKAGED_EXE="$APPIMAGE" xvfb-run -a node tests/packaged-smoke.mjs --install 2>&1 | tee "$EVIDENCE/runtime-install.log"
+          else
+            VOICESTUDIO_PACKAGED_EXE="$MAC_APP_EXE" node tests/packaged-smoke.mjs --install 2>&1 | tee "$EVIDENCE/runtime-install.log"
+          fi
+          du -sh "$VOICESTUDIO_TEST_PROFILE" | tee -a "$EVIDENCE/runtime-install.log"
+      - name: Download a small test model and generate audio (network, test only)
+        if: env.INTEGRATION == 'true' && matrix.local_runtime
+        working-directory: electron
+        timeout-minutes: 30
+        env:
+          # Apache-2.0 KittenTTS (about 80 MB): no licence acceptance, CPU only.
+          # It lands in the disposable runner profile, never in an installer.
+          VOICESTUDIO_TEST_PROFILE: ${{ runner.temp }}/azuria-test-profile
+        run: |
+          set -o pipefail
+          if [ "$RUNNER_OS" = Linux ]; then
+            VOICESTUDIO_PACKAGED_EXE="$APPIMAGE" xvfb-run -a node tests/packaged-smoke.mjs --generate 2>&1 | tee "$EVIDENCE/generate.log"
+          else
+            VOICESTUDIO_PACKAGED_EXE="$MAC_APP_EXE" node tests/packaged-smoke.mjs --generate 2>&1 | tee "$EVIDENCE/generate.log"
+          fi
+      - name: Mark this leg as fully validated
+        run: echo "validated $SOURCE_SHA ${{ matrix.platform }}-${{ matrix.arch }} integration=${{ env.INTEGRATION == 'true' && matrix.local_runtime }}" | tee "$EVIDENCE/validated.txt"
+      - name: Write SHA-256 checksums
+        id: checksums
+        if: always() && steps.package.outcome == 'success'
+        working-directory: electron/release
+        run: |
+          shopt -s nullglob
+          files=(Azuria-Voice-Electron-* electron-stable-*.yml)
+          test "${#files[@]}" -ge 3
+          shasum -a 256 "${files[@]}" | sort -k2 > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+      - name: Save packages, updater files, checksums and evidence
+        if: always() && steps.checksums.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Azuria-Voice-${{ matrix.platform }}-${{ matrix.arch }}-${{ env.SOURCE_SHA }}
+          retention-days: 30
+          if-no-files-found: error
+          path: |
+            electron/release/Azuria-Voice-Electron-*
+            electron/release/electron-stable-*.yml
+            electron/release/SHA256SUMS.txt
+            evidence/
+      - name: Collect macOS crash reports
+        if: failure() && runner.os == 'macOS'
+        timeout-minutes: 15
+        run: |
+          mkdir -p "$EVIDENCE/crash-reports"
+          find "$HOME/Library/Logs/DiagnosticReports" /Library/Logs/DiagnosticReports \
+            -maxdepth 1 -type f -newer "$GITHUB_WORKSPACE/package.json" \
+            \( -iname '*Azu*' -o -iname '*Electron*' \) \
+            -exec cp {} "$EVIDENCE/crash-reports/" \; 2>/dev/null || true
+          ls -la "$EVIDENCE/crash-reports"
+          for report in "$EVIDENCE"/crash-reports/*.ips; do
+            [ -f "$report" ] || continue
+            # .ips = one JSON header line + a JSON body; print the crash reason
+            # and the faulting thread with image names instead of raw offsets.
+            python3 -I - "$report" <<'PY' || true
+          import json, sys
+          header, body = open(sys.argv[1], encoding='utf-8').read().split('\n', 1)
+          report = json.loads(body)
+          for key in ('exception', 'termination', 'asi', 'ktriageinfo', 'vmRegionInfo'):
+              if key in report:
+                  print(f'{key}: {json.dumps(report[key])[:3000]}')
+          images = report.get('usedImages', [])
+          thread = report['threads'][report.get('faultingThread', 0)]
+          print('faulting thread:', thread.get('name'), thread.get('queue'))
+          for frame in thread.get('frames', [])[:40]:
+              image = images[frame['imageIndex']] if frame.get('imageIndex', -1) < len(images) else {}
+              print(f"  {image.get('name', '?'):<28} +{frame.get('imageOffset')} {frame.get('symbol', '')}")
+          PY
+          done
+          # Launch the app once without Playwright to tell an app crash from a
+          # harness crash, then keep the unified log around the launch.
+          if [ -n "${MAC_APP_EXE:-}" ]; then
+            ELECTRON_ENABLE_LOGGING=1 ELECTRON_ENABLE_STACK_DUMPING=1 \
+              "$MAC_APP_EXE" --user-data-dir="$(mktemp -d)" --lang=en-US \
+              > "$EVIDENCE/direct-launch.log" 2>&1 &
+            app_pid=$!
+            sleep 25
+            if kill -0 "$app_pid" 2>/dev/null; then
+              echo "direct launch: still running after 25s" | tee -a "$EVIDENCE/direct-launch.log"
+              kill "$app_pid" 2>/dev/null || true; sleep 5; kill -9 "$app_pid" 2>/dev/null || true
+            fi
+            status=0; wait "$app_pid" || status=$?
+            echo "direct launch exit status: $status" | tee -a "$EVIDENCE/direct-launch.log"
+            tail -n 120 "$EVIDENCE/direct-launch.log"
+            # An unpacked copy whose entry logs each Electron call before it
+            # runs (electron/tests/startup-trace.cjs), then the same copy with
+            # one suspect call stubbed out, then a blank window without the app.
+            TRACE_ROOT=$(mktemp -d)
+            TRACE_APP="$TRACE_ROOT/$(basename "${MAC_APP_EXE%/Contents/MacOS/*}")"
+            ditto "${MAC_APP_EXE%/Contents/MacOS/*}" "$TRACE_APP"
+            RES="$TRACE_APP/Contents/Resources"
+            ASAR_PKG=$(find node_modules electron/node_modules -path '*/@electron/asar/package.json' -print -quit 2>/dev/null || true)
+            node -e 'const [pkg, archive, dest] = process.argv.slice(1); require(require("node:path").dirname(require("node:path").resolve(pkg))).extractAll(archive, dest)' \
+              "$ASAR_PKG" "$RES/app.asar" "$RES/app"
+            mv "$RES/app.asar" "$TRACE_ROOT/app.asar"
+            cp electron/tests/startup-trace.cjs "$RES/app/startup-trace.cjs"
+            node -e 'const fs = require("node:fs"); const f = process.argv[1]; const p = JSON.parse(fs.readFileSync(f, "utf8")); p.main = "startup-trace.cjs"; fs.writeFileSync(f, JSON.stringify(p))' "$RES/app/package.json"
+            codesign --force --deep --sign - "$TRACE_APP" 2>&1 | tail -n 1
+            TRACE_EXE="$TRACE_APP/Contents/MacOS/$(basename "$MAC_APP_EXE")"
+            for variant in full skip:app.userAgentFallback skip:app.setName skip:app.requestSingleInstanceLock bare; do
+              trace_skip=""; trace_main=""
+              case $variant in skip:*) trace_skip=${variant#skip:} ;; bare) trace_main=bare ;; esac
+              trace_log="$EVIDENCE/trace-${variant//[:.]/-}.log"
+              AZURIA_TRACE_SKIP="$trace_skip" AZURIA_TRACE_MAIN="$trace_main" \
+                "$TRACE_EXE" --user-data-dir="$(mktemp -d)" --lang=en-US > "$trace_log" 2>&1 &
+              trace_pid=$!
+              sleep 20
+              alive=no
+              if kill -0 "$trace_pid" 2>/dev/null; then alive=yes; kill "$trace_pid" 2>/dev/null || true; sleep 5; kill -9 "$trace_pid" 2>/dev/null || true; fi
+              status=0; wait "$trace_pid" || status=$?
+              echo "== trace $variant: alive after 20s=$alive exit=$status"
+              grep -E '^\[trace|supervisor|Error' "$trace_log" | tail -n "$([ "$variant" = full ] && echo 80 || echo 12)" || true
+            done
+            echo "== Electron as plain Node (RunAsNode):"
+            ELECTRON_RUN_AS_NODE=1 "$MAC_APP_EXE" -e 'console.log("node ok", process.versions.electron, process.arch)' || echo "run-as-node exit $?"
+            # The trap fires before `ready` even with a blank main (above), so
+            # test the bundle itself: the same app renamed to an ASCII name
+            # (executable, helpers and CFBundleName), only its folder renamed,
+            # and the stock Electron.app under its own and the accented name.
+            rename_bundle() { # source.app destination-dir new-name
+              local src=$1 name=$3 old app helper suffix new
+              old=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$src/Contents/Info.plist")
+              app="$2/$name.app"
+              ditto "$src" "$app"
+              mv "$app/Contents/MacOS/$old" "$app/Contents/MacOS/$name"
+              plutil -replace CFBundleExecutable -string "$name" "$app/Contents/Info.plist"
+              plutil -replace CFBundleName -string "$name" "$app/Contents/Info.plist"
+              for helper in "$app/Contents/Frameworks/$old Helper"*.app; do
+                suffix=${helper##*/"$old Helper"}; suffix=${suffix%.app}
+                new="$app/Contents/Frameworks/$name Helper$suffix.app"
+                mv "$helper" "$new"
+                mv "$new/Contents/MacOS/$old Helper$suffix" "$new/Contents/MacOS/$name Helper$suffix"
+                plutil -replace CFBundleExecutable -string "$name Helper$suffix" "$new/Contents/Info.plist"
+                plutil -replace CFBundleName -string "$name Helper$suffix" "$new/Contents/Info.plist"
+              done
+              codesign --force --deep --sign - "$app" >/dev/null 2>&1
+            }
+            try_launch() { # label executable
+              local log="$EVIDENCE/bundle-${1}.log" pid alive=no status=0
+              "$2" --user-data-dir="$(mktemp -d)" --lang=en-US > "$log" 2>&1 &
+              pid=$!
+              sleep 20
+              if kill -0 "$pid" 2>/dev/null; then alive=yes; kill "$pid" 2>/dev/null || true; sleep 5; kill -9 "$pid" 2>/dev/null || true; fi
+              wait "$pid" || status=$?
+              echo "== bundle $1: alive after 20s=$alive exit=$status"
+              tail -n 5 "$log"
+            }
+            SOURCE_BUNDLE="${MAC_APP_EXE%/Contents/MacOS/*}"
+            EXP=$(mktemp -d)
+            mkdir "$EXP/ascii" "$EXP/folder" "$EXP/stock" "$EXP/stock-accented"
+            { rename_bundle "$SOURCE_BUNDLE" "$EXP/ascii" "Azuria Voice" &&
+              try_launch ascii-name "$EXP/ascii/Azuria Voice.app/Contents/MacOS/Azuria Voice"; } || echo "ascii rename failed"
+            { ditto "$SOURCE_BUNDLE" "$EXP/folder/Azuria Voice.app" &&
+              try_launch ascii-folder-only "$EXP/folder/Azuria Voice.app/Contents/MacOS/$(basename "$MAC_APP_EXE")"; } || echo "folder rename failed"
+            # electron-builder writes file names in NFD but CFBundleName in NFC,
+            # and Electron finds its helpers through CFBundleName.
+            mkdir "$EXP/nfd"
+            NFD_APP="$EXP/nfd/$(basename "$SOURCE_BUNDLE")"
+            ditto "$SOURCE_BUNDLE" "$NFD_APP"
+            plutil -replace CFBundleName -string "$(basename "$MAC_APP_EXE")" "$NFD_APP/Contents/Info.plist"
+            codesign --force --deep --sign - "$NFD_APP" >/dev/null 2>&1
+            echo "CFBundleName bytes: original $(/usr/libexec/PlistBuddy -c 'Print :CFBundleName' "$SOURCE_BUNDLE/Contents/Info.plist" | od -An -tx1 | tr -d ' \n'), executable $(basename "$MAC_APP_EXE" | od -An -tx1 | tr -d ' \n')"
+            try_launch nfd-bundle-name "$NFD_APP/Contents/MacOS/$(basename "$MAC_APP_EXE")" || echo "nfd launch failed"
+            STOCK=$(find node_modules electron/node_modules -path '*/electron/dist/Electron.app' -type d -print -quit 2>/dev/null || true)
+            if [ -n "$STOCK" ]; then
+              ditto "$STOCK" "$EXP/stock/Electron.app"
+              try_launch stock-electron "$EXP/stock/Electron.app/Contents/MacOS/Electron"
+              { rename_bundle "$STOCK" "$EXP/stock-accented" "$(basename "$MAC_APP_EXE")" &&
+                try_launch stock-electron-accented "$EXP/stock-accented/$(basename "$MAC_APP_EXE").app/Contents/MacOS/$(basename "$MAC_APP_EXE")"; } || echo "stock rename failed"
+            else
+              echo "stock Electron.app not installed"
+            fi
+          fi
+          log show --last 10m --style compact \
+            --predicate 'process BEGINSWITH "Az" OR eventMessage CONTAINS[c] "zria Voice"' \
+            > "$EVIDENCE/unified-log.txt" 2>&1 || true
+          grep -i -E "fault|crash|trap|signal|denied|codesign|cs_|amfi|fatal" "$EVIDENCE/unified-log.txt" | tail -n 80 || true
+      - name: Save failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Azuria-Voice-${{ matrix.platform }}-${{ matrix.arch }}-diagnostics-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            evidence/
+            ${{ runner.temp }}/azuria-test-profile/data/logs/
+            ${{ runner.temp }}/azuria-test-profile/runtime/*.log
+
+  test-draft:
+    name: Test draft release (unpublished)
+    needs: package
+    if: >-
+      needs.package.result == 'success' && github.actor != 'dependabot[bot]' &&
+      ((github.event_name == 'workflow_dispatch' && inputs.test_draft) ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'test-draft-release')))
+    runs-on: ubuntu-24.04
+    # The only job allowed to write: it creates a draft, never a tag or a feed.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: Azuria-Voice-*-${{ env.SOURCE_SHA }}
+          path: downloaded
+      - name: Validate the combined packages
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          SHORT=${SOURCE_SHA:0:12}
+          mkdir -p release-assets
+          targets=linux-x64,darwin-arm64
+          for dir in downloaded/*/; do
+            name=$(basename "$dir"); key=${name#Azuria-Voice-}; key=${key%-$SOURCE_SHA}
+            # Only legs whose every check passed (the optional Intel leg may not).
+            if [ ! -f "$dir/evidence/validated.txt" ]; then echo "Skipping unvalidated $key"; continue; fi
+            (cd "$dir/electron/release" && sha256sum -c SHA256SUMS.txt)
+            find "$dir/electron/release" -maxdepth 1 -type f ! -name SHA256SUMS.txt -exec cp {} release-assets/ \;
+            tar -czf "release-assets/evidence-$key-$SHORT.tar.gz" -C "$dir" evidence
+          done
+          # Same contract as a release, limited to the targets this workflow
+          # requires. An Intel ZIP, when present, is still hash-checked below
+          # through its manifest, but it has no DMG and is never required.
+          python3 scripts/prepare_electron_release.py --assets release-assets --tag "v$VERSION" --targets "$targets" --no-notes
+          cat release-assets/SHA256SUMS.txt
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "SHORT=$SHORT" >> "$GITHUB_ENV"
+          echo "TARGETS=$targets" >> "$GITHUB_ENV"
+      - name: Create or refresh the unpublished test draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          TAG="test-linux-macos-$SHORT"
+          cat > notes.md <<EOF
+          Rascunho de teste, não publicado, do commit \`$SOURCE_SHA\`. Não é uma versão estável:
+          sem tag, sem marcação latest e fora dos feeds de atualização.
+
+          - Alvos: $TARGETS (e, quando presente, o .zip do Mac Intel apenas como interface com backend remoto).
+          - Rótulo de versão interno: $VERSION (versão da próxima entrega ainda não definida).
+          - macOS: assinatura ad hoc, sem Developer ID nem notarização.
+          - Execução: $RUN_URL
+          EOF
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true || { echo "Refusing to touch a published release"; exit 1; }
+            gh release edit "$TAG" --notes-file notes.md
+          else
+            gh release create "$TAG" --draft --prerelease --latest=false --target "$SOURCE_SHA" \
+              --title "Teste Linux/macOS $SHORT" --notes-file notes.md
+          fi
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$TAG" --clobber release-assets/*
+          # Read the draft back and verify every uploaded byte.
+          mkdir verify
+          gh release download "$TAG" --dir verify
+          (cd verify && sha256sum -c SHA256SUMS.txt)
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          if gh api "repos/$GH_REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then echo "A draft must not create a tag"; exit 1; fi
+          echo "Draft: $(gh release view "$TAG" --json url --jq .url)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  publish-test-prerelease:
+    name: Publish the test prerelease (maintainer label)
+    needs: test-draft
+    # Only when a maintainer adds the label; a prerelease is never "latest",
+    # so the stable release and its updater feeds stay untouched.
+    if: >-
+      needs.test-draft.result == 'success' && github.event_name == 'pull_request' &&
+      contains(github.event.pull_request.labels.*.name, 'publish-test-prerelease')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Publish the validated draft as a prerelease (never latest)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          SHORT=${SOURCE_SHA:0:12}
+          TAG="test-linux-macos-$SHORT"
+          LATEST_BEFORE=$(gh api "repos/$GH_REPO/releases/latest" --jq .tag_name)
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true
+          VERSION=$(gh release view "$TAG" --json assets --jq '.assets[].name' |
+            sed -n 's/^Azuria-Voice-Electron-\(.*\)-linux-x64\.AppImage$/\1/p')
+          test -n "$VERSION"
+          cat > notes.md <<EOF
+          Pré-lançamento de teste do Azúria Voice para **Linux** e **macOS**, compilado e testado no GitHub Actions a partir do commit \`$SOURCE_SHA\`. Não é a versão estável: o Windows continua em [$LATEST_BEFORE](https://github.com/$GH_REPO/releases/tag/$LATEST_BEFORE), e este pré-lançamento não entra na atualização automática.
+
+          | Sistema | Arquivo | Como instalar |
+          | --- | --- | --- |
+          | Linux x64 | \`Azuria-Voice-Electron-$VERSION-linux-x64.AppImage\` | Dê permissão de execução (\`chmod +x\`) e abra. |
+          | Linux x64 (Debian/Ubuntu) | \`Azuria-Voice-Electron-$VERSION-linux-x64.deb\` | \`sudo apt install ./Azuria-Voice-Electron-$VERSION-linux-x64.deb\`. Para atualizar, instale o .deb novo. |
+          | macOS Apple Silicon (M1 ou mais novo) | \`Azuria-Voice-Electron-$VERSION-mac-arm64.dmg\` (ou .zip) | Arraste o app para Aplicativos. |
+          | macOS Intel | \`Azuria-Voice-Electron-$VERSION-mac-x64.zip\`, quando presente | Só a interface, ligada a um backend em outro computador; o backend local exige Apple Silicon. |
+
+          **macOS:** assinatura ad hoc, sem Developer ID nem notarização da Apple. Na primeira abertura o macOS bloqueia o app: abra **Ajustes do Sistema → Privacidade e Segurança** e clique em **Abrir Mesmo Assim** para o Azúria Voice. Isso vale só para este app; não desative o Gatekeeper. Sem assinatura da Apple, baixe as versões novas por esta página.
+
+          **Testado no GitHub Actions:** testes do backend e do frontend. Linux e Mac Apple Silicon: instalação do pacote, abertura do app, conexão com a API local, instalação real do ambiente Python, geração de voz com o modelo pequeno KittenTTS e desligamento do backend. Mac Intel: compilação e abertura da interface.
+
+          **Não testado:** GPU (os testes rodam em CPU), o aviso do Gatekeeper num Mac real e o Mac Intel ligado a um backend remoto.
+
+          Conferência: \`SHA256SUMS.txt\`. Execução: $RUN_URL
+          EOF
+          gh release edit "$TAG" --draft=false --prerelease --latest=false \
+            --title "Azúria Voice $VERSION Linux e macOS (pré-lançamento de teste, $SHORT)" --notes-file notes.md
+          test "$(gh release view "$TAG" --json isPrerelease --jq .isPrerelease)" = true
+          test "$(gh api "repos/$GH_REPO/releases/latest" --jq .tag_name)" = "$LATEST_BEFORE"
+          echo "Prerelease: $(gh release view "$TAG" --json url --jq .url)" | tee -a "$GITHUB_STEP_SUMMARY"

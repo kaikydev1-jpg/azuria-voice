@@ -17,11 +17,13 @@ metadata and the backend fallback mirror it.
 
 ### Added
 
+- Azúria Voice: pacotes de teste Linux x64 (AppImage e .deb) e macOS Apple Silicon (.dmg e .zip, assinatura ad hoc) compilados e testados no GitHub Actions (#12)
 - Preview iOS and Android companion apps: drive your own VoiceStudio from your phone (speak, voices and cloning, dubbing, dictation) after pairing by QR code; build from source for now ([guide](docs/mobile.md)) (#2965)
 - Smart Fit speed limits: set the fastest and slowest speed dubbing may apply to a line, from the Timing section (#3026) — thanks @MoonDragon-MD!
 
 ### Fixed
 
+- Azúria Voice: o app do macOS não fecha mais ao abrir por causa do acento no nome (CFBundleName na mesma forma Unicode dos arquivos) (#12)
 - Older synthesized takes play again with accurate play/pause controls after a newer generation (#3102)
 - Generation-complete notifications appear above the workspace instead of covering synthesis controls (#3102)
 - Generated speech no longer starts and ends with silence, and `[pause]` markers give exactly the pause you asked for (Raw preset and explicit durations untouched) (#3080)
