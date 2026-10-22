@@ -11,7 +11,10 @@ text files. Output is one JSON document plus the raw license texts.
 from __future__ import annotations
 
 import hashlib
+import html.parser
+import io
 import json
+import re
 import sys
 import time
 import urllib.error
@@ -48,6 +51,39 @@ GITHUB_RAW = [
     ("Stability-AI/stable-audio-tools", "main", "LICENSE"),
     ("huggingface/diffusers", "main", "LICENSE"),
 ]
+
+
+PAGES = [
+    "https://stability.ai/license",
+    "https://stability.ai/community-license-agreement",
+    "https://huggingface.co/stabilityai/stable-audio-open-1.0",
+    "https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B/blob/main/LICENSE",
+]
+
+
+class _Text(html.parser.HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.parts: list[str] = []
+        self._skip = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style", "noscript"):
+            self._skip += 1
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style", "noscript") and self._skip:
+            self._skip -= 1
+
+    def handle_data(self, data):
+        if not self._skip and data.strip():
+            self.parts.append(data.strip())
+
+
+def page_text(raw: str) -> str:
+    parser = _Text()
+    parser.feed(raw)
+    return "\n".join(parser.parts)
 
 
 def get(url: str, *, binary: bool = False):
@@ -111,6 +147,8 @@ def print_report(report: dict, out: Path) -> None:
         print(f"pypi {package} {d.get('version')} py{d.get('requires_python')} license={d.get('license')!r}")
     ace = report["pypi"].get("ace-step", {})
     print("ace-step requires_dist:", json.dumps(ace.get("requires_dist")))
+    for url, d in report.get("pages", {}).items():
+        print("page", url, d["status"], d["chars"], (d["sha256"] or "")[:16])
     for key, d in report["github"].items():
         print("github", key, d["status"], (d["sha256"] or "")[:16])
 
@@ -159,8 +197,24 @@ def main(out: Path) -> int:
         report["github"][f"{repo}/{path}"] = {"status": s, "sha256": hashlib.sha256(body.encode()).hexdigest() if s == 200 else None}
         if s == 200:
             (out / "texts" / f"{repo.replace('/', '__')}__{path}").write_text(body, encoding="utf-8")
+    report["pages"] = {}
+    for url in PAGES:
+        status, body = get(url)
+        text = page_text(body) if status == 200 else ""
+        report["pages"][url] = {"status": status, "chars": len(text),
+                                "sha256": hashlib.sha256(text.encode()).hexdigest() if text else None}
+        if text:
+            name = re.sub(r"[^A-Za-z0-9]+", "_", url.split("//", 1)[1])
+            (out / "texts" / f"page__{name}.txt").write_text(text, encoding="utf-8")
     (out / "metadata.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
-    print_report(report, out)
+    buffer = io.StringIO()
+    stdout, sys.stdout = sys.stdout, buffer
+    try:
+        print_report(report, out)
+    finally:
+        sys.stdout = stdout
+    (out / "summary.txt").write_text(buffer.getvalue(), encoding="utf-8")
+    print(f"collected {len(report['models'])} models")
     return 0
 
 
