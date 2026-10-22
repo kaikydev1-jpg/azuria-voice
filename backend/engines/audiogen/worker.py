@@ -20,6 +20,7 @@ a missing file is an error, never a download.
 """
 from __future__ import annotations
 
+import functools
 import json
 import os
 import sys
@@ -235,10 +236,10 @@ def run_acestep(req: dict, device: str, outdir: str) -> dict:
 
 
 RUNNERS = {
-    "musicgen": lambda req, dev, out: run_musicgen(req, dev, out),
-    "stableaudio": lambda req, dev, out: run_diffusers_audio(req, dev, out, "StableAudioPipeline"),
-    "audioldm2": lambda req, dev, out: run_diffusers_audio(req, dev, out, "AudioLDM2Pipeline"),
-    "acestep": lambda req, dev, out: run_acestep(req, dev, out),
+    "musicgen": run_musicgen,
+    "stableaudio": functools.partial(run_diffusers_audio, cls_name="StableAudioPipeline"),
+    "audioldm2": functools.partial(run_diffusers_audio, cls_name="AudioLDM2Pipeline"),
+    "acestep": run_acestep,
 }
 
 

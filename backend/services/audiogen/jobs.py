@@ -71,7 +71,7 @@ class Manager:
         try:
             self._loop = asyncio.get_running_loop()
         except RuntimeError:
-            pass
+            pass  # called outside an event loop (tests, scripts): no loop to free memory through
         with self._lock:
             self._purge()
             if sum(1 for j in self._jobs.values() if j["state"] in ("queued", "running")) >= MAX_QUEUED:
@@ -195,12 +195,14 @@ class Manager:
         model = plan.model
         with self._lock:
             if job["_cancel"].is_set():
-                return self._finish(job, "cancelled")
+                self._finish(job, "cancelled")
+                return
             job["state"], job["stage"], job["started_at"] = "running", "preparing", time.time()
         python = runtime.venv_python(model)
         weights = runtime.weights_status(model)
         if python is None or weights["state"] != "ready":
-            return self._finish(job, "failed", {"code": "runtime_or_weights_missing", "message": ""})
+            self._finish(job, "failed", {"code": "runtime_or_weights_missing", "message": ""})
+            return
         self._free_memory()
 
         workdir = Path(DATA_DIR) / "audiogen_tmp" / job["id"]
@@ -273,18 +275,21 @@ class Manager:
                 if reason and error is None and result is None:
                     error = {"code": reason[0], "message": ""}
             if job["_cancel"].is_set():
-                return self._finish(job, "cancelled")
+                self._finish(job, "cancelled")
+                return
             if result is None:
                 if error is None:
                     tail = log_path.read_text(encoding="utf-8", errors="replace")[-_LOG_TAIL_CHARS:]
                     error = {"code": "worker_exited", "message": tail}
-                return self._finish(job, "failed", error)
+                self._finish(job, "failed", error)
+                return
             with self._lock:
                 job["stage"], job["device"], job["fell_back"] = "saving", result.get("device"), bool(result.get("fell_back"))
             takes = self._save_takes(job, plan, result)
             if job["_cancel"].is_set():
                 self._discard(takes)
-                return self._finish(job, "cancelled")
+                self._finish(job, "cancelled")
+                return
             with self._lock:
                 job["takes"], job["fraction"] = takes, 1.0
             self._finish(job, "done")

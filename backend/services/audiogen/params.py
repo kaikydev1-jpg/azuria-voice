@@ -12,7 +12,6 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
-from services.audiogen import catalog
 from services.audiogen.policy import PolicyError
 
 MAX_PROMPT_CHARS = 1000
