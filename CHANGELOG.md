@@ -23,6 +23,7 @@ metadata and the backend fallback mirror it.
 
 ### Fixed
 
+- Azúria Voice: o aviso de instalação de música e efeitos sonoros termina ao concluir ou falhar, acompanha o modelo original e impede pedidos duplicados (#17)
 - Azúria Voice: o app do macOS não fecha mais ao abrir por causa do acento no nome (CFBundleName na mesma forma Unicode dos arquivos) (#12)
 - Older synthesized takes play again with accurate play/pause controls after a newer generation (#3102)
 - Generation-complete notifications appear above the workspace instead of covering synthesis controls (#3102)
