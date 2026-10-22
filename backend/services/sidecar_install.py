@@ -600,7 +600,7 @@ SPECS: dict[str, SidecarSpec] = {
         has_source=False,
         venv_args=("--python", "3.11"),
         install_args=(
-            "transformers==4.57.1", "diffusers==0.35.2", "accelerate==1.10.1",
+            "transformers==4.46.3", "diffusers==0.35.2", "accelerate==1.10.1",
             "safetensors==0.6.2", "sentencepiece==0.2.1", "scipy==1.15.3",
             "soundfile==0.13.1", "numpy==2.2.6",
         ),
