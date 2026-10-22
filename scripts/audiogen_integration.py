@@ -67,8 +67,9 @@ def peak_rss(proc: subprocess.Popen, out_peak: list) -> None:
             total = ps.memory_info().rss + sum(c.memory_info().rss for c in ps.children(recursive=True))
             out_peak[0] = max(out_peak[0], total)
         except psutil.Error:
-            pass
-        time.sleep(0.5)
+            continue  # processo filho terminou entre a listagem e a leitura
+        finally:
+            time.sleep(0.5)
 
 
 def main(model_id: str, result_path: str) -> int:
