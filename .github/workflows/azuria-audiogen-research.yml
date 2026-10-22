@@ -1,0 +1,31 @@
+name: Azúria música e SFX: evidências de modelos
+
+# Somente leitura e anônimo: coleta metadados públicos (revisões, arquivos,
+# digests, textos de licença legíveis e pacotes PyPI) dos modelos candidatos.
+# Não baixa pesos, não aceita termos e não publica nada.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/project-thread-exxwck]
+    paths:
+      - scripts/audiogen_collect_metadata.py
+      - .github/workflows/azuria-audiogen-research.yml
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    name: Coletar evidências
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata | tee "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: audiogen-metadata
+          path: audiogen-metadata
+          retention-days: 14
