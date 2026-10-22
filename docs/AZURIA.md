@@ -157,3 +157,7 @@ Use o instalador Windows 0.5.8 ou atualize o checkout e sincronize o ambiente co
 Preserve `LICENSE`, `LICENSE-NOTICE.md`, `electron/T3CODE-LICENSE.txt` e os avisos dos modelos. A aplicação permanece AGPL-3.0; os pesos e serviços têm termos próprios. Os nomes, IDs, URLs e consentimentos necessários a integrações e modelos não devem ser trocados apenas para remover referências textuais à marca original.
 
 VoiceStudio Cloud é um serviço externo original e mantém seu nome. Integrações remotas, contas e telemetria opcionais seguem o comportamento e os consentimentos da base; a mudança de marca não cria um novo serviço de nuvem.
+
+### Publicação estável (Windows, Linux e macOS)
+
+O fluxo `Azúria Voice Release` (manual, só em `main`) monta num único rascunho `vX.Y.Z` os pacotes que os fluxos do Windows e do Linux/macOS já validaram para o mesmo commit, confere tamanhos, SHA-256 e SHA-512 dos feeds, baixa o rascunho de volta e só publica (estável, `latest`) quando `publish` está marcado.

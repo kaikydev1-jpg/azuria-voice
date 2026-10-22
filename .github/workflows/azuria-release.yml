@@ -1,0 +1,98 @@
+name: Azúria Voice Release
+
+# Manual. Assembles the packages that the Windows and Linux/macOS workflows
+# already built and validated for one commit on main into ONE draft release,
+# verifies every byte, and only publishes when `publish` is true.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full commit SHA on main whose Windows and Linux/macOS runs succeeded (default = this ref)
+        type: string
+        default: ''
+      publish:
+        description: Publish the verified draft (stable, latest). Leave off to only create or refresh the draft
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: azuria-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOURCE_SHA: ${{ inputs.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ inputs.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download the validated builds of this commit
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main || { echo "$SOURCE_SHA is not on main"; exit 1; }
+          pick() {
+            gh run list --workflow "$1" --commit "$SOURCE_SHA" --event push --status success --json databaseId --jq '.[0].databaseId'
+          }
+          WIN=$(pick azuria-windows.yml); LM=$(pick azuria-linux-macos.yml)
+          test -n "$WIN" && test -n "$LM" || { echo "Missing a successful push run for $SOURCE_SHA (windows=$WIN linux-macos=$LM)"; exit 1; }
+          mkdir -p downloaded/windows downloaded/lm
+          gh run download "$WIN" --dir downloaded/windows --name Azuria-Voice-Windows-x64
+          gh run download "$LM" --dir downloaded/lm --pattern "Azuria-Voice-*-$SOURCE_SHA"
+          echo "Windows run $WIN, Linux/macOS run $LM"
+      - name: Assemble and validate
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          SHORT=${SOURCE_SHA:0:12}
+          mkdir release-assets
+          (cd downloaded/windows && sha256sum -c SHA256SUMS.txt)
+          find downloaded/windows -maxdepth 1 -type f ! -name SHA256SUMS.txt -exec cp {} release-assets/ \;
+          for dir in downloaded/lm/*/; do
+            key=$(basename "$dir"); key=${key#Azuria-Voice-}; key=${key%-$SOURCE_SHA}
+            if [ ! -f "$dir/evidence/validated.txt" ]; then echo "Skipping unvalidated $key"; continue; fi
+            (cd "$dir/electron/release" && sha256sum -c SHA256SUMS.txt)
+            find "$dir/electron/release" -maxdepth 1 -type f ! -name SHA256SUMS.txt -exec cp {} release-assets/ \;
+            tar -czf "release-assets/evidence-$key-$SHORT.tar.gz" -C "$dir" evidence
+          done
+          python3 scripts/prepare_electron_release.py --assets release-assets --tag "v$VERSION" --targets win32-x64,linux-x64,darwin-arm64
+          grep -q "^## \[$VERSION\]" CHANGELOG.md
+          ls -l release-assets; cat release-assets/SHA256SUMS.txt
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Create or refresh the draft and verify it
+        run: |
+          set -euo pipefail
+          TAG="v$VERSION"
+          if gh api "repos/$GH_REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then echo "Tag $TAG already exists"; exit 1; fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = true || { echo "Refusing to touch a published release"; exit 1; }
+            gh release edit "$TAG" --notes-file release-assets/RELEASE_NOTES.md --target "$SOURCE_SHA"
+          else
+            gh release create "$TAG" --draft --target "$SOURCE_SHA" --title "Azúria Voice $VERSION" --notes-file release-assets/RELEASE_NOTES.md
+          fi
+          gh release upload "$TAG" --clobber $(ls release-assets/* | grep -v RELEASE_NOTES.md)
+          mkdir verify
+          gh release download "$TAG" --dir verify
+          (cd verify && sha256sum -c SHA256SUMS.txt)
+          for f in release-assets/*; do n=$(basename "$f"); [ "$n" = RELEASE_NOTES.md ] && continue; cmp "$f" "verify/$n"; done
+          gh release view "$TAG" --json url,isDraft,targetCommitish,assets --jq '"Draft: \(.url) draft=\(.isDraft) target=\(.targetCommitish)", (.assets[] | "\(.size)\t\(.name)")' | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Publish the verified release
+        if: inputs.publish == true
+        run: |
+          set -euo pipefail
+          TAG="v$VERSION"
+          gh release edit "$TAG" --draft=false --latest --prerelease=false
+          test "$(gh release view "$TAG" --json isDraft,isPrerelease --jq '[.isDraft,.isPrerelease]|@csv')" = "false,false"
+          gh release view "$TAG" --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"
