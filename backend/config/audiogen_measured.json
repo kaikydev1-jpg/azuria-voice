@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "scope": "Hardware and speed measured by the CI integration job (docs/music-and-sound-effects.md). Empty until a real generation has been measured; the UI then replaces the estimate and names the host.",
+  "models": {}
+}

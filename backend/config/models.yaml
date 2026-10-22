@@ -391,3 +391,53 @@ models:
     size_gb: 0.2
     note: "Apple Silicon only — via mlx-audio backend."
     platforms: [darwin-arm64]
+
+  # ── Music and sound effects (optional, local text-to-audio) ───────────
+  # Opt-in downloads started from Tools -> Music / Sound effects. Each entry
+  # lists only the files the runtime loads (safetensors, no pickle).
+  - repo_id: "ACE-Step/ACE-Step-v1-3.5B"
+    label: "ACE-Step v1 3.5B (music, Apache-2.0)"
+    role: Music
+    engines: [audiogen-acestep]
+    size_gb: 7.7
+    allow_patterns: ["config.json", "ace_step_transformer/*", "music_dcae_f8c8/*", "music_vocoder/*", "umt5-base/*"]
+    required_files: ["ace_step_transformer/diffusion_pytorch_model.safetensors", "music_dcae_f8c8/diffusion_pytorch_model.safetensors", "music_vocoder/diffusion_pytorch_model.safetensors", "umt5-base/model.safetensors"]
+    note: "Text to music with optional lyrics; 48 kHz stereo. Needs the ACE-Step runtime."
+
+  - repo_id: "facebook/musicgen-small"
+    label: "MusicGen small (music, non-commercial)"
+    role: Music
+    engines: [audiogen-torch]
+    size_gb: 2.2
+    allow_patterns: ["config.json", "generation_config.json", "model.safetensors", "preprocessor_config.json", "special_tokens_map.json", "tokenizer.json", "tokenizer_config.json"]
+    required_files: ["model.safetensors", "config.json"]
+    note: "Instrumental text to music; 32 kHz mono, up to 30 s. Weights are CC-BY-NC-4.0."
+
+  - repo_id: "facebook/musicgen-stereo-medium"
+    label: "MusicGen stereo medium 1.5B (music, non-commercial)"
+    role: Music
+    engines: [audiogen-torch]
+    size_gb: 3.8
+    allow_patterns: ["config.json", "generation_config.json", "model.safetensors", "preprocessor_config.json", "special_tokens_map.json", "tokenizer.json", "tokenizer_config.json"]
+    required_files: ["model.safetensors", "config.json"]
+    note: "Instrumental text to music; 32 kHz stereo, up to 30 s. Weights are CC-BY-NC-4.0."
+
+  - repo_id: "stabilityai/stable-audio-open-1.0"
+    label: "Stable Audio Open 1.0 (sound effects, commercial with conditions)"
+    role: SFX
+    engines: [audiogen-torch]
+    size_gb: 4.9
+    gated: true
+    requires_hf_token: true
+    allow_patterns: ["LICENSE.md", "model_index.json", "projection_model/*", "scheduler/*", "text_encoder/*", "tokenizer/*", "transformer/*", "vae/*"]
+    required_files: ["transformer/diffusion_pytorch_model.safetensors", "vae/diffusion_pytorch_model.safetensors", "text_encoder/model.safetensors", "model_index.json"]
+    note: "Sound effects and short music; 44.1 kHz stereo, up to about 47 s. Gated: accept the terms on Hugging Face first."
+
+  - repo_id: "cvssp/audioldm2"
+    label: "AudioLDM 2 (sound effects, non-commercial)"
+    role: SFX
+    engines: [audiogen-torch]
+    size_gb: 4.2
+    allow_patterns: ["model_index.json", "feature_extractor/*", "language_model/config.json", "language_model/model.safetensors", "projection_model/*", "scheduler/*", "text_encoder/config.json", "text_encoder/model.safetensors", "text_encoder_2/config.json", "text_encoder_2/model.safetensors", "tokenizer/*", "tokenizer_2/*", "unet/config.json", "unet/diffusion_pytorch_model.safetensors", "vae/config.json", "vae/diffusion_pytorch_model.safetensors", "vocoder/config.json", "vocoder/model.safetensors"]
+    required_files: ["unet/diffusion_pytorch_model.safetensors", "vae/diffusion_pytorch_model.safetensors", "vocoder/model.safetensors", "text_encoder/model.safetensors", "text_encoder_2/model.safetensors", "language_model/model.safetensors", "model_index.json"]
+    note: "Sound effects at 16 kHz mono (native rate). Weights are CC-BY-NC-SA-4.0."

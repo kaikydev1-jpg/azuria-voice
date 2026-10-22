@@ -150,8 +150,13 @@ def validate(registry, catalog, source_ids=()):
             errors.append(f"{rid}: central pin missing")
         if record.get("component_closure") not in {"complete", "incomplete"}:
             errors.append(f"{rid}: invalid component_closure")
-        for field in ("commercial_inference", "commercial_outputs"):
-            if record.get(field) not in {"unknown", "restricted"}:
+        # separate_permission_required: commercial use exists only under the
+        # licensor's own registration or revenue conditions (Stable Audio Open).
+        for field, allowed_values in (
+            ("commercial_inference", {"unknown", "restricted", "separate_permission_required"}),
+            ("commercial_outputs", {"unknown", "restricted"}),
+        ):
+            if record.get(field) not in allowed_values:
                 errors.append(f"{rid}: unsupported {field} assessment")
         if record.get("data_kind", "production") != "production":
             errors.append(f"{rid}: test/illustrative data is not production evidence")

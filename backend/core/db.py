@@ -75,6 +75,7 @@ _BASE_SCHEMA = """
         seed INTEGER DEFAULT NULL,
         starred INTEGER DEFAULT 0,
         design_recipe TEXT DEFAULT NULL,
+        provenance TEXT DEFAULT NULL,
         created_at REAL,
         FOREIGN KEY (profile_id) REFERENCES voice_profiles(id)
     );

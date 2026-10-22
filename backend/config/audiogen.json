@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "scope": "Local text-to-music and text-to-sound-effects. Licences and exact revisions live in model_licenses.json (the single legal registry); this file holds only engine behaviour: runtimes, limits, profiles and hardware estimates. Hardware figures marked estimated are upper-level guesses until a measured value from docs/audiogen-measurements.json replaces them.",
+  "purposes": ["personal", "commercial"],
+  "default_purpose": "personal",
+  "content_presets": {
+    "music": [
+      {"id": "game_soundtrack", "style_hint": "instrumental, loopable game soundtrack, steady tempo", "duration_s": 30},
+      {"id": "monetized_video", "style_hint": "instrumental background music for a video, no abrupt endings", "duration_s": 30}
+    ],
+    "sfx": [
+      {"id": "game_sfx", "style_hint": "clean isolated game sound effect, no background music", "duration_s": 3},
+      {"id": "monetized_video", "style_hint": "clean sound effect for a video, no background music", "duration_s": 5}
+    ]
+  },
+  "runtimes": {
+    "audiogen-torch": {"engine_id": "audiogen-torch", "approx_download_gb": 3.5, "confidence": "estimated"},
+    "audiogen-acestep": {"engine_id": "audiogen-acestep", "approx_download_gb": 6.5, "confidence": "estimated"}
+  },
+  "models": [
+    {
+      "id": "ace-step-v1",
+      "kind": "music",
+      "repo_id": "ACE-Step/ACE-Step-v1-3.5B",
+      "runtime": "audiogen-acestep",
+      "engine": "acestep",
+      "audio": {"sample_rate": 48000, "channels": 2},
+      "prompt_languages": ["en"],
+      "lyrics": {"supported": true, "max_chars": 4000, "languages_note": "Lyrics in several languages; quality varies by language (upstream: the ten best-covered languages perform best)."},
+      "limits": {"duration_min_s": 5, "duration_max_s": 240, "duration_default_s": 30, "variations_max": 4},
+      "devices": ["cuda", "mps", "cpu"],
+      "mps_validated": false,
+      "hardware": {"ram_gb_min": 16, "vram_gb_min": 12, "confidence": "estimated"},
+      "profiles": {
+        "fast": {"infer_step": 27, "guidance_scale": 15.0},
+        "balanced": {"infer_step": 60, "guidance_scale": 15.0},
+        "high": {"infer_step": 100, "guidance_scale": 15.0}
+      },
+      "default_profile": "balanced",
+      "custom_params": {
+        "infer_step": {"min": 10, "max": 200, "type": "int"},
+        "guidance_scale": {"min": 1.0, "max": 30.0, "type": "float"}
+      },
+      "fixed_params": {"scheduler_type": "euler", "cfg_type": "apg", "omega_scale": 10.0, "guidance_interval": 0.5}
+    },
+    {
+      "id": "musicgen-small",
+      "kind": "music",
+      "repo_id": "facebook/musicgen-small",
+      "runtime": "audiogen-torch",
+      "engine": "musicgen",
+      "audio": {"sample_rate": 32000, "channels": 1},
+      "prompt_languages": ["en"],
+      "lyrics": {"supported": false},
+      "limits": {"duration_min_s": 1, "duration_max_s": 30, "duration_default_s": 10, "variations_max": 4},
+      "devices": ["cuda", "mps", "cpu"],
+      "mps_validated": false,
+      "hardware": {"ram_gb_min": 8, "vram_gb_min": 4, "confidence": "estimated"},
+      "profiles": {
+        "balanced": {"guidance_scale": 3.0, "top_k": 250, "temperature": 1.0}
+      },
+      "default_profile": "balanced",
+      "custom_params": {
+        "guidance_scale": {"min": 1.0, "max": 10.0, "type": "float"},
+        "top_k": {"min": 0, "max": 1000, "type": "int"},
+        "temperature": {"min": 0.1, "max": 2.0, "type": "float"}
+      },
+      "fixed_params": {"do_sample": true}
+    },
+    {
+      "id": "musicgen-stereo-medium",
+      "kind": "music",
+      "repo_id": "facebook/musicgen-stereo-medium",
+      "runtime": "audiogen-torch",
+      "engine": "musicgen",
+      "audio": {"sample_rate": 32000, "channels": 2},
+      "prompt_languages": ["en"],
+      "lyrics": {"supported": false},
+      "limits": {"duration_min_s": 1, "duration_max_s": 30, "duration_default_s": 10, "variations_max": 4},
+      "devices": ["cuda", "mps", "cpu"],
+      "mps_validated": false,
+      "hardware": {"ram_gb_min": 16, "vram_gb_min": 8, "confidence": "estimated"},
+      "profiles": {
+        "balanced": {"guidance_scale": 3.0, "top_k": 250, "temperature": 1.0}
+      },
+      "default_profile": "balanced",
+      "custom_params": {
+        "guidance_scale": {"min": 1.0, "max": 10.0, "type": "float"},
+        "top_k": {"min": 0, "max": 1000, "type": "int"},
+        "temperature": {"min": 0.1, "max": 2.0, "type": "float"}
+      },
+      "fixed_params": {"do_sample": true}
+    },
+    {
+      "id": "stable-audio-open-1.0",
+      "kind": "sfx",
+      "repo_id": "stabilityai/stable-audio-open-1.0",
+      "runtime": "audiogen-torch",
+      "engine": "stableaudio",
+      "audio": {"sample_rate": 44100, "channels": 2},
+      "prompt_languages": ["en"],
+      "lyrics": {"supported": false},
+      "limits": {"duration_min_s": 1, "duration_max_s": 47, "duration_default_s": 5, "variations_max": 4},
+      "devices": ["cuda", "mps", "cpu"],
+      "mps_validated": false,
+      "hardware": {"ram_gb_min": 12, "vram_gb_min": 8, "confidence": "estimated"},
+      "profiles": {
+        "fast": {"num_inference_steps": 30, "guidance_scale": 7.0},
+        "balanced": {"num_inference_steps": 100, "guidance_scale": 7.0},
+        "high": {"num_inference_steps": 150, "guidance_scale": 7.0}
+      },
+      "default_profile": "balanced",
+      "custom_params": {
+        "num_inference_steps": {"min": 10, "max": 250, "type": "int"},
+        "guidance_scale": {"min": 1.0, "max": 15.0, "type": "float"}
+      },
+      "fixed_params": {"negative_prompt": "Low quality."}
+    },
+    {
+      "id": "audioldm2",
+      "kind": "sfx",
+      "repo_id": "cvssp/audioldm2",
+      "runtime": "audiogen-torch",
+      "engine": "audioldm2",
+      "audio": {"sample_rate": 16000, "channels": 1},
+      "prompt_languages": ["en"],
+      "lyrics": {"supported": false},
+      "limits": {"duration_min_s": 1, "duration_max_s": 10, "duration_default_s": 5, "variations_max": 4},
+      "devices": ["cuda", "mps", "cpu"],
+      "mps_validated": false,
+      "hardware": {"ram_gb_min": 12, "vram_gb_min": 6, "confidence": "estimated"},
+      "profiles": {
+        "fast": {"num_inference_steps": 50, "guidance_scale": 3.5},
+        "balanced": {"num_inference_steps": 100, "guidance_scale": 3.5},
+        "high": {"num_inference_steps": 200, "guidance_scale": 3.5}
+      },
+      "default_profile": "balanced",
+      "custom_params": {
+        "num_inference_steps": {"min": 10, "max": 300, "type": "int"},
+        "guidance_scale": {"min": 1.0, "max": 10.0, "type": "float"}
+      },
+      "fixed_params": {"negative_prompt": "Low quality."}
+    }
+  ]
+}

@@ -159,6 +159,8 @@ _CONDITIONS_LICENSES = frozenset({
     "openrail", "openrail++", "openrail-m", "creativeml-openrail-m",
     "bigscience-openrail-m", "cc-by-sa-3.0", "cc-by-sa-4.0",
     "gpl-3.0", "agpl-3.0", "lgpl-3.0",
+    # Commercial use only under registration and a revenue ceiling.
+    "stability ai community license", "stable-audio-community",
 })
 # Deliberately unknown: no assertion, or bespoke terms nobody has categorised.
 _UNKNOWN_LICENSES = frozenset({"noassertion", "other", "unknown", "higgs audio 2"})
