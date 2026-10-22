@@ -29,6 +29,5 @@ jobs:
           name: audiogen-metadata
           path: audiogen-metadata
           retention-days: 14
-      - name: Resumo ACE-Step e Stable Audio Open
-        run: |
-          awk '/^## /{p=($0 ~ /ACE-Step\/ACE-Step-v1-3.5B|stable-audio-open-1.0/)} p' audiogen-metadata/summary.txt | cut -c1-320
+      - name: Digests completos e trechos de capacidades
+        run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata --evidence

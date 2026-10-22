@@ -153,6 +153,26 @@ def print_report(report: dict, out: Path) -> None:
         print("github", key, d["status"], (d["sha256"] or "")[:16])
 
 
+def print_evidence(texts: Path) -> None:
+    """Full digests of the license documents and the capability statements the catalogue cites."""
+    for path in sorted(texts.iterdir()):
+        data = path.read_bytes()
+        print(f"sha256 {hashlib.sha256(data).hexdigest()} {len(data):>7} {path.name}")
+    for name, patterns in (
+        ("ACE-Step__ACE-Step-v1-3.5B__README.md", r"licen|lyric|language|minute|second|duration|limit|bf16|memory|vram|step|speed|rtf"),
+        ("facebook__musicgen-small__README.md", r"licen|limitation|vocal|lyric|english|32|second|sample|mono|stereo"),
+        ("facebook__musicgen-stereo-medium__README.md", r"licen|stereo|32|second|sample"),
+        ("cvssp__audioldm2__README.md", r"licen|second|16|sampl|step|negative|waveform|english|prompt"),
+        ("ace-step__ACE-Step__setup.py", r"python_requires|install_requires|name=|version"),
+    ):
+        path = texts / name
+        print(f"--- {name}")
+        if path.exists():
+            hits = [line.strip()[:240] for line in path.read_text(encoding="utf-8").splitlines()
+                    if re.search(patterns, line, re.I)]
+            print("\n".join(hits[:22]))
+
+
 def main(out: Path) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "texts").mkdir(exist_ok=True)
@@ -219,4 +239,7 @@ def main(out: Path) -> int:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 2 and sys.argv[2] == "--evidence":
+        print_evidence(Path(sys.argv[1]) / "texts")
+        sys.exit(0)
     sys.exit(main(Path(sys.argv[1] if len(sys.argv) > 1 else "audiogen-metadata")))
