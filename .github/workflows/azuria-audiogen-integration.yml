@@ -11,6 +11,7 @@ on:
     paths:
       - scripts/audiogen_integration.py
       - backend/engines/audiogen/**
+      - backend/services/sidecar_install.py
       - .github/workflows/azuria-audiogen-integration.yml
 
 permissions:

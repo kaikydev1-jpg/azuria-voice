@@ -602,7 +602,7 @@ SPECS: dict[str, SidecarSpec] = {
         install_args=(
             "transformers==4.46.3", "diffusers==0.35.2", "accelerate==1.10.1",
             "safetensors==0.6.2", "sentencepiece==0.2.1", "scipy==1.15.3",
-            "soundfile==0.13.1", "numpy==2.2.6",
+            "soundfile==0.13.1", "numpy==2.2.6", "torchsde==0.2.6",
         ),
         torch_pins=("torch==2.11.0", "torchaudio==2.11.0"),
         probe_code="import torch, transformers, diffusers, scipy, soundfile",
