@@ -3791,5 +3791,99 @@
       "remove_file": "Verwijderen",
       "no_matches": "Geen resultaten voor \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Muziek",
+      "desc": "Beschrijf de gewenste muziek en genereer die op deze computer."
+    },
+    "sfx": {
+      "title": "Geluidseffecten",
+      "desc": "Beschrijf een geluidseffect en genereer het op deze computer."
+    },
+    "local": "Draait lokaal. Na het downloaden van het model is geen internet nodig.",
+    "purpose": "Hoe ga je de audio gebruiken?",
+    "purposes": {
+      "personal": "Persoonlijk / niet-commercieel",
+      "commercial": "Commercieel / gemonetariseerd"
+    },
+    "purposeNote": "Je keuze wordt gecontroleerd aan de licentie van het model en bij elk resultaat opgeslagen. Het is een verklaring, geen licentie.",
+    "model": "Model",
+    "license": {
+      "commercial": "Commercieel gebruik toegestaan — volgens de licentie",
+      "conditions": "Commercieel gebruik onder voorwaarden",
+      "noncommercial": "Alleen niet-commercieel gebruik",
+      "unconfirmed": "Toestemming niet bevestigd"
+    },
+    "licenseNote": "De labels beschrijven de opgegeven licentie van elk model. Ze zijn geen juridisch advies en certificeren je resultaat niet.",
+    "ready": "Klaar",
+    "notInstalled": "Niet geïnstalleerd",
+    "notForCommercial": "Niet beschikbaar voor commercieel gebruik.",
+    "hardware": "Schatting: ongeveer {{ram}} GB RAM en {{vram}} GB GPU-geheugen. Werkt ook op de CPU, maar langzamer.",
+    "conditionsText": "Commercieel gebruik vereist registratie bij de licentiegever en geldt alleen onder {{amount}} USD jaaromzet.",
+    "officialTerms": "Lees de officiële voorwaarden",
+    "acknowledge": "Ik begrijp deze voorwaarden en ben zelf verantwoordelijk voor de naleving.",
+    "installRuntime": "Runtime installeren (ongeveer {{size}} GB)",
+    "revisionMismatch": "De geïnstalleerde bestanden wijken af van de gecontroleerde versie. Download het model opnieuw.",
+    "downloadModel": "Model downloaden ({{size}} GB)",
+    "gatedNote": "Dit model vraagt je om de voorwaarden op Hugging Face te accepteren en in de instellingen met je eigen token in te loggen.",
+    "installing": "Installeren… dit kan enkele minuten duren.",
+    "prompt": "Beschrijving (Engels werkt het best)",
+    "lyrics": "Songtekst (optioneel)",
+    "quality": "Kwaliteit",
+    "profiles": {
+      "fast": "Snel",
+      "balanced": "Gebalanceerd",
+      "high": "Hoog",
+      "custom": "Aangepast"
+    },
+    "duration": "Duur in seconden ({{min}}–{{max}})",
+    "variations": "Variaties",
+    "seed": "Seed (leeg = willekeurig)",
+    "device": "Apparaat",
+    "devices": {
+      "auto": "Automatisch",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple-GPU (experimenteel)"
+    },
+    "preset": "Inhoudsvoorinstelling",
+    "presets": {
+      "none": "Geen",
+      "game_soundtrack": "Game-soundtrack",
+      "monetized_video": "Gemonetariseerde video",
+      "game_sfx": "Game-geluidseffect"
+    },
+    "generate": "Genereren",
+    "cancel": "Annuleren",
+    "status": {
+      "queued": "In de wachtrij ({{ahead}} voor je)",
+      "preparing": "Voorbereiden…",
+      "loading": "Model laden…",
+      "generating": "Genereren…",
+      "saving": "Opslaan…",
+      "done": "Klaar",
+      "failed": "Mislukt",
+      "cancelled": "Geannuleerd"
+    },
+    "errors": {
+      "out_of_memory": "Onvoldoende geheugen. Probeer de kwaliteit Snel, een kortere duur of de CPU.",
+      "stalled": "Het model reageerde niet meer en is gestopt.",
+      "timeout": "Genereren duurde te lang en is gestopt.",
+      "device_unavailable": "Het gekozen apparaat is niet beschikbaar voor dit model.",
+      "generation_failed": "Genereren is mislukt."
+    },
+    "fellBack": "De GPU kon niet worden gebruikt; deze run is overgeschakeld naar de CPU.",
+    "ranOn": "Gegenereerd op: {{device}}",
+    "downloadWav": "WAV downloaden",
+    "exportProvenance": "WAV + herkomst exporteren",
+    "provenance": {
+      "title": "Herkomst",
+      "revision": "Revisie",
+      "license": "Licentie",
+      "declaredUse": "Opgegeven gebruik",
+      "acknowledged": "voorwaarden erkend",
+      "notRecorded": "Herkomst niet vastgelegd voor deze take. Er wordt geen model, licentie of toegestaan gebruik aangenomen."
+    }
   }
 }

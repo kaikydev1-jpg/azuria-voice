@@ -3793,5 +3793,99 @@
       "remove_file": "Remover",
       "no_matches": "Nenhum resultado para \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Música",
+      "desc": "Descreva a música que você quer e gere neste computador."
+    },
+    "sfx": {
+      "title": "Efeitos sonoros",
+      "desc": "Descreva um efeito sonoro e gere neste computador."
+    },
+    "local": "Roda localmente. Depois de baixar o modelo, não precisa de internet.",
+    "purpose": "Como você vai usar o áudio?",
+    "purposes": {
+      "personal": "Pessoal / não comercial",
+      "commercial": "Comercial / monetizado"
+    },
+    "purposeNote": "Sua escolha é conferida com a licença do modelo e guardada em cada resultado. É uma declaração, não uma licença.",
+    "model": "Modelo",
+    "license": {
+      "commercial": "Uso comercial permitido — conforme licença",
+      "conditions": "Uso comercial com condições",
+      "noncommercial": "Somente não comercial",
+      "unconfirmed": "Permissão não confirmada"
+    },
+    "licenseNote": "Os rótulos descrevem a licença declarada de cada modelo. Não são aconselhamento jurídico e não certificam o seu resultado.",
+    "ready": "Pronto",
+    "notInstalled": "Não instalado",
+    "notForCommercial": "Não disponível para uso comercial.",
+    "hardware": "Estimativa: cerca de {{ram}} GB de RAM e {{vram}} GB de memória da GPU. Também roda na CPU, mais devagar.",
+    "conditionsText": "O uso comercial exige cadastro com o titular da licença e vale apenas abaixo de USD {{amount}} de receita anual.",
+    "officialTerms": "Ler os termos oficiais",
+    "acknowledge": "Entendo estas condições e assumo a responsabilidade de cumpri-las.",
+    "installRuntime": "Instalar o ambiente (cerca de {{size}} GB)",
+    "revisionMismatch": "Os arquivos instalados diferem da versão revisada. Baixe o modelo novamente.",
+    "downloadModel": "Baixar modelo ({{size}} GB)",
+    "gatedNote": "Este modelo pede que você aceite os termos no Hugging Face e entre com o seu próprio token em Configurações.",
+    "installing": "Instalando… isso pode levar vários minutos.",
+    "prompt": "Descrição (inglês funciona melhor)",
+    "lyrics": "Letra (opcional)",
+    "quality": "Qualidade",
+    "profiles": {
+      "fast": "Rápido",
+      "balanced": "Equilibrado",
+      "high": "Alto",
+      "custom": "Personalizado"
+    },
+    "duration": "Duração em segundos ({{min}}–{{max}})",
+    "variations": "Variações",
+    "seed": "Semente (vazio = aleatória)",
+    "device": "Dispositivo",
+    "devices": {
+      "auto": "Automático",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU Apple (experimental)"
+    },
+    "preset": "Predefinição de conteúdo",
+    "presets": {
+      "none": "Nenhuma",
+      "game_soundtrack": "Trilha de jogo",
+      "monetized_video": "Vídeo monetizado",
+      "game_sfx": "Efeito sonoro de jogo"
+    },
+    "generate": "Gerar",
+    "cancel": "Cancelar",
+    "status": {
+      "queued": "Na fila ({{ahead}} à frente)",
+      "preparing": "Preparando…",
+      "loading": "Carregando o modelo…",
+      "generating": "Gerando…",
+      "saving": "Salvando…",
+      "done": "Concluído",
+      "failed": "Falhou",
+      "cancelled": "Cancelado"
+    },
+    "errors": {
+      "out_of_memory": "Memória insuficiente. Tente a qualidade Rápido, uma duração menor ou a CPU.",
+      "stalled": "O modelo parou de responder e foi encerrado.",
+      "timeout": "A geração demorou demais e foi encerrada.",
+      "device_unavailable": "O dispositivo escolhido não está disponível para este modelo.",
+      "generation_failed": "A geração falhou."
+    },
+    "fellBack": "Não foi possível usar a GPU; esta execução usou a CPU.",
+    "ranOn": "Gerado em: {{device}}",
+    "downloadWav": "Baixar WAV",
+    "exportProvenance": "Exportar WAV + proveniência",
+    "provenance": {
+      "title": "Proveniência",
+      "revision": "Revisão",
+      "license": "Licença",
+      "declaredUse": "Uso declarado",
+      "acknowledged": "condições reconhecidas",
+      "notRecorded": "Proveniência não registrada para esta geração. Nenhum modelo, licença ou uso permitido é presumido."
+    }
   }
 }

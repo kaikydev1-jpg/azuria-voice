@@ -13,6 +13,8 @@ Tools exposed:
     list_languages    — available TTS languages
     list_personalities — voice personality presets
     check_health      — backend status + active GPU device
+    list_audio_models, generate_music, generate_sound_effect, get_audio_job,
+    cancel_audio_job  — local text-to-music and text-to-sound-effects
 
 Resources exposed:
     voice://{profile_id}  — voice profile metadata
@@ -789,6 +791,129 @@ def create_mcp_server(app=None):
             # Transport failures + non-JSON success bodies (proxy error page).
             return json.dumps({"error": f"backend request failed: {exc}"})
         return json.dumps({"profile_id": p["id"], "name": p["name"], "kind": p["kind"]})
+
+    async def _audio_gen_call(method: str, path: str, payload: dict | None = None) -> str:
+        """Call /audio-gen and hand the server's own verdict (including licence
+        refusals) back to the agent unchanged."""
+        import httpx
+        try:
+            async with _client(_post_timeout_s()) as c:
+                r = await (c.get(path) if method == "GET" else c.post(path, json=payload or {}))
+        except httpx.HTTPError as exc:
+            return json.dumps({"error": f"backend request failed: {exc}"})
+        try:
+            body = r.json()
+        except ValueError:
+            body = {"detail": r.text[:300]}
+        if r.status_code >= 400:
+            return json.dumps({"error": True, "status": r.status_code, **(body if isinstance(body, dict) else {"detail": body})})
+        return json.dumps(body)
+
+    @mcp.tool()
+    async def list_audio_models(kind: str = "") -> str:
+        """List the local music and sound-effect models with licence class,
+        install state, quality profiles and limits.
+
+        Licence classes: commercial, commercial_conditions, noncommercial,
+        unconfirmed. Nothing is downloaded by this call.
+
+        Args:
+            kind: "music", "sfx", or empty for both.
+        """
+        suffix = f"?kind={kind}" if kind in ("music", "sfx") else ""
+        return await _audio_gen_call("GET", "/audio-gen/catalog" + suffix)
+
+    @mcp.tool()
+    async def generate_music(
+        model: str,
+        prompt: str,
+        purpose: str = "personal",
+        lyrics: str = "",
+        duration_s: float = 0,
+        profile: str = "",
+        seed: int = -1,
+        variations: int = 1,
+        conditions_acknowledged: bool = False,
+    ) -> str:
+        """Start a local text-to-music job. Returns a job to poll with get_audio_job.
+
+        The declared purpose ("personal" or "commercial") is checked against
+        the model's licence by the server: non-commercial models are refused
+        for "commercial", and models with conditions need
+        conditions_acknowledged=true. The declaration is recorded with the
+        output; it is not a licence.
+
+        Args:
+            model: ace-step-v1, musicgen-small or musicgen-stereo-medium.
+            prompt: Description of the music (English).
+            purpose: "personal" (default) or "commercial".
+            lyrics: ACE-Step only; empty for instrumental.
+            duration_s: Seconds; 0 uses the model default.
+            profile: fast, balanced, high (as offered by the model); empty = default.
+            seed: Non-negative for a repeatable result; -1 picks one.
+            variations: How many takes (1-4).
+            conditions_acknowledged: Only for models with licence conditions.
+        """
+        payload = {"model": model, "prompt": prompt, "purpose": purpose,
+                   "conditions_acknowledged": conditions_acknowledged, "variations": variations}
+        if lyrics:
+            payload["lyrics"] = lyrics
+        if duration_s:
+            payload["duration_s"] = duration_s
+        if profile:
+            payload["profile"] = profile
+        if seed >= 0:
+            payload["seed"] = seed
+        return await _audio_gen_call("POST", "/audio-gen/music", payload)
+
+    @mcp.tool()
+    async def generate_sound_effect(
+        model: str,
+        prompt: str,
+        purpose: str = "personal",
+        duration_s: float = 0,
+        profile: str = "",
+        seed: int = -1,
+        variations: int = 1,
+        conditions_acknowledged: bool = False,
+    ) -> str:
+        """Start a local text-to-sound-effect job. Returns a job to poll with get_audio_job.
+
+        Same purpose and licence rules as generate_music.
+
+        Args:
+            model: stable-audio-open-1.0 or audioldm2.
+            prompt: Description of the sound (English).
+            purpose: "personal" (default) or "commercial".
+            duration_s: Seconds; 0 uses the model default.
+            profile: fast, balanced, high; empty = default.
+            seed: Non-negative for a repeatable result; -1 picks one.
+            variations: How many takes (1-4).
+            conditions_acknowledged: Only for models with licence conditions.
+        """
+        payload = {"model": model, "prompt": prompt, "purpose": purpose,
+                   "conditions_acknowledged": conditions_acknowledged, "variations": variations}
+        if duration_s:
+            payload["duration_s"] = duration_s
+        if profile:
+            payload["profile"] = profile
+        if seed >= 0:
+            payload["seed"] = seed
+        return await _audio_gen_call("POST", "/audio-gen/sfx", payload)
+
+    @mcp.tool()
+    async def get_audio_job(job_id: str) -> str:
+        """Status, progress and finished takes (with audio_url) of a music / sound-effect job."""
+        if not re.fullmatch(r"[0-9a-f]{12}", job_id or ""):
+            return json.dumps({"error": True, "status": 404, "code": "unknown_job"})
+        return await _audio_gen_call("GET", f"/audio-gen/jobs/{job_id}")
+
+    @mcp.tool()
+    async def cancel_audio_job(job_id: str) -> str:
+        """Cancel a queued or running music / sound-effect job; a running one is stopped for real."""
+        if not re.fullmatch(r"[0-9a-f]{12}", job_id or ""):
+            return json.dumps({"error": True, "status": 404, "code": "unknown_job"})
+        return await _audio_gen_call("POST", f"/audio-gen/jobs/{job_id}/cancel")
 
     @mcp.tool()
     async def describe_voice(description: str) -> str:

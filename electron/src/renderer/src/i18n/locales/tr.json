@@ -3791,5 +3791,99 @@
       "remove_file": "Kaldır",
       "no_matches": "\"{{query}}\" için eşleşme yok."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Müzik",
+      "desc": "İstediğiniz müziği anlatın ve bu bilgisayarda üretin."
+    },
+    "sfx": {
+      "title": "Ses efektleri",
+      "desc": "Bir ses efekti anlatın ve bu bilgisayarda üretin."
+    },
+    "local": "Yerel çalışır. Model indirildikten sonra internet gerekmez.",
+    "purpose": "Sesi nasıl kullanacaksınız?",
+    "purposes": {
+      "personal": "Kişisel / ticari olmayan",
+      "commercial": "Ticari / gelir getiren"
+    },
+    "purposeNote": "Seçiminiz modelin lisansıyla karşılaştırılır ve her sonuçla birlikte kaydedilir. Bu bir beyandır, lisans değildir.",
+    "model": "Model",
+    "license": {
+      "commercial": "Ticari kullanıma izin var — lisansa göre",
+      "conditions": "Koşullu ticari kullanım",
+      "noncommercial": "Yalnızca ticari olmayan kullanım",
+      "unconfirmed": "İzin doğrulanmadı"
+    },
+    "licenseNote": "Etiketler her modelin beyan edilen lisansını anlatır. Hukuki tavsiye değildir ve sonucunuzu onaylamaz.",
+    "ready": "Hazır",
+    "notInstalled": "Yüklü değil",
+    "notForCommercial": "Ticari kullanım için sunulmaz.",
+    "hardware": "Tahmin: yaklaşık {{ram}} GB RAM ve {{vram}} GB GPU belleği. CPU'da da çalışır, daha yavaş.",
+    "conditionsText": "Ticari kullanım için lisans sahibine kayıt gerekir ve yalnızca yıllık geliri {{amount}} USD'nin altında olanlar için geçerlidir.",
+    "officialTerms": "Resmî koşulları oku",
+    "acknowledge": "Bu koşulları anlıyorum ve uymaktan sorumlu olduğumu kabul ediyorum.",
+    "installRuntime": "Çalışma ortamını yükle (yaklaşık {{size}} GB)",
+    "revisionMismatch": "Yüklü dosyalar incelenen sürümden farklı. Modeli yeniden indirin.",
+    "downloadModel": "Modeli indir ({{size}} GB)",
+    "gatedNote": "Bu model, koşullarını Hugging Face'te kabul etmenizi ve Ayarlar'da kendi belirtecinizle oturum açmanızı ister.",
+    "installing": "Yükleniyor… birkaç dakika sürebilir.",
+    "prompt": "Açıklama (İngilizce en iyi sonucu verir)",
+    "lyrics": "Şarkı sözü (isteğe bağlı)",
+    "quality": "Kalite",
+    "profiles": {
+      "fast": "Hızlı",
+      "balanced": "Dengeli",
+      "high": "Yüksek",
+      "custom": "Özel"
+    },
+    "duration": "Saniye cinsinden süre ({{min}}–{{max}})",
+    "variations": "Varyasyonlar",
+    "seed": "Tohum (boş = rastgele)",
+    "device": "Aygıt",
+    "devices": {
+      "auto": "Otomatik",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple GPU (deneysel)"
+    },
+    "preset": "İçerik ön ayarı",
+    "presets": {
+      "none": "Yok",
+      "game_soundtrack": "Oyun müziği",
+      "monetized_video": "Gelir getiren video",
+      "game_sfx": "Oyun ses efekti"
+    },
+    "generate": "Üret",
+    "cancel": "İptal",
+    "status": {
+      "queued": "Sırada ({{ahead}} kişi önde)",
+      "preparing": "Hazırlanıyor…",
+      "loading": "Model yükleniyor…",
+      "generating": "Üretiliyor…",
+      "saving": "Kaydediliyor…",
+      "done": "Bitti",
+      "failed": "Başarısız",
+      "cancelled": "İptal edildi"
+    },
+    "errors": {
+      "out_of_memory": "Bellek yetersiz. Hızlı kaliteyi, daha kısa süreyi veya CPU'yu deneyin.",
+      "stalled": "Model yanıt vermeyi bıraktı ve durduruldu.",
+      "timeout": "Üretim çok uzun sürdü ve durduruldu.",
+      "device_unavailable": "Seçilen aygıt bu model için kullanılamıyor.",
+      "generation_failed": "Üretim başarısız oldu."
+    },
+    "fellBack": "GPU kullanılamadı; bu çalıştırma CPU'ya geçti.",
+    "ranOn": "Üretilen aygıt: {{device}}",
+    "downloadWav": "WAV indir",
+    "exportProvenance": "WAV + kaynak bilgisini dışa aktar",
+    "provenance": {
+      "title": "Kaynak bilgisi",
+      "revision": "Revizyon",
+      "license": "Lisans",
+      "declaredUse": "Beyan edilen kullanım",
+      "acknowledged": "koşullar kabul edildi",
+      "notRecorded": "Bu kayıt için kaynak bilgisi saklanmadı. Hiçbir model, lisans veya izinli kullanım varsayılmaz."
+    }
   }
 }

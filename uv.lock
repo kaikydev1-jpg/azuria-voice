@@ -3905,7 +3905,7 @@ wheels = [
 
 [[package]]
 name = "omnivoice"
-version = "0.5.10"
+version = "0.5.11"
 source = { editable = "." }
 default-groups = ["cuda", "dev"]
 dependencies = [

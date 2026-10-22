@@ -109,3 +109,29 @@ async def evict_other_tts_engines(keep_id: str) -> list[str]:
     if evicted:
         logger.info("single-engine eviction: freed %s (keeping %s)", log_safe(evicted), log_safe(keep_id))
     return evicted
+
+
+async def evict_all_tts_engines() -> list[str]:
+    """Hand every resident TTS model back before a non-TTS job (music, sound
+    effects) loads its own multi-GB model in a separate process. Same policy
+    gate and never-raises contract as :func:`evict_other_tts_engines`."""
+    if not single_engine_resident():
+        return []
+
+    from services import tts_backend
+
+    evicted: list[str] = []
+    try:
+        import services.model_manager as mm
+
+        async with mm._model_lock:
+            with tts_backend._ENGINE_CACHE_LOCK:
+                core_busy = tts_backend._ENGINE_IN_USE.get(tts_backend.OmniVoiceBackend)
+                if not core_busy and mm.unload_shared_model():
+                    evicted.append("omnivoice")
+    except Exception:  # noqa: BLE001
+        logger.warning("evict: VoiceStudio core unload failed", exc_info=True)
+    evicted.extend(_evict_instance_cache(None))
+    if evicted:
+        logger.info("audiogen eviction: freed %s", log_safe(evicted))
+    return evicted

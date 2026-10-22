@@ -3791,5 +3791,99 @@
       "remove_file": "Hapus",
       "no_matches": "Tidak ada hasil untuk \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Musik",
+      "desc": "Jelaskan musik yang Anda mau dan buat di komputer ini."
+    },
+    "sfx": {
+      "title": "Efek suara",
+      "desc": "Jelaskan efek suara dan buat di komputer ini."
+    },
+    "local": "Berjalan secara lokal. Setelah model diunduh, internet tidak diperlukan.",
+    "purpose": "Bagaimana Anda akan memakai audio ini?",
+    "purposes": {
+      "personal": "Pribadi / nonkomersial",
+      "commercial": "Komersial / dimonetisasi"
+    },
+    "purposeNote": "Pilihan Anda dicocokkan dengan lisensi model dan disimpan bersama setiap hasil. Ini pernyataan, bukan lisensi.",
+    "model": "Model",
+    "license": {
+      "commercial": "Penggunaan komersial diizinkan — sesuai lisensi",
+      "conditions": "Penggunaan komersial dengan syarat",
+      "noncommercial": "Hanya penggunaan nonkomersial",
+      "unconfirmed": "Izin belum dikonfirmasi"
+    },
+    "licenseNote": "Label menjelaskan lisensi yang dinyatakan tiap model. Ini bukan nasihat hukum dan tidak mengesahkan hasil Anda.",
+    "ready": "Siap",
+    "notInstalled": "Belum terpasang",
+    "notForCommercial": "Tidak ditawarkan untuk penggunaan komersial.",
+    "hardware": "Perkiraan: sekitar {{ram}} GB RAM dan {{vram}} GB memori GPU. Juga berjalan di CPU, lebih lambat.",
+    "conditionsText": "Penggunaan komersial mengharuskan pendaftaran ke pemberi lisensi dan hanya berlaku di bawah pendapatan tahunan {{amount}} USD.",
+    "officialTerms": "Baca ketentuan resmi",
+    "acknowledge": "Saya memahami syarat ini dan bertanggung jawab memenuhinya.",
+    "installRuntime": "Pasang runtime (sekitar {{size}} GB)",
+    "revisionMismatch": "File yang terpasang berbeda dari versi yang ditinjau. Unduh model lagi.",
+    "downloadModel": "Unduh model ({{size}} GB)",
+    "gatedNote": "Model ini meminta Anda menerima ketentuannya di Hugging Face dan masuk dengan token Anda sendiri di Pengaturan.",
+    "installing": "Memasang… ini bisa memakan beberapa menit.",
+    "prompt": "Deskripsi (bahasa Inggris paling baik)",
+    "lyrics": "Lirik (opsional)",
+    "quality": "Kualitas",
+    "profiles": {
+      "fast": "Cepat",
+      "balanced": "Seimbang",
+      "high": "Tinggi",
+      "custom": "Kustom"
+    },
+    "duration": "Durasi dalam detik ({{min}}–{{max}})",
+    "variations": "Variasi",
+    "seed": "Seed (kosong = acak)",
+    "device": "Perangkat",
+    "devices": {
+      "auto": "Otomatis",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU Apple (eksperimental)"
+    },
+    "preset": "Preset konten",
+    "presets": {
+      "none": "Tidak ada",
+      "game_soundtrack": "Soundtrack game",
+      "monetized_video": "Video dimonetisasi",
+      "game_sfx": "Efek suara game"
+    },
+    "generate": "Buat",
+    "cancel": "Batal",
+    "status": {
+      "queued": "Dalam antrean ({{ahead}} di depan)",
+      "preparing": "Menyiapkan…",
+      "loading": "Memuat model…",
+      "generating": "Membuat…",
+      "saving": "Menyimpan…",
+      "done": "Selesai",
+      "failed": "Gagal",
+      "cancelled": "Dibatalkan"
+    },
+    "errors": {
+      "out_of_memory": "Memori tidak cukup. Coba kualitas Cepat, durasi lebih pendek, atau CPU.",
+      "stalled": "Model berhenti merespons dan dihentikan.",
+      "timeout": "Pembuatan terlalu lama dan dihentikan.",
+      "device_unavailable": "Perangkat yang dipilih tidak tersedia untuk model ini.",
+      "generation_failed": "Pembuatan gagal."
+    },
+    "fellBack": "GPU tidak dapat dipakai; proses ini beralih ke CPU.",
+    "ranOn": "Dibuat di: {{device}}",
+    "downloadWav": "Unduh WAV",
+    "exportProvenance": "Ekspor WAV + asal-usul",
+    "provenance": {
+      "title": "Asal-usul",
+      "revision": "Revisi",
+      "license": "Lisensi",
+      "declaredUse": "Penggunaan yang dinyatakan",
+      "acknowledged": "syarat diakui",
+      "notRecorded": "Asal-usul tidak tercatat untuk hasil ini. Tidak ada model, lisensi, atau penggunaan yang diizinkan yang diasumsikan."
+    }
   }
 }

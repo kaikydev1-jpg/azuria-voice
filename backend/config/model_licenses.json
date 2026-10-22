@@ -2947,6 +2947,415 @@
         ],
         "identified_components": []
       }
+    },
+    {
+      "id": "ACE-Step/ACE-Step-v1-3.5B",
+      "license": "Apache-2.0",
+      "review_status": "unreviewed",
+      "credit": "ACE-Step v1 3.5B — ACE Studio and StepFun",
+      "source_url": "https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B",
+      "evidence_url": "https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B/blob/82cd0d7b6322bd28cd4e830fe675ddb6180ce36c/README.md",
+      "revision": "82cd0d7b6322bd28cd4e830fe675ddb6180ce36c",
+      "engines": [
+        "audiogen-acestep"
+      ],
+      "notes": "Model card and code repository declare Apache-2.0 for exactly this v1 3.5B distribution. The text encoder (umt5-base), the audio autoencoder and the vocoder ship inside the same repository. This record does not extend to ACE-Step 1.5, Spaces, LoRAs, quantizations or fine-tunes. The declaration is upstream metadata, not legal clearance, exclusivity or a statement about similarity to existing works.",
+      "runtime_revision": "82cd0d7b6322bd28cd4e830fe675ddb6180ce36c",
+      "commercial_inference": "unknown",
+      "commercial_use": false,
+      "configured_at": "backend/config/models.yaml",
+      "runtime_pin_scope": "central",
+      "runtime_pin_source": "backend/services/hf_revisions.py",
+      "component_closure": "incomplete",
+      "commercial_outputs": "unknown",
+      "documents": [],
+      "artifacts": [],
+      "required_components": [],
+      "upstream_access": "unknown",
+      "audiogen_evidence": {
+        "verified_at": "2026-10-22",
+        "scope": "weights",
+        "declared_by": "model card front matter (license: apache-2.0) and README 'License: Apache 2.0'",
+        "evidence_documents": [
+          {
+            "name": "model card README at the pinned revision",
+            "url": "https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B/blob/82cd0d7b6322bd28cd4e830fe675ddb6180ce36c/README.md",
+            "sha256": "b5674b0c01f5b8e6e38291f1d36baa749a60f5cd5c450b70d23e247a772d930f"
+          },
+          {
+            "name": "code repository LICENSE (Apache-2.0, main branch)",
+            "url": "https://github.com/ace-step/ACE-Step/blob/main/LICENSE",
+            "sha256": "1402dd74e3b2fecdfc7cd4427a924b93cbd134eb96f09d0df80dcd01fc29102a"
+          }
+        ],
+        "code_license": "Apache-2.0 (ace-step/ACE-Step)",
+        "components": [
+          "ace_step_transformer",
+          "music_dcae_f8c8",
+          "music_vocoder",
+          "umt5-base (google/umt5-base, Apache-2.0, vendored in the same repository)"
+        ],
+        "output_terms": "No output restriction found in the reviewed material; Apache-2.0 contains no output clause.",
+        "conflicts": [],
+        "scope_limits": "Pinned v1 3.5B revision only."
+      },
+      "audit_observations": {
+        "commercial_inference": {
+          "status": "unreviewed",
+          "scope": "Selected weight/component only; not complete workflow clearance."
+        },
+        "output_terms": {
+          "status": "not_assessed",
+          "ownership_or_all_rights_cleared": false
+        },
+        "sources": [
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://huggingface.co/ACE-Step/ACE-Step-v1-3.5B/blob/82cd0d7b6322bd28cd4e830fe675ddb6180ce36c/README.md"
+          },
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://github.com/ace-step/ACE-Step/blob/main/LICENSE"
+          }
+        ],
+        "open_questions": [
+          "Attribution/NOTICE/redistribution duties",
+          "Rights in prompts and any reference material supplied by the user"
+        ],
+        "identified_components": [
+          "ace_step_transformer",
+          "music_dcae_f8c8",
+          "music_vocoder",
+          "umt5-base (google/umt5-base, Apache-2.0, vendored in the same repository)"
+        ]
+      }
+    },
+    {
+      "id": "stabilityai/stable-audio-open-1.0",
+      "license": "Stability AI Community License",
+      "review_status": "unreviewed",
+      "credit": "Stable Audio Open 1.0 — Stability AI",
+      "source_url": "https://huggingface.co/stabilityai/stable-audio-open-1.0",
+      "evidence_url": "https://huggingface.co/stabilityai/stable-audio-open-1.0",
+      "revision": "f21265c1e2710b3bd2386596943f0007f55f802e",
+      "engines": [
+        "audiogen-torch"
+      ],
+      "notes": "Gated repository (account and acceptance on Hugging Face required; contact information is shared with Stability AI). Stability's community license allows research, non-commercial and limited commercial use; commercial use requires registering with Stability AI and ends when you and your affiliates exceed USD 1,000,000 in annual revenue, after which a separate license is needed. Attribution notice, acceptable use policy and a ban on using the model or its outputs to train competing foundation models apply. Accepting access on Hugging Face is not the commercial registration.",
+      "runtime_revision": "f21265c1e2710b3bd2386596943f0007f55f802e",
+      "commercial_inference": "separate_permission_required",
+      "commercial_use": false,
+      "configured_at": "backend/config/models.yaml",
+      "runtime_pin_scope": "central",
+      "runtime_pin_source": "backend/services/hf_revisions.py",
+      "component_closure": "incomplete",
+      "commercial_outputs": "unknown",
+      "documents": [],
+      "artifacts": [],
+      "required_components": [],
+      "upstream_access": "gated",
+      "audiogen_evidence": {
+        "verified_at": "2026-10-22",
+        "scope": "weights",
+        "declared_by": "Hugging Face metadata (license: other, license_name: stable-audio-community, license_link: LICENSE)",
+        "evidence_documents": [
+          {
+            "name": "Stability AI Community License Agreement (public page)",
+            "url": "https://stability.ai/community-license-agreement",
+            "sha256": "c1015cc70f5a8622614909cb0a1f22c5004ca256fc521f78533e45e57dadfc97"
+          },
+          {
+            "name": "Stability AI license overview (public page)",
+            "url": "https://stability.ai/license",
+            "sha256": "ef0e19e3c43200e97736a6bfd0822c14313d0783d75f1031d605e54884ba61a7"
+          },
+          {
+            "name": "Hugging Face model page (gated view)",
+            "url": "https://huggingface.co/stabilityai/stable-audio-open-1.0",
+            "sha256": "dad0d0f289b9b9e0e3da6df0207d0762503010ac36e1b0296b8a4ef52cdb764e"
+          }
+        ],
+        "code_license": "MIT (Stability-AI/stable-audio-tools); inference here uses the Apache-2.0 diffusers StableAudioPipeline",
+        "components": [
+          "transformer",
+          "vae",
+          "text_encoder (T5-base, Apache-2.0)"
+        ],
+        "output_terms": "Public agreement text: as between you and Stability AI you own outputs to the extent permitted by law; outputs must not be used to create or improve a foundational generative AI model.",
+        "conflicts": [],
+        "scope_limits": "The repository LICENSE.md is not readable without accepting access, so the conditions were read from Stability's public agreement pages. The agreement shown by Hugging Face at acceptance time governs.",
+        "revenue_threshold_usd": 1000000,
+        "registration_required_for_commercial": true
+      },
+      "audit_observations": {
+        "commercial_inference": {
+          "status": "unreviewed",
+          "scope": "Selected weight/component only; not complete workflow clearance."
+        },
+        "output_terms": {
+          "status": "not_assessed",
+          "ownership_or_all_rights_cleared": false
+        },
+        "sources": [
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://stability.ai/community-license-agreement"
+          },
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://stability.ai/license"
+          },
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://huggingface.co/stabilityai/stable-audio-open-1.0"
+          }
+        ],
+        "open_questions": [
+          "Attribution/NOTICE/redistribution duties",
+          "Rights in prompts and any reference material supplied by the user"
+        ],
+        "identified_components": [
+          "transformer",
+          "vae",
+          "text_encoder (T5-base, Apache-2.0)"
+        ]
+      }
+    },
+    {
+      "id": "facebook/musicgen-small",
+      "license": "CC-BY-NC-4.0",
+      "review_status": "noncommercial",
+      "credit": "MusicGen small — Meta AI (FAIR)",
+      "source_url": "https://huggingface.co/facebook/musicgen-small",
+      "evidence_url": "https://huggingface.co/facebook/musicgen-small/blob/4c8334b02c6ec4e8664a91979669a501ec497792/README.md",
+      "revision": "4c8334b02c6ec4e8664a91979669a501ec497792",
+      "engines": [
+        "audiogen-torch"
+      ],
+      "notes": "Weights are CC-BY-NC-4.0 (code is MIT). Not offered here as a model for audio intended for sold games, monetized channels or other commercial work.",
+      "runtime_revision": "4c8334b02c6ec4e8664a91979669a501ec497792",
+      "commercial_inference": "restricted",
+      "commercial_use": false,
+      "configured_at": "backend/config/models.yaml",
+      "runtime_pin_scope": "central",
+      "runtime_pin_source": "backend/services/hf_revisions.py",
+      "component_closure": "incomplete",
+      "commercial_outputs": "unknown",
+      "documents": [],
+      "artifacts": [],
+      "required_components": [],
+      "upstream_access": "unknown",
+      "audiogen_evidence": {
+        "verified_at": "2026-10-22",
+        "scope": "weights",
+        "declared_by": "model card front matter (license: cc-by-nc-4.0) and README 'model weights are released under CC-BY-NC 4.0'",
+        "evidence_documents": [
+          {
+            "name": "model card README at the pinned revision",
+            "url": "https://huggingface.co/facebook/musicgen-small/blob/4c8334b02c6ec4e8664a91979669a501ec497792/README.md",
+            "sha256": "fd82bcd1695c15550d5a047b911980038fc776f3bf417450c4596c6486d0cd2d"
+          },
+          {
+            "name": "audiocraft LICENSE_weights (CC BY-NC 4.0, main branch)",
+            "url": "https://github.com/facebookresearch/audiocraft/blob/main/LICENSE_weights",
+            "sha256": "336255dc30193e8e15d689d9481bb05673d89055718f3a96923a7ffb99adbbaf"
+          }
+        ],
+        "code_license": "MIT (facebookresearch/audiocraft; transformers implementation Apache-2.0)",
+        "components": [
+          "text encoder (T5-base) and EnCodec audio codec inside model.safetensors"
+        ],
+        "output_terms": "Not stated for outputs; the weights license is non-commercial.",
+        "conflicts": []
+      },
+      "audit_observations": {
+        "commercial_inference": {
+          "status": "noncommercial",
+          "scope": "Selected weight/component only; not complete workflow clearance."
+        },
+        "output_terms": {
+          "status": "not_assessed",
+          "ownership_or_all_rights_cleared": false
+        },
+        "sources": [
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://huggingface.co/facebook/musicgen-small/blob/4c8334b02c6ec4e8664a91979669a501ec497792/README.md"
+          },
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://github.com/facebookresearch/audiocraft/blob/main/LICENSE_weights"
+          }
+        ],
+        "open_questions": [
+          "Attribution/NOTICE/redistribution duties",
+          "Rights in prompts and any reference material supplied by the user"
+        ],
+        "identified_components": [
+          "text encoder (T5-base) and EnCodec audio codec inside model.safetensors"
+        ]
+      }
+    },
+    {
+      "id": "facebook/musicgen-stereo-medium",
+      "license": "CC-BY-NC-4.0",
+      "review_status": "noncommercial",
+      "credit": "MusicGen stereo medium 1.5B — Meta AI (FAIR)",
+      "source_url": "https://huggingface.co/facebook/musicgen-stereo-medium",
+      "evidence_url": "https://huggingface.co/facebook/musicgen-stereo-medium/blob/2747e613fbaadc43b14257224326ef58c5c11b81/README.md",
+      "revision": "2747e613fbaadc43b14257224326ef58c5c11b81",
+      "engines": [
+        "audiogen-torch"
+      ],
+      "notes": "Weights are CC-BY-NC-4.0 (code is MIT). Not offered here as a model for audio intended for sold games, monetized channels or other commercial work.",
+      "runtime_revision": "2747e613fbaadc43b14257224326ef58c5c11b81",
+      "commercial_inference": "restricted",
+      "commercial_use": false,
+      "configured_at": "backend/config/models.yaml",
+      "runtime_pin_scope": "central",
+      "runtime_pin_source": "backend/services/hf_revisions.py",
+      "component_closure": "incomplete",
+      "commercial_outputs": "unknown",
+      "documents": [],
+      "artifacts": [],
+      "required_components": [],
+      "upstream_access": "unknown",
+      "audiogen_evidence": {
+        "verified_at": "2026-10-22",
+        "scope": "weights",
+        "declared_by": "model card front matter (license: cc-by-nc-4.0)",
+        "evidence_documents": [
+          {
+            "name": "model card README at the pinned revision",
+            "url": "https://huggingface.co/facebook/musicgen-stereo-medium/blob/2747e613fbaadc43b14257224326ef58c5c11b81/README.md",
+            "sha256": "8115e5dae38d11cb346343809a266ed80f7ac0ffaa271d77702feccae16ea073"
+          },
+          {
+            "name": "audiocraft LICENSE_weights (CC BY-NC 4.0, main branch)",
+            "url": "https://github.com/facebookresearch/audiocraft/blob/main/LICENSE_weights",
+            "sha256": "336255dc30193e8e15d689d9481bb05673d89055718f3a96923a7ffb99adbbaf"
+          }
+        ],
+        "code_license": "MIT (facebookresearch/audiocraft; transformers implementation Apache-2.0)",
+        "components": [
+          "text encoder (T5-base) and EnCodec audio codec inside model.safetensors"
+        ],
+        "output_terms": "Not stated for outputs; the weights license is non-commercial.",
+        "conflicts": []
+      },
+      "audit_observations": {
+        "commercial_inference": {
+          "status": "noncommercial",
+          "scope": "Selected weight/component only; not complete workflow clearance."
+        },
+        "output_terms": {
+          "status": "not_assessed",
+          "ownership_or_all_rights_cleared": false
+        },
+        "sources": [
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://huggingface.co/facebook/musicgen-stereo-medium/blob/2747e613fbaadc43b14257224326ef58c5c11b81/README.md"
+          },
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://github.com/facebookresearch/audiocraft/blob/main/LICENSE_weights"
+          }
+        ],
+        "open_questions": [
+          "Attribution/NOTICE/redistribution duties",
+          "Rights in prompts and any reference material supplied by the user"
+        ],
+        "identified_components": [
+          "text encoder (T5-base) and EnCodec audio codec inside model.safetensors"
+        ]
+      }
+    },
+    {
+      "id": "cvssp/audioldm2",
+      "license": "CC-BY-NC-SA-4.0",
+      "review_status": "noncommercial",
+      "credit": "AudioLDM 2 — CVSSP, University of Surrey",
+      "source_url": "https://huggingface.co/cvssp/audioldm2",
+      "evidence_url": "https://huggingface.co/cvssp/audioldm2/blob/c8e7e189d324425c05c4c2f81214041ef4107983/README.md",
+      "revision": "c8e7e189d324425c05c4c2f81214041ef4107983",
+      "engines": [
+        "audiogen-torch"
+      ],
+      "notes": "Weights are CC-BY-NC-SA-4.0. Not offered here as a model for audio intended for sold games, monetized channels or other commercial work.",
+      "runtime_revision": "c8e7e189d324425c05c4c2f81214041ef4107983",
+      "commercial_inference": "restricted",
+      "commercial_use": false,
+      "configured_at": "backend/config/models.yaml",
+      "runtime_pin_scope": "central",
+      "runtime_pin_source": "backend/services/hf_revisions.py",
+      "component_closure": "incomplete",
+      "commercial_outputs": "unknown",
+      "documents": [],
+      "artifacts": [],
+      "required_components": [],
+      "upstream_access": "unknown",
+      "audiogen_evidence": {
+        "verified_at": "2026-10-22",
+        "scope": "weights",
+        "declared_by": "model card front matter (license: cc-by-nc-sa-4.0)",
+        "evidence_documents": [
+          {
+            "name": "model card README at the pinned revision",
+            "url": "https://huggingface.co/cvssp/audioldm2/blob/c8e7e189d324425c05c4c2f81214041ef4107983/README.md",
+            "sha256": "ea09e056e8ef02ee75eb86e8052bf3bd9b36417f2b7b3090f3b1595c1da64aed"
+          }
+        ],
+        "code_license": "Apache-2.0 (diffusers AudioLDM2Pipeline)",
+        "components": [
+          "unet",
+          "vae",
+          "vocoder (HiFi-GAN)",
+          "CLAP text encoder",
+          "FLAN-T5 text encoder",
+          "GPT-2 language model"
+        ],
+        "output_terms": "Not stated for outputs; the weights license is non-commercial share-alike.",
+        "conflicts": []
+      },
+      "audit_observations": {
+        "commercial_inference": {
+          "status": "noncommercial",
+          "scope": "Selected weight/component only; not complete workflow clearance."
+        },
+        "output_terms": {
+          "status": "not_assessed",
+          "ownership_or_all_rights_cleared": false
+        },
+        "sources": [
+          {
+            "checked_at": "2026-10-22",
+            "method": "read_primary_source",
+            "url": "https://huggingface.co/cvssp/audioldm2/blob/c8e7e189d324425c05c4c2f81214041ef4107983/README.md"
+          }
+        ],
+        "open_questions": [
+          "Attribution/NOTICE/redistribution duties",
+          "Rights in prompts and any reference material supplied by the user"
+        ],
+        "identified_components": [
+          "unet",
+          "vae",
+          "vocoder (HiFi-GAN)",
+          "CLAP text encoder",
+          "FLAN-T5 text encoder",
+          "GPT-2 language model"
+        ]
+      }
     }
   ],
   "dynamic_assets": [

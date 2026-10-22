@@ -3795,5 +3795,99 @@
       "remove_file": "Usuń",
       "no_matches": "Brak wyników dla \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Muzyka",
+      "desc": "Opisz muzykę, jakiej chcesz, i wygeneruj ją na tym komputerze."
+    },
+    "sfx": {
+      "title": "Efekty dźwiękowe",
+      "desc": "Opisz efekt dźwiękowy i wygeneruj go na tym komputerze."
+    },
+    "local": "Działa lokalnie. Po pobraniu modelu internet nie jest potrzebny.",
+    "purpose": "Jak wykorzystasz dźwięk?",
+    "purposes": {
+      "personal": "Osobiste / niekomercyjne",
+      "commercial": "Komercyjne / z monetyzacją"
+    },
+    "purposeNote": "Twój wybór jest sprawdzany względem licencji modelu i zapisywany przy każdym wyniku. To oświadczenie, a nie licencja.",
+    "model": "Model",
+    "license": {
+      "commercial": "Użycie komercyjne dozwolone — zgodnie z licencją",
+      "conditions": "Użycie komercyjne na warunkach",
+      "noncommercial": "Tylko użycie niekomercyjne",
+      "unconfirmed": "Zgoda niepotwierdzona"
+    },
+    "licenseNote": "Etykiety opisują zadeklarowaną licencję każdego modelu. Nie są poradą prawną i nie poświadczają Twojego wyniku.",
+    "ready": "Gotowe",
+    "notInstalled": "Niezainstalowany",
+    "notForCommercial": "Niedostępny do użytku komercyjnego.",
+    "hardware": "Szacunek: około {{ram}} GB RAM i {{vram}} GB pamięci GPU. Działa też na CPU, wolniej.",
+    "conditionsText": "Użycie komercyjne wymaga rejestracji u licencjodawcy i dotyczy tylko rocznych przychodów poniżej {{amount}} USD.",
+    "officialTerms": "Przeczytaj oficjalne warunki",
+    "acknowledge": "Rozumiem te warunki i biorę odpowiedzialność za ich przestrzeganie.",
+    "installRuntime": "Zainstaluj środowisko (około {{size}} GB)",
+    "revisionMismatch": "Zainstalowane pliki różnią się od sprawdzonej wersji. Pobierz model ponownie.",
+    "downloadModel": "Pobierz model ({{size}} GB)",
+    "gatedNote": "Ten model wymaga zaakceptowania jego warunków w Hugging Face i zalogowania własnym tokenem w Ustawieniach.",
+    "installing": "Instalowanie… może to potrwać kilka minut.",
+    "prompt": "Opis (najlepiej po angielsku)",
+    "lyrics": "Tekst piosenki (opcjonalnie)",
+    "quality": "Jakość",
+    "profiles": {
+      "fast": "Szybka",
+      "balanced": "Zrównoważona",
+      "high": "Wysoka",
+      "custom": "Własna"
+    },
+    "duration": "Czas trwania w sekundach ({{min}}–{{max}})",
+    "variations": "Warianty",
+    "seed": "Ziarno (puste = losowe)",
+    "device": "Urządzenie",
+    "devices": {
+      "auto": "Automatyczne",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "GPU Apple (eksperymentalne)"
+    },
+    "preset": "Ustawienie treści",
+    "presets": {
+      "none": "Brak",
+      "game_soundtrack": "Muzyka do gry",
+      "monetized_video": "Film z monetyzacją",
+      "game_sfx": "Efekt dźwiękowy do gry"
+    },
+    "generate": "Generuj",
+    "cancel": "Anuluj",
+    "status": {
+      "queued": "W kolejce ({{ahead}} przed Tobą)",
+      "preparing": "Przygotowywanie…",
+      "loading": "Ładowanie modelu…",
+      "generating": "Generowanie…",
+      "saving": "Zapisywanie…",
+      "done": "Gotowe",
+      "failed": "Niepowodzenie",
+      "cancelled": "Anulowano"
+    },
+    "errors": {
+      "out_of_memory": "Za mało pamięci. Spróbuj jakości Szybka, krótszego czasu albo CPU.",
+      "stalled": "Model przestał odpowiadać i został zatrzymany.",
+      "timeout": "Generowanie trwało zbyt długo i zostało zatrzymane.",
+      "device_unavailable": "Wybrane urządzenie nie jest dostępne dla tego modelu.",
+      "generation_failed": "Generowanie nie powiodło się."
+    },
+    "fellBack": "Nie można było użyć GPU; to uruchomienie przeszło na CPU.",
+    "ranOn": "Wygenerowano na: {{device}}",
+    "downloadWav": "Pobierz WAV",
+    "exportProvenance": "Eksportuj WAV + pochodzenie",
+    "provenance": {
+      "title": "Pochodzenie",
+      "revision": "Rewizja",
+      "license": "Licencja",
+      "declaredUse": "Zadeklarowane użycie",
+      "acknowledged": "warunki potwierdzone",
+      "notRecorded": "Brak zapisanego pochodzenia dla tego nagrania. Nie zakłada się żadnego modelu, licencji ani dozwolonego użycia."
+    }
   }
 }

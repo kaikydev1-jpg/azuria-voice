@@ -3791,5 +3791,99 @@
       "remove_file": "Remove",
       "no_matches": "No matches for \"{{query}}\"."
     }
+  },
+  "audiogen": {
+    "music": {
+      "title": "Music",
+      "desc": "Describe the music you want and generate it on this computer."
+    },
+    "sfx": {
+      "title": "Sound effects",
+      "desc": "Describe a sound effect and generate it on this computer."
+    },
+    "local": "Runs locally. After the model is downloaded, no internet is needed.",
+    "purpose": "How will you use the audio?",
+    "purposes": {
+      "personal": "Personal / non-commercial",
+      "commercial": "Commercial / monetized"
+    },
+    "purposeNote": "Your choice is checked against the model's licence and saved with each result. It is a declaration, not a licence.",
+    "model": "Model",
+    "license": {
+      "commercial": "Commercial use allowed — per licence",
+      "conditions": "Commercial use with conditions",
+      "noncommercial": "Non-commercial use only",
+      "unconfirmed": "Permission not confirmed"
+    },
+    "licenseNote": "Labels describe each model's declared licence. They are not legal advice and do not certify your output.",
+    "ready": "Ready",
+    "notInstalled": "Not installed",
+    "notForCommercial": "Not offered for commercial use.",
+    "hardware": "Estimated: about {{ram}} GB of RAM and {{vram}} GB of GPU memory. It also runs on the CPU, more slowly.",
+    "conditionsText": "Commercial use requires registering with the licensor and applies only below USD {{amount}} of annual revenue.",
+    "officialTerms": "Read the official terms",
+    "acknowledge": "I understand these conditions and take responsibility for meeting them.",
+    "installRuntime": "Install runtime (about {{size}} GB)",
+    "revisionMismatch": "The installed files differ from the reviewed version. Download the model again.",
+    "downloadModel": "Download model ({{size}} GB)",
+    "gatedNote": "This model asks you to accept its terms on Hugging Face and sign in with your own token in Settings.",
+    "installing": "Installing… this can take several minutes.",
+    "prompt": "Description (English works best)",
+    "lyrics": "Lyrics (optional)",
+    "quality": "Quality",
+    "profiles": {
+      "fast": "Fast",
+      "balanced": "Balanced",
+      "high": "High",
+      "custom": "Custom"
+    },
+    "duration": "Duration in seconds ({{min}}–{{max}})",
+    "variations": "Variations",
+    "seed": "Seed (empty = random)",
+    "device": "Device",
+    "devices": {
+      "auto": "Automatic",
+      "cpu": "CPU",
+      "cuda": "GPU (CUDA)",
+      "mps": "Apple GPU (experimental)"
+    },
+    "preset": "Content preset",
+    "presets": {
+      "none": "None",
+      "game_soundtrack": "Game soundtrack",
+      "monetized_video": "Monetized video",
+      "game_sfx": "Game sound effect"
+    },
+    "generate": "Generate",
+    "cancel": "Cancel",
+    "status": {
+      "queued": "Waiting in the queue ({{ahead}} ahead)",
+      "preparing": "Preparing…",
+      "loading": "Loading the model…",
+      "generating": "Generating…",
+      "saving": "Saving…",
+      "done": "Done",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "errors": {
+      "out_of_memory": "Not enough memory. Try the Fast quality, a shorter duration, or the CPU.",
+      "stalled": "The model stopped responding and was stopped.",
+      "timeout": "Generation took too long and was stopped.",
+      "device_unavailable": "The chosen device is not available for this model.",
+      "generation_failed": "Generation failed."
+    },
+    "fellBack": "The GPU could not be used; this run fell back to the CPU.",
+    "ranOn": "Generated on: {{device}}",
+    "downloadWav": "Download WAV",
+    "exportProvenance": "Export WAV + provenance",
+    "provenance": {
+      "title": "Provenance",
+      "revision": "Revision",
+      "license": "Licence",
+      "declaredUse": "Declared use",
+      "acknowledged": "conditions acknowledged",
+      "notRecorded": "Provenance not recorded for this take. No model, licence or permitted use is implied."
+    }
   }
 }

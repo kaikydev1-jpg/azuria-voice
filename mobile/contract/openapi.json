@@ -2338,6 +2338,136 @@
     "title": "FitOptions",
     "type": "object"
    },
+   "GenerateRequest": {
+    "additionalProperties": false,
+    "properties": {
+     "conditions_acknowledged": {
+      "default": false,
+      "title": "Conditions Acknowledged",
+      "type": "boolean"
+     },
+     "content_preset": {
+      "anyOf": [
+       {
+        "maxLength": 48,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Content Preset"
+     },
+     "custom": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Custom"
+     },
+     "device": {
+      "default": "auto",
+      "enum": [
+       "auto",
+       "cpu",
+       "cuda",
+       "mps"
+      ],
+      "title": "Device",
+      "type": "string"
+     },
+     "duration_s": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Duration S"
+     },
+     "lyrics": {
+      "anyOf": [
+       {
+        "maxLength": 8000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Lyrics"
+     },
+     "model": {
+      "maxLength": 64,
+      "title": "Model",
+      "type": "string"
+     },
+     "profile": {
+      "anyOf": [
+       {
+        "maxLength": 16,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Profile"
+     },
+     "prompt": {
+      "maxLength": 1200,
+      "title": "Prompt",
+      "type": "string"
+     },
+     "purpose": {
+      "anyOf": [
+       {
+        "maxLength": 16,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Purpose"
+     },
+     "seed": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Seed"
+     },
+     "variations": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Variations"
+     }
+    },
+    "required": [
+     "model",
+     "prompt"
+    ],
+    "title": "GenerateRequest",
+    "type": "object"
+   },
    "GlossaryTerm": {
     "properties": {
      "note": {
@@ -8453,6 +8583,330 @@
      }
     },
     "summary": "Use Archetype"
+   }
+  },
+  "/audio-gen/catalog": {
+   "get": {
+    "description": "Models, licence classes, profiles and install state. Never downloads anything.",
+    "operationId": "get_catalog_audio_gen_catalog_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "kind",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "enum": [
+          "music",
+          "sfx"
+         ],
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Catalog",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/jobs": {
+   "get": {
+    "operationId": "list_jobs_audio_gen_jobs_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Jobs",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/jobs/{job_id}": {
+   "get": {
+    "operationId": "get_job_audio_gen_jobs__job_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Job",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/jobs/{job_id}/cancel": {
+   "post": {
+    "operationId": "cancel_job_audio_gen_jobs__job_id__cancel_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Cancel Job",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/music": {
+   "post": {
+    "operationId": "generate_music_audio_gen_music_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/GenerateRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Generate Music",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/sfx": {
+   "post": {
+    "operationId": "generate_sfx_audio_gen_sfx_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/GenerateRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Generate Sfx",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/takes/{take_id}/export": {
+   "get": {
+    "description": "ZIP with the WAV, ``provenance.json`` and a readable ``provenance.txt``.",
+    "operationId": "export_take_audio_gen_takes__take_id__export_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "take_id",
+      "required": true,
+      "schema": {
+       "title": "Take Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Export Take",
+    "tags": [
+     "audio-gen"
+    ]
+   }
+  },
+  "/audio-gen/takes/{take_id}/provenance": {
+   "get": {
+    "operationId": "get_provenance_audio_gen_takes__take_id__provenance_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "take_id",
+      "required": true,
+      "schema": {
+       "title": "Take Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "format",
+      "required": false,
+      "schema": {
+       "default": "json",
+       "enum": [
+        "json",
+        "text"
+       ],
+       "title": "Format",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Provenance",
+    "tags": [
+     "audio-gen"
+    ]
    }
   },
   "/audio/{audio_id}.ogg": {

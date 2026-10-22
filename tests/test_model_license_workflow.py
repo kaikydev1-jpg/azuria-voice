@@ -358,7 +358,7 @@ class ProductionTests(unittest.TestCase):
 
     def test_production_rows_never_use_synthetic_positive_fixtures(self):
         registry = ml.load_registry()
-        self.assertEqual(len(registry["models"]), 57)
+        self.assertEqual(len(registry["models"]), 62)
         self.assertEqual(len(registry["dynamic_assets"]), 7)
         for row in registry["models"]:
             self.assertEqual(row["component_closure"], "incomplete")
@@ -381,9 +381,15 @@ class ProductionTests(unittest.TestCase):
         expected = {r["id"]: r["runtime_revision"] for r in data["models"]
                     if r["runtime_pin_scope"] == "central"}
         self.assertEqual(CURATED_REVISIONS, expected)
-        self.assertEqual(len(expected), 43)
+        self.assertEqual(len(expected), 48)
         self.assertEqual(expected.pop("OpenMOSS-Team/MOSS-Audio-Tokenizer"),
                          "3cd226ba2947efa357ef453bcad111b6eafba782")
+        # The music / sound-effects catalogue (0.5.11) adds its own pins; the
+        # digest below still covers only the pre-existing ones.
+        for audiogen_id in ("ACE-Step/ACE-Step-v1-3.5B", "stabilityai/stable-audio-open-1.0",
+                            "facebook/musicgen-small", "facebook/musicgen-stereo-medium",
+                            "cvssp/audioldm2"):
+            self.assertRegex(expected.pop(audiogen_id), r"[0-9a-f]{40}\Z")
         # Preserve ALL 42 pre-existing pins from base 06c6e077 unchanged.
         self.assertEqual(ml.digest(expected), "421276b5ac88b32b36b838667e4cd2da8d410d48ba489dcffb8486772df9d858")
         self.assertEqual(expected["openbmb/VoxCPM2"], "bffb3df5a29440629464e5e839f4d214c8714c3d")

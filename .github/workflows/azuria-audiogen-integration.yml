@@ -1,0 +1,53 @@
+name: Azúria música e SFX - geração real
+
+# Instala cada runtime isolado, baixa os pesos fixados e gera áudio de verdade na
+# CPU, medindo tempo e memória. Roda só sob demanda ou ao mudar os arquivos abaixo.
+# O Stable Audio Open exige o segredo HF_TOKEN (de quem aceitou os termos no
+# Hugging Face); sem ele o caso é marcado como ignorado, nunca como aprovado.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/project-thread-exxwck]
+    paths:
+      - scripts/audiogen_integration.py
+      - backend/engines/audiogen/**
+      - backend/services/sidecar_install.py
+      - .github/workflows/azuria-audiogen-integration.yml
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    name: ${{ matrix.model }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, model: ace-step-v1 }
+          - { os: ubuntu-24.04, model: musicgen-small }
+          - { os: ubuntu-24.04, model: audioldm2 }
+          - { os: ubuntu-24.04, model: stable-audio-open-1.0 }
+          - { os: macos-14, model: musicgen-small }
+          - { os: windows-2022, model: musicgen-small }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+      - name: Gerar áudio real
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYTHONUTF8: "1"
+        shell: bash
+        run: |
+          uv run --no-project --python 3.12 --with pyyaml --with huggingface_hub --with numpy --with soundfile --with psutil --with fastapi --with pydantic --with httpx --with cryptography --with python-jose --with argon2-cffi --with bcrypt --with sqlalchemy --with alembic --with python-multipart \
+            python scripts/audiogen_integration.py "${{ matrix.model }}" result.json
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: audiogen-${{ matrix.model }}-${{ matrix.os }}
+          path: result.json
+          if-no-files-found: ignore

@@ -584,6 +584,56 @@ SPECS: dict[str, SidecarSpec] = {
             "VoxCPM2 needs a PyTorch version that has no Intel Mac build."
         ),
     ),
+    # Music / sound-effects runtimes (services/audiogen). Each lives in its own
+    # venv so the app's Torch / Transformers never move: ACE-Step pins
+    # transformers==4.50.0 and diffusers==0.32.2, MusicGen / Stable Audio Open /
+    # AudioLDM2 want newer ones. Weights are NOT part of the install; they are
+    # ordinary Model Catalogue downloads chosen per model.
+    "audiogen-torch": SidecarSpec(
+        engine_id="audiogen-torch",
+        display_name="Music and sound effects runtime (MusicGen, Stable Audio Open, AudioLDM2)",
+        repo_url="",
+        tarball_url="",
+        checkout_dirname="audiogen-torch",
+        env_var="OMNIVOICE_AUDIOGEN_TORCH_DIR",
+        probe_module="diffusers",
+        has_source=False,
+        venv_args=("--python", "3.11"),
+        install_args=(
+            "transformers==4.46.3", "diffusers==0.35.2", "accelerate==1.10.1",
+            "safetensors==0.6.2", "sentencepiece==0.2.1", "scipy==1.15.3",
+            "soundfile==0.13.1", "numpy==2.2.6", "torchsde==0.2.6",
+        ),
+        torch_pins=("torch==2.11.0", "torchaudio==2.11.0"),
+        probe_code="import torch, transformers, diffusers, scipy, soundfile",
+        docs_path="docs/music-and-sound-effects.md",
+        required_bytes=10 * _GIB,
+        host_supported=_no_intel_mac(
+            "The music and sound-effects runtime needs a PyTorch version that has no Intel Mac build."
+        ),
+    ),
+    "audiogen-acestep": SidecarSpec(
+        engine_id="audiogen-acestep",
+        display_name="Music runtime (ACE-Step)",
+        repo_url="",
+        tarball_url="",
+        checkout_dirname="audiogen-acestep",
+        env_var="OMNIVOICE_AUDIOGEN_ACESTEP_DIR",
+        probe_module="acestep",
+        has_source=False,
+        venv_args=("--python", "3.11"),
+        # O sdist 0.1.0 do PyPI não traz requirements.txt e não compila; o mesmo
+        # código vem do commit que o GitHub marca como 0.1.0 (508fc67, 2025-05-17).
+        install_args=("ace-step @ https://github.com/ace-step/ACE-Step/archive/508fc67bad550347ac201bb2d99e9cd52fb7f951.tar.gz",),
+        # torchaudio 2.9+ salva WAV só via torchcodec; 2.8.0 ainda usa soundfile (testado em CI)
+        torch_pins=("torch==2.8.0", "torchaudio==2.8.0"),
+        probe_code="import torch, acestep.pipeline_ace_step",
+        docs_path="docs/music-and-sound-effects.md",
+        required_bytes=10 * _GIB,
+        host_supported=_no_intel_mac(
+            "The ACE-Step runtime needs a PyTorch version that has no Intel Mac build."
+        ),
+    ),
     # Upstream is unpinned and its entry point has moved before (#1287), so the
     # install pins a reviewed commit (2026-09-06) and the sidecar drives the
     # runtime that commit ships (moss_tts_nano_runtime.NanoTTSService). Its
