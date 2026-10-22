@@ -625,7 +625,8 @@ SPECS: dict[str, SidecarSpec] = {
         # O sdist 0.1.0 do PyPI não traz requirements.txt e não compila; o mesmo
         # código vem do commit que o GitHub marca como 0.1.0 (508fc67, 2025-05-17).
         install_args=("ace-step @ https://github.com/ace-step/ACE-Step/archive/508fc67bad550347ac201bb2d99e9cd52fb7f951.tar.gz",),
-        torch_pins=("torch==2.11.0", "torchaudio==2.11.0"),
+        # torchaudio 2.9+ salva WAV só via torchcodec; 2.8.0 ainda usa soundfile (testado em CI)
+        torch_pins=("torch==2.8.0", "torchaudio==2.8.0"),
         probe_code="import torch, acestep.pipeline_ace_step",
         docs_path="docs/music-and-sound-effects.md",
         required_bytes=10 * _GIB,
