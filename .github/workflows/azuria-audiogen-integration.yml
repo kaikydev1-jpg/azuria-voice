@@ -36,14 +36,14 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
-      - name: Dependências do script
-        run: uv pip install --system --break-system-packages pyyaml huggingface_hub numpy soundfile psutil fastapi pydantic httpx cryptography python-jose argon2-cffi bcrypt sqlalchemy alembic python-multipart
       - name: Gerar áudio real
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           PYTHONUTF8: "1"
         shell: bash
-        run: python scripts/audiogen_integration.py "${{ matrix.model }}" result.json
+        run: |
+          uv run --no-project --python 3.12 --with pyyaml --with huggingface_hub --with numpy --with soundfile --with psutil --with fastapi --with pydantic --with httpx --with cryptography --with python-jose --with argon2-cffi --with bcrypt --with sqlalchemy --with alembic --with python-multipart \
+            python scripts/audiogen_integration.py "${{ matrix.model }}" result.json
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
