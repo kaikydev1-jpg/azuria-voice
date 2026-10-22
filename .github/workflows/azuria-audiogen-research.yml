@@ -24,6 +24,14 @@ jobs:
         with:
           persist-credentials: false
       - run: python3 scripts/audiogen_collect_metadata.py audiogen-metadata
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: audiogen-metadata
+          path: audiogen-metadata
+          retention-days: 14
+      - name: Resumo dos três modelos principais
+        run: |
+          awk '/^## /{p=($0 ~ /ACE-Step\/ACE-Step-v1-3.5B|stable-audio-open-1.0|facebook\/musicgen-small|facebook\/musicgen-stereo-small/)} p' audiogen-metadata/summary.txt | cut -c1-320
       - name: Trechos das licenças de uso comercial
         run: |
           cd audiogen-metadata/texts
@@ -33,10 +41,3 @@ jobs:
           for f in ACE-Step__ACE-Step-v1-3.5B__LICENSE* ace-step__ACE-Step__LICENSE; do
             [ -f "$f" ] && echo "=== $f $(wc -l < "$f") linhas, $(head -c 80 "$f" | tr '\n' ' ')"
           done
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: audiogen-metadata
-          path: audiogen-metadata
-          retention-days: 14
-      - name: Resumo
-        run: cut -c1-400 audiogen-metadata/summary.txt
