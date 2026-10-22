@@ -30,6 +30,8 @@ Em cada geração você informa **Pessoal / não comercial** (padrão) ou **Come
 
 A declaração é gravada com o resultado. **Ela não é uma licença** e não muda os direitos de gerações anteriores.
 
+Aceitar os termos de um modelo não comercial não libera seu uso para gerar conteúdo destinado a jogos vendidos (inclusive na Steam), canais monetizados ou outros projetos comerciais. Para essa finalidade, escolha um modelo comercial permitido ou cumpra as condições do modelo comercial condicionado. As condições, o aceite e os registros de proveniência já fazem parte do aplicativo; nenhum registro substitui a licença oficial.
+
 ## Qualidade
 
 Rápido, Equilibrado, Alto e Personalizado (parâmetros dentro de limites validados no servidor). O MusicGen tem um único perfil.
@@ -41,6 +43,8 @@ Cada geração roda em um processo próprio. Os trabalhos entram numa fila (um p
 ## Ambientes isolados
 
 Os modelos usam ambientes Python separados (`audiogen-torch` e `audiogen-acestep`), instalados pelo app. O Torch e o Transformers do aplicativo principal não são alterados.
+
+O aviso **Instalando…** acompanha o trabalho em segundo plano até ele terminar ou falhar. Instalar o ambiente e baixar os pesos são etapas separadas: concluir uma delas encerra seu aviso mesmo que a outra ainda esteja pendente. Durante essa etapa os botões de instalação ficam desabilitados para evitar pedidos duplicados; uma falha mostra o diagnóstico e permite tentar novamente. Trocar o modelo selecionado não troca o trabalho acompanhado, e sair da tela encerra apenas o acompanhamento, sem cancelar a instalação.
 
 ## Histórico e proveniência
 
@@ -57,6 +61,6 @@ Ferramentas MCP: `list_audio_models`, `generate_music`, `generate_sound_effect`,
 
 ## Limitações conhecidas
 
-- O texto exato da licença do Stable Audio Open exige login no Hugging Face e não pôde ser lido sem conta; o app guarda os documentos públicos da Stability e a revisão fixada.
+- A [licença oficial do Stable Audio Open](https://huggingface.co/stabilityai/stable-audio-open-1.0/blob/main/LICENSE.md) deve ser conferida junto das condições comerciais; aceitar o acesso aos pesos no Hugging Face é uma etapa distinta do registro comercial.
 - A geração real do Stable Audio Open no CI depende de um token do Hugging Face com os termos aceitos.
 - MPS (Apple) e GPUs AMD não foram validados.

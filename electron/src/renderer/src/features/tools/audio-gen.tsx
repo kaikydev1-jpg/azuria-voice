@@ -7,6 +7,7 @@ import { PipelineFailure } from '@/components/pipeline-failure';
 import { ExternalLink } from '@/components/external-link';
 import { Progress } from '@/components/ui/progress';
 import { apiFetch, apiJson, audioUrl, describeError } from '@/lib/api/client';
+import { useAudioInstall } from './use-audio-install';
 import {
   LICENSE_KEYS,
   clampParam,
@@ -38,7 +39,8 @@ async function saveBlob(path: string, name: string) {
 export function AudioGen({ kind }: { kind: AudioKind }) {
   const { t } = useTranslation();
   const client = useQueryClient();
-  const [installing, setInstalling] = useState(false);
+  const installation = useAudioInstall(t('modelMaintenance.failed'));
+  const { installing } = installation;
   const catalog = useQuery({
     queryKey: ['audio-gen-catalog', kind],
     queryFn: () => apiJson<AudioCatalog>(`/audio-gen/catalog?kind=${kind}`),
@@ -98,25 +100,6 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
   if (catalog.isError)
     return <PipelineFailure fallback={describeError(catalog.error)} onDismiss={() => void catalog.refetch()} />;
   if (!model) return <p role="status">{t('common.loading')}</p>;
-
-  const installRuntime = async () => {
-    setError(null);
-    setInstalling(true);
-    try {
-      await apiJson(`/engines/sidecar/${model.status.runtime.engine_id}/install`, { method: 'POST' });
-    } catch (reason) {
-      setError(describeError(reason));
-    }
-  };
-  const installWeights = async () => {
-    setError(null);
-    setInstalling(true);
-    try {
-      await apiJson('/models/install', { method: 'POST', body: JSON.stringify({ repo_id: model.repo_id }) });
-    } catch (reason) {
-      setError(describeError(reason));
-    }
-  };
 
   const generate = async () => {
     if (busy || running || !ready || blocked || (needsAck && !acknowledged) || !prompt.trim()) return;
@@ -256,20 +239,26 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
         <div className="space-y-2 rounded-xl border border-border/60 p-3 text-sm">
           {!model.status.runtime.supported && <p role="alert">{model.status.runtime.reason}</p>}
           {model.status.runtime.supported && !model.status.runtime.installed && (
-            <Button type="button" variant="outline" onClick={() => void installRuntime()}>
+            <Button type="button" variant="outline" disabled={installing} onClick={() => {
+              setError(null);
+              void installation.start({ kind: 'runtime', id: model.status.runtime.engine_id });
+            }}>
               {t('audiogen.installRuntime', { size: model.status.runtime.approx_download_gb ?? '?' })}
             </Button>
           )}
           {model.status.weights.state === 'revision_mismatch' && <p role="alert">{t('audiogen.revisionMismatch')}</p>}
           {model.status.weights.state !== 'ready' && (
-            <Button type="button" variant="outline" onClick={() => void installWeights()}>
+            <Button type="button" variant="outline" disabled={installing} onClick={() => {
+              setError(null);
+              void installation.start({ kind: 'weights', id: model.repo_id });
+            }}>
               {t('audiogen.downloadModel', { size: model.download.size_gb ?? '?' })}
             </Button>
           )}
           {model.download.gated && <p className="text-xs text-muted-foreground">{t('audiogen.gatedNote')}</p>}
-          {installing && <p role="status" className="text-xs">{t('audiogen.installing')}</p>}
         </div>
       )}
+      {installing && <p role="status" className="text-xs">{t('audiogen.installing')}</p>}
 
       <label className="block space-y-2 text-sm">
         <span>{t('audiogen.prompt')}</span>
@@ -348,6 +337,7 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
       </div>
 
       {error && <PipelineFailure fallback={error} onDismiss={() => setError(null)} />}
+      {installation.error && <PipelineFailure fallback={installation.error} onDismiss={installation.clearError} />}
 
       {job && (
         <div role="status" className="space-y-3 rounded-xl border border-border/60 p-4 text-sm">
