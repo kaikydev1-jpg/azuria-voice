@@ -54,7 +54,7 @@ def fetch_weights(model: dict) -> str:
     from services import hf_revisions
 
     repo = model["repo_id"]
-    meta = get_model_catalog()[repo]
+    meta = get_model_catalog().get(repo) or {}
     return snapshot_download(repo, revision=hf_revisions.revision_for(repo),
                              allow_patterns=list(meta.get("allow_patterns") or []) or None,
                              token=os.environ.get("HF_TOKEN") or None)
@@ -89,11 +89,12 @@ def main(model_id: str, result_path: str) -> int:
     t0 = time.time()
     try:
         snapshot = fetch_weights(model)
-    except Exception as exc:  # noqa: BLE001 — gated model without token is a skip, not a pass
-        result.update(status="skipped", reason=f"weights unavailable: {type(exc).__name__}")
+    except Exception as exc:  # noqa: BLE001
+        gated = type(exc).__name__ in ("GatedRepoError", "RepositoryNotFoundError", "HfHubHTTPError") and not os.environ.get("HF_TOKEN")
+        result.update(status="skipped" if gated else "failed", reason=f"weights unavailable: {type(exc).__name__}: {exc}"[:300])
         Path(result_path).write_text(json.dumps(result, indent=1))
         print(result)
-        return 0
+        return 0 if gated else 1
     result["download_s"] = round(time.time() - t0, 1)
     plan = params.build_plan(model, prompt=PROMPTS[model["kind"]], duration_s=SECONDS[model_id],
                              profile="fast" if "fast" in model["profiles"] else model["default_profile"], seed=1)
