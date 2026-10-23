@@ -7,6 +7,7 @@ import { loadWorkflowMedia } from './workflow-run-store';
 import type { WorkflowOperations } from './workflow-runtime';
 
 function languageCode(language?: string) {
+  if (language === 'Portuguese (Brazil)') return 'pt';
   return LANG_CODES.find((entry) => entry.label === language)?.code || language;
 }
 

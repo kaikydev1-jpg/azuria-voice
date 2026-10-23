@@ -31,6 +31,8 @@ from typing import Literal, Optional
 
 import torch
 
+from services.language_variants import canonical_language
+
 logger = logging.getLogger("omnivoice.tts")
 
 
@@ -333,7 +335,7 @@ class TTSBackend(ABC):
             return None
         if not isinstance(language, str):
             raise ValueError("Language must be a string or None")
-        value = language.strip().lower()
+        value = canonical_language(language.strip()).lower()
         if not value or value == "auto":
             return None
         from omnivoice.utils.lang_map import LANG_NAME_TO_ID

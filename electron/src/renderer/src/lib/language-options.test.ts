@@ -56,3 +56,13 @@ it('keeps disabled recent choices behind enabled choices and uses exact matches 
     'German',
   ]);
 });
+
+it('offers Brazilian Portuguese as a Portuguese variant with its own label and flag', () => {
+  expect(LANGUAGES).toContain('Portuguese (Brazil)');
+  const [option] = languageOptions(['Portuguese (Brazil)'], 'en', 'Auto');
+  expect(option).toMatchObject({ value: 'Portuguese (Brazil)', code: 'pt-BR' });
+  expect(option.label).not.toBe('Portuguese');
+  expect(rankOptions([option], 'brasil', [])[0]?.value).toBe('Portuguese (Brazil)');
+  expect(languageSupported('Portuguese (Brazil)', ['portuguese'])).toBe(true);
+  expect(languageSupported('Portuguese (Brazil)', ['german'])).toBe(false);
+});

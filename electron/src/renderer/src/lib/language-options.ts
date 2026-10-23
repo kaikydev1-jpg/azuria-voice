@@ -8,6 +8,8 @@ import type { EnginesResponse } from './api/types';
 const codes: Record<string, string> = {
   ...languageCodes,
   ...Object.fromEntries(LANG_CODES.map((item) => [item.label.toLowerCase(), item.code])),
+  // The backend folds this regional picker entry onto Portuguese before synthesis.
+  'portuguese (brazil)': 'pt-BR',
 };
 const codeValues = new Set(Object.values(codes));
 // These display names are accepted by the backend; keep persisted values unchanged.
@@ -15,9 +17,14 @@ export function languageCode(name: string) {
   return codes[name.toLowerCase()] || '';
 }
 
+// Brazilian Portuguese has no engine id of its own; it is supported wherever Portuguese is.
+const engineCode = (code: string) => (code === 'pt-BR' ? 'pt' : code);
+
 export function languageSupported(name: string, supported?: readonly string[] | null) {
   if (name.toLowerCase() === 'auto' || supported == null) return true;
-  const code = languageCode(name) || (codeValues.has(name.toLowerCase()) ? name.toLowerCase() : '');
+  const code = engineCode(
+    languageCode(name) || (codeValues.has(name.toLowerCase()) ? name.toLowerCase() : ''),
+  );
   return supported.some(
     (candidate) =>
       candidate.toLowerCase() === name.toLowerCase() ||
@@ -95,7 +102,10 @@ export function languageOptions(
         /* A language without ICU data retains its canonical name. */
       }
     }
-    const region = (languageRegions as Record<string, string>)[code === 'zh' ? 'cmn-Hans' : code];
+    const region =
+      code === 'pt-BR'
+        ? 'BR'
+        : (languageRegions as Record<string, string>)[code === 'zh' ? 'cmn-Hans' : code];
     const flagAliases =
       region && /^[A-Z]{2}$/.test(region)
         ? [

@@ -10,6 +10,7 @@ export const POPULAR_LANGUAGES: string[] = [
   'German',
   'Italian',
   'Portuguese',
+  'Portuguese (Brazil)',
   'Russian',
   'Chinese',
   'Japanese',

@@ -150,6 +150,20 @@ DIALECT_HINTS = {
 }
 
 
+def effective_dialect(dialect: Optional[str], target_code: Optional[str]) -> Optional[str]:
+    """The requested dialect, or Brazilian Portuguese when a Portuguese target has none.
+
+    Azúria Voice is aimed at Brazilian users, so an unset Portuguese dialect
+    means pt-BR instead of whatever variant the translator model prefers. An
+    explicit choice (including pt-PT) always wins.
+    """
+    if dialect and str(dialect).strip():
+        return dialect
+    if str(target_code or "").lower()[:2] == "pt":
+        return "pt-BR"
+    return dialect
+
+
 def dialect_clause(dialect: Optional[str]) -> str:
     """Prompt fragment for a requested dialect, or '' when unset/unknown.
 
@@ -698,8 +712,9 @@ async def dub_translate(req: TranslateRequest):
                 # the dialect belongs to the target language (a leftover
                 # "es-AR" must not contaminate a French translation).
                 dia_clause = ""
-                if req.dialect and str(req.dialect).lower().startswith(str(tgt_code).lower()[:2]):
-                    dia_clause = dialect_clause(req.dialect)
+                _dia = effective_dialect(req.dialect, tgt_code)
+                if _dia and str(_dia).lower().startswith(str(tgt_code).lower()[:2]):
+                    dia_clause = dialect_clause(_dia)
                 base = (
                     f"You are a professional dubbing translator. "
                     f"Translate the user's text from {src_name} into "
@@ -1225,7 +1240,7 @@ async def _maybe_cinematic(translated, req, src_lang, loop, *, already_llm=False
     # another language. For already_llm the initial translate prompt already
     # applied it, so it's reported applied in the Fast-shape base too.
     dialect_hint = ""
-    _dialect = getattr(req, "dialect", None)
+    _dialect = effective_dialect(getattr(req, "dialect", None), req.target_lang)
     if _dialect and str(_dialect).lower().startswith(str(req.target_lang).lower()[:2]):
         dialect_hint = dialect_clause(_dialect)
 
