@@ -17,14 +17,12 @@ metadata and the backend fallback mirror it.
 
 ### Added
 
-- Azúria Voice: opção "Portuguese (Brazil)" no seletor de idioma e tradução de dublagem para português em pt-BR por padrão (#18)
 - Azúria Voice: pacotes de teste Linux x64 (AppImage e .deb) e macOS Apple Silicon (.dmg e .zip, assinatura ad hoc) compilados e testados no GitHub Actions (#12)
 - Preview iOS and Android companion apps: drive your own VoiceStudio from your phone (speak, voices and cloning, dubbing, dictation) after pairing by QR code; build from source for now ([guide](docs/mobile.md)) (#2965)
 - Smart Fit speed limits: set the fastest and slowest speed dubbing may apply to a line, from the Timing section (#3026) — thanks @MoonDragon-MD!
 
 ### Fixed
 
-- Azúria Voice: textos da interface em português usam o português do Brasil, não o de Portugal (#18)
 - Azúria Voice: o app do macOS não fecha mais ao abrir por causa do acento no nome (CFBundleName na mesma forma Unicode dos arquivos) (#12)
 - Older synthesized takes play again with accurate play/pause controls after a newer generation (#3102)
 - Generation-complete notifications appear above the workspace instead of covering synthesis controls (#3102)
@@ -63,6 +61,26 @@ metadata and the backend fallback mirror it.
 - New `mobile` workflow builds and tests both phone apps; a contract test fails when their theme or API description drifts from the desktop app (#2965)
 
 - Gallery preview fallback smoke no longer flakes when a slower runner reads the playing clip in several byte ranges (#3018)
+
+## [0.5.12] — 2026-10-23
+
+O Azúria Voice agora fala **português do Brasil**: há uma opção "Portuguese (Brazil)" no seletor de idioma, a dublagem traduz para pt-BR por padrão e os textos da interface deixam de misturar termos de Portugal. Nenhum modelo tem pt-BR separado, então o sotaque da clonagem continua vindo da voz de referência.
+
+**Highlights**
+
+- Opção "Portuguese (Brazil)" ao lado de "Portuguese" em todos os seletores de idioma
+- Tradução de dublagem para português em pt-BR por padrão (pt-PT continua escolhível)
+- Interface em português do Brasil (arquivo, compartilhar, configurações, conexão)
+- A tela de instalação de música e efeitos sonoros agora acompanha o trabalho até o fim
+
+### Added
+
+- Azúria Voice: opção "Portuguese (Brazil)" no seletor de idioma e tradução de dublagem para português em pt-BR por padrão (#18)
+
+### Fixed
+
+- Azúria Voice: textos da interface em português usam o português do Brasil, não o de Portugal (#18)
+- Azúria Voice: o aviso de instalação de música e efeitos sonoros termina ao concluir ou falhar, acompanha o modelo original e impede pedidos duplicados (#17)
 
 ## [0.5.11] — 2026-10-22
 
