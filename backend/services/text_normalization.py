@@ -86,6 +86,7 @@ _FULL_NAME_TO_CODE = {
     "french": "fr",
     "italian": "it",
     "portuguese": "pt",
+    "portuguese (brazil)": "pt",
     "dutch": "nl",
     "russian": "ru",
     "ukrainian": "uk",

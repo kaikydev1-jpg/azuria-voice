@@ -29,6 +29,7 @@ from services.model_manager import (
     GpuPoolBusyError,
 )
 from services.generation_audio import save_generation_wav
+from services.language_variants import canonical_language
 # Compatibility export used by archetype previews and the gallery renderer.
 from services.audio_io import _safe_torchaudio_save
 from services.binary_preflight import InvalidBinaryError
@@ -1172,6 +1173,7 @@ def _run_inference(
     max_chunk_chars=None, crossfade_ms=None, *, dropped_sink=None,
 ):
     import torch
+    language = canonical_language(language)
     try:
         if used_seed is not None:
             torch.manual_seed(used_seed)
@@ -1270,6 +1272,7 @@ def _run_backend_inference(
     narrower protocol unchanged.
     """
     import torch
+    language = canonical_language(language)
     try:
         if used_seed is not None:
             torch.manual_seed(used_seed)
