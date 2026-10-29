@@ -62,6 +62,35 @@ metadata and the backend fallback mirror it.
 
 - Gallery preview fallback smoke no longer flakes when a slower runner reads the playing clip in several byte ranges (#3018)
 
+## [0.5.13] — 2026-10-29
+
+Revisão geral do Azúria Voice: a tela de música e efeitos sonoros ficou mais clara e deixou de perder o trabalho ao sair dela, dá para criar vários áudios de uma vez, e a integração de API agora se chama **Azúria Voice API**. Nenhuma função mudou de lugar e a API (`http://127.0.0.1:3900/v1`) segue igual.
+
+**Highlights**
+
+- Música e efeitos sonoros: explicações simples em cada campo (versões, código de repetição, qualidade, uso comercial, letra) em todos os 21 idiomas
+- A tela guarda o que você escreveu; ao voltar, as gerações em andamento aparecem com progresso e botão Cancelar
+- Criar vários áudios de uma vez, uma descrição por linha, em fila segura
+- Geração de música mais rápida num app já usado: as vozes na memória agora são liberadas antes
+- "VoiceStudio API" virou "Azúria Voice API" na tela Integrações, com links e logo do Azúria
+
+### Added
+
+- Azúria Voice: lote de músicas e efeitos sonoros (uma descrição por linha) e lista de gerações na própria tela (#19)
+- Azúria Voice: exemplos de descrição e de letra e dicas sob cada campo da tela de música e efeitos sonoros (#19)
+
+### Changed
+
+- Azúria Voice: rótulos "Versões a criar", "Código de repetição" e "Aleatório" no lugar de "Variações" e "Semente (vazio = aleatório)" (#19)
+- Azúria Voice: o cartão e a página "VoiceStudio API" agora são "Azúria Voice API", com a documentação do Azúria; a rota interna e a API não mudam (#19)
+- Azúria Voice: os links "Saiba mais" das integrações apontam para a documentação do Azúria (#19)
+- Azúria Voice: a voz de demonstração nova chama "Azúria Demo Voice"; quem não renomeou a antiga recebe o novo nome (#19)
+
+### Fixed
+
+- Azúria Voice: a geração de música e efeitos sonoros pelo app era mais lenta que pela API porque as vozes de fala ficavam na memória; agora são descarregadas antes de carregar o modelo (#19)
+- Azúria Voice: sair da tela de música apagava o formulário e deixava a geração rodando escondida; agora o formulário e os trabalhos voltam e podem ser cancelados (#19)
+
 ## [0.5.12] — 2026-10-23
 
 O Azúria Voice agora fala **português do Brasil**: há uma opção "Portuguese (Brazil)" no seletor de idioma, a dublagem traduz para pt-BR por padrão e os textos da interface deixam de misturar termos de Portugal. Nenhum modelo tem pt-BR separado, então o sotaque da clonagem continua vindo da voz de referência.

@@ -18,6 +18,7 @@ it('only lists integrations with completed wiring pages', () => {
     (heading) => heading.textContent,
   );
   expect(names.sort()).toEqual([
+    'Azúria Voice API',
     'Claude Code',
     'Codex CLI',
     'Cursor',
@@ -26,7 +27,6 @@ it('only lists integrations with completed wiring pages', () => {
     'Model Context Protocol',
     'OpenAI Agents',
     'Twilio',
-    'VoiceStudio API',
     'n8n',
   ]);
   expect(container.textContent).not.toContain('Zapier');

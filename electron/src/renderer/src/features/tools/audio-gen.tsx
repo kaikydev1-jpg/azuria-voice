@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -11,20 +11,24 @@ import { useAudioInstall } from './use-audio-install';
 import {
   LICENSE_KEYS,
   clampParam,
+  isActive,
+  jobsOfKind,
   modelReady,
   offeredFor,
   overallFraction,
+  queueRoom,
   type AudioCatalog,
   type AudioJob,
+  type AudioJobList,
   type AudioKind,
   type AudioModel,
   type ProfileName,
-  type Purpose,
 } from './audio-gen-state';
+import { batchLines, useAudioGenDraft } from './audio-gen-store';
 
 const FIELD =
   'w-full rounded-lg border border-input bg-transparent p-3 text-sm leading-6 outline-none focus-visible:ring-2 focus-visible:ring-ring';
-const ACTIVE = new Set(['queued', 'running']);
+const JOBS_KEY = ['audio-gen-jobs'];
 
 async function saveBlob(path: string, name: string) {
   const blob = await (await apiFetch(path)).blob();
@@ -34,6 +38,83 @@ async function saveBlob(path: string, name: string) {
   anchor.download = name;
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 30_000);
+}
+
+/** A labelled control with a plain-language hint under it that screen readers read with the control. */
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: ReactNode;
+  hint?: string;
+  children: (describedBy: string | undefined) => ReactNode;
+}) {
+  const hintId = useId();
+  return (
+    <div className="space-y-2 text-sm">
+      <label className="block space-y-2">
+        <span>{label}</span>
+        {children(hint ? hintId : undefined)}
+      </label>
+      {hint && (
+        <p id={hintId} className="text-xs leading-5 text-muted-foreground">
+          {hint}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function JobCard({
+  job,
+  onCancel,
+  onError,
+}: {
+  job: AudioJob;
+  onCancel: (job: AudioJob) => void;
+  onError: (message: string) => void;
+}) {
+  const { t } = useTranslation();
+  const active = isActive(job);
+  const fraction = overallFraction(job);
+  const stage =
+    job.state === 'queued'
+      ? t('audiogen.status.queued', { ahead: Math.max(0, job.queue_position) })
+      : t(`audiogen.status.${job.state === 'running' ? job.stage : job.state}`, { defaultValue: job.stage });
+  return (
+    <div role="status" className="space-y-3 rounded-xl border border-border/60 p-4 text-sm">
+      {job.prompt && <p className="line-clamp-2 font-medium">{job.prompt}</p>}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p>{stage}</p>
+        {active && (
+          <Button type="button" variant="outline" size="sm" onClick={() => onCancel(job)}>
+            {t('audiogen.cancel')}
+          </Button>
+        )}
+      </div>
+      {active && <Progress value={fraction == null ? null : Math.round(fraction * 100)} />}
+      {job.state === 'failed' && job.error && (
+        <PipelineFailure fallback={t(`audiogen.errors.${job.error.code}`, { defaultValue: job.error.message || job.error.code })} />
+      )}
+      {job.fell_back && <p className="text-xs text-muted-foreground">{t('audiogen.fellBack')}</p>}
+      {job.state === 'done' && job.device && <p className="text-xs text-muted-foreground">{t('audiogen.ranOn', { device: job.device })}</p>}
+      {job.takes.map((take) => (
+        <div key={take.id} className="space-y-2">
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <audio controls className="w-full" src={audioUrl(take.audio_path)} />
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => void saveBlob(`/audio/${encodeURIComponent(take.audio_path)}`, `${take.id}.wav`).catch((reason) => onError(describeError(reason)))}>
+              {t('audiogen.downloadWav')}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => void saveBlob(`/audio-gen/takes/${take.id}/export`, `azuria-${take.id}.zip`).catch((reason) => onError(describeError(reason)))}>
+              {t('audiogen.exportProvenance')}
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function AudioGen({ kind }: { kind: AudioKind }) {
@@ -47,26 +128,21 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
     refetchInterval: installing ? 3_000 : false,
   });
   const models = catalog.data?.models ?? [];
-  const [modelId, setModelId] = useState<string | null>(null);
-  const [purpose, setPurpose] = useState<Purpose>('personal');
-  const [acknowledged, setAcknowledged] = useState(false);
-  const [profile, setProfile] = useState<ProfileName | null>(null);
-  const [custom, setCustom] = useState<Record<string, string>>({});
-  const [prompt, setPrompt] = useState('');
-  const [lyrics, setLyrics] = useState('');
-  const [duration, setDuration] = useState('');
-  const [variations, setVariations] = useState('1');
-  const [seed, setSeed] = useState('');
-  const [preset, setPreset] = useState('');
-  const [device, setDevice] = useState('auto');
+  const [draft, patch] = useAudioGenDraft(kind);
+  const { modelId, purpose, acknowledged, profile, custom, prompt, lyrics, duration, variations, seed, preset, device, batch } = draft;
   const [error, setError] = useState<string | null>(null);
-  const [job, setJob] = useState<AudioJob | null>(null);
   const [busy, setBusy] = useState(false);
-  const mounted = useRef(true);
-  useEffect(() => {
-    mounted.current = true;
-    return () => void (mounted.current = false);
-  }, []);
+
+  // The server owns every job. Reading the list (not component state) is what lets a
+  // generation started earlier be seen, played and cancelled after leaving and returning.
+  const jobList = useQuery({
+    queryKey: JOBS_KEY,
+    queryFn: () => apiJson<AudioJobList>('/audio-gen/jobs'),
+    refetchInterval: (query) => (jobsOfKind(query.state.data, kind).some(isActive) ? 1_000 : false),
+  });
+  const jobs = jobsOfKind(jobList.data, kind);
+  const room = queueRoom(jobList.data);
+  const doneIds = jobs.filter((job) => job.state === 'done').map((job) => job.id).join(',');
 
   const model: AudioModel | undefined =
     models.find((item) => item.id === modelId) ?? models.find((item) => offeredFor(item, purpose)) ?? models[0];
@@ -75,83 +151,77 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
   const blocked = Boolean(model && !offeredFor(model, purpose));
   const needsAck = purpose === 'commercial' && model?.license.class === 'commercial_conditions';
   const ready = Boolean(model && modelReady(model));
-  const running = Boolean(job && ACTIVE.has(job.state));
-
-  // Poll the running job; the server owns the truth, the page only mirrors it.
-  useEffect(() => {
-    if (!job || !ACTIVE.has(job.state)) return;
-    const id = job.id;
-    const timer = setInterval(() => {
-      apiJson<AudioJob>(`/audio-gen/jobs/${id}`)
-        .then((next) => {
-          if (mounted.current) setJob(next);
-        })
-        .catch((reason) => {
-          if (mounted.current) setError(describeError(reason));
-        });
-    }, 1_000);
-    return () => clearInterval(timer);
-  }, [job]);
+  const descriptions = batch ? batchLines(prompt) : prompt.trim() ? [prompt] : [];
 
   useEffect(() => {
-    if (job?.state === 'done') void client.invalidateQueries({ queryKey: ['history'] });
-  }, [job?.state, client]);
+    if (doneIds) void client.invalidateQueries({ queryKey: ['history'] });
+  }, [doneIds, client]);
 
   if (catalog.isError)
     return <PipelineFailure fallback={describeError(catalog.error)} onDismiss={() => void catalog.refetch()} />;
   if (!model) return <p role="status">{t('common.loading')}</p>;
 
+  const canGenerate = !busy && ready && !blocked && !(needsAck && !acknowledged) && descriptions.length > 0;
+
   const generate = async () => {
-    if (busy || running || !ready || blocked || (needsAck && !acknowledged) || !prompt.trim()) return;
+    if (!canGenerate) return;
+    if (descriptions.length > room) {
+      setError(t('audiogen.batch.tooMany', { max: room }));
+      return;
+    }
     setBusy(true);
     setError(null);
-    setJob(null);
+    let queued = 0;
     try {
-      const body: Record<string, unknown> = {
-        model: model.id,
-        prompt,
-        purpose,
-        conditions_acknowledged: needsAck && acknowledged,
-        variations: Number(variations) || 1,
-        profile: chosenProfile,
-        device,
-      };
-      if (model.lyrics.supported && lyrics.trim()) body.lyrics = lyrics;
-      if (duration.trim()) body.duration_s = Number(duration);
-      if (seed.trim()) body.seed = Number(seed);
-      if (preset) body.content_preset = preset;
-      if (chosenProfile === 'custom') {
-        body.custom = Object.fromEntries(
-          Object.entries(model.custom_params)
-            .filter(([name]) => custom[name]?.trim())
-            .map(([name, spec]) => [name, clampParam(spec, Number(custom[name]))]),
-        );
+      for (const text of descriptions) {
+        const body: Record<string, unknown> = {
+          model: model.id,
+          prompt: text,
+          purpose,
+          conditions_acknowledged: needsAck && acknowledged,
+          variations: Number(variations) || 1,
+          profile: chosenProfile,
+          device,
+        };
+        if (model.lyrics.supported && lyrics.trim()) body.lyrics = lyrics;
+        if (duration.trim()) body.duration_s = Number(duration);
+        if (seed.trim()) body.seed = Number(seed);
+        if (preset) body.content_preset = preset;
+        if (chosenProfile === 'custom') {
+          body.custom = Object.fromEntries(
+            Object.entries(model.custom_params)
+              .filter(([name]) => custom[name]?.trim())
+              .map(([name, spec]) => [name, clampParam(spec, Number(custom[name]))]),
+          );
+        }
+        const job = await apiJson<AudioJob>(`/audio-gen/${kind}`, { method: 'POST', body: JSON.stringify(body) });
+        queued += 1;
+        client.setQueryData<AudioJobList>(JOBS_KEY, (old) => ({ ...old, jobs: [...(old?.jobs ?? []), job] }));
       }
-      setJob(await apiJson<AudioJob>(`/audio-gen/${kind}`, { method: 'POST', body: JSON.stringify(body) }));
     } catch (reason) {
       setError(describeError(reason));
+      // Keep what was not accepted in the box so nothing typed is lost.
+      if (batch && queued > 0) patch({ prompt: descriptions.slice(queued).join('\n') });
     } finally {
       setBusy(false);
     }
   };
 
-  const cancel = async () => {
-    if (!job) return;
+  const cancel = async (job: AudioJob) => {
     try {
-      setJob(await apiJson<AudioJob>(`/audio-gen/jobs/${job.id}/cancel`, { method: 'POST' }));
+      const next = await apiJson<AudioJob>(`/audio-gen/jobs/${job.id}/cancel`, { method: 'POST' });
+      client.setQueryData<AudioJobList>(JOBS_KEY, (old) => ({
+        ...old,
+        jobs: (old?.jobs ?? []).map((item) => (item.id === next.id ? next : item)),
+      }));
     } catch (reason) {
       setError(describeError(reason));
     }
   };
 
-  const fraction = job ? overallFraction(job) : null;
-  const stage = job
-    ? job.state === 'queued'
-      ? t('audiogen.status.queued', { ahead: Math.max(0, job.queue_position) })
-      : t(`audiogen.status.${job.state === 'running' ? job.stage : job.state}`, { defaultValue: job.stage })
-    : '';
   const conditions = model.license.conditions;
   const hardware = model.hardware;
+  const presets = catalog.data?.presets[kind] ?? [];
 
   return (
     <form
@@ -165,20 +235,21 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
         <h2 className="text-lg font-medium">{t(`audiogen.${kind}.title`)}</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">{t(`audiogen.${kind}.desc`)}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t('audiogen.local')}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t('audiogen.jobs.background')}</p>
       </div>
 
-      <fieldset className="space-y-2" disabled={running}>
+      <fieldset className="space-y-2">
         <legend className="text-sm font-medium">{t('audiogen.purpose')}</legend>
         {(['personal', 'commercial'] as const).map((value) => (
           <label key={value} className="flex items-center gap-2 text-sm">
-            <input type="radio" name={`purpose-${kind}`} checked={purpose === value} onChange={() => setPurpose(value)} />
+            <input type="radio" name={`purpose-${kind}`} checked={purpose === value} onChange={() => patch({ purpose: value })} />
             {t(`audiogen.purposes.${value}`)}
           </label>
         ))}
-        <p className="text-xs text-muted-foreground">{t('audiogen.purposeNote')}</p>
+        <p className="text-xs leading-5 text-muted-foreground">{t('audiogen.purposeNote')}</p>
       </fieldset>
 
-      <fieldset className="space-y-3" disabled={running}>
+      <fieldset className="space-y-3">
         <legend className="text-sm font-medium">{t('audiogen.model')}</legend>
         {models.map((item) => {
           const offered = offeredFor(item, purpose);
@@ -192,11 +263,7 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
                   type="radio"
                   name={`model-${kind}`}
                   checked={item.id === model.id}
-                  onChange={() => {
-                    setModelId(item.id);
-                    setProfile(null);
-                    setAcknowledged(false);
-                  }}
+                  onChange={() => patch({ modelId: item.id, profile: null, acknowledged: false })}
                 />
                 <span className="min-w-0 flex-1">
                   <span className="font-medium">{item.label}</span>
@@ -228,7 +295,7 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
           {conditions.official_url && <ExternalLink href={conditions.official_url}>{t('audiogen.officialTerms')}</ExternalLink>}
           {needsAck && (
             <label className="flex items-start gap-2">
-              <input type="checkbox" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} />
+              <input type="checkbox" checked={acknowledged} onChange={(event) => patch({ acknowledged: event.target.checked })} />
               <span>{t('audiogen.acknowledge')}</span>
             </label>
           )}
@@ -260,109 +327,120 @@ export function AudioGen({ kind }: { kind: AudioKind }) {
       )}
       {installing && <p role="status" className="text-xs">{t('audiogen.installing')}</p>}
 
-      <label className="block space-y-2 text-sm">
-        <span>{t('audiogen.prompt')}</span>
-        <textarea className={`${FIELD} min-h-28 resize-y`} maxLength={1000} disabled={running} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
-      </label>
-      {model.lyrics.supported && (
-        <label className="block space-y-2 text-sm">
-          <span>{t('audiogen.lyrics')}</span>
-          <textarea className={`${FIELD} min-h-24 resize-y`} maxLength={model.lyrics.max_chars} disabled={running} value={lyrics} onChange={(event) => setLyrics(event.target.value)} />
+      <div className="space-y-2">
+        <Field label={t(batch ? 'audiogen.batch.promptLabel' : 'audiogen.prompt')}>
+          {() => (
+            <textarea
+              className={`${FIELD} min-h-28 resize-y`}
+              maxLength={batch ? 20_000 : 1000}
+              placeholder={t(`audiogen.promptPlaceholder.${kind}`)}
+              value={prompt}
+              onChange={(event) => patch({ prompt: event.target.value })}
+            />
+          )}
+        </Field>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={batch} onChange={(event) => patch({ batch: event.target.checked })} />
+          {t('audiogen.batch.toggle')}
         </label>
+        {batch && (
+          <p className="text-xs leading-5 text-muted-foreground">
+            {t('audiogen.batch.hint', { max: room })} {t('audiogen.batch.count', { n: descriptions.length })}
+          </p>
+        )}
+      </div>
+      {model.lyrics.supported && (
+        <Field label={t('audiogen.lyrics')} hint={t('audiogen.lyricsHint')}>
+          {(described) => (
+            <textarea
+              className={`${FIELD} min-h-24 resize-y`}
+              maxLength={model.lyrics.max_chars}
+              placeholder={t('audiogen.lyricsPlaceholder')}
+              aria-describedby={described}
+              value={lyrics}
+              onChange={(event) => patch({ lyrics: event.target.value })}
+            />
+          )}
+        </Field>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="space-y-2 text-sm">
-          <span>{t('audiogen.quality')}</span>
-          <select className={FIELD} disabled={running} value={chosenProfile} onChange={(event) => setProfile(event.target.value as ProfileName)}>
-            {Object.keys(model.profiles).map((name) => (
-              <option key={name} value={name}>{t(`audiogen.profiles.${name}`)}</option>
-            ))}
-            <option value="custom">{t('audiogen.profiles.custom')}</option>
-          </select>
-        </label>
-        <label className="space-y-2 text-sm">
-          <span>{t('audiogen.duration', { min: limits?.duration_min_s, max: limits?.duration_max_s })}</span>
-          <Input type="number" disabled={running} min={limits?.duration_min_s} max={limits?.duration_max_s} placeholder={String(limits?.duration_default_s ?? '')} value={duration} onChange={(event) => setDuration(event.target.value)} />
-        </label>
-        <label className="space-y-2 text-sm">
-          <span>{t('audiogen.variations')}</span>
-          <Input type="number" disabled={running} min={1} max={limits?.variations_max} value={variations} onChange={(event) => setVariations(event.target.value)} />
-        </label>
-        <label className="space-y-2 text-sm">
-          <span>{t('audiogen.seed')}</span>
-          <Input type="number" disabled={running} min={0} value={seed} onChange={(event) => setSeed(event.target.value)} />
-        </label>
-        <label className="space-y-2 text-sm">
-          <span>{t('audiogen.device')}</span>
-          <select className={FIELD} disabled={running} value={device} onChange={(event) => setDevice(event.target.value)}>
-            {['auto', ...model.devices].map((name) => (
-              <option key={name} value={name}>{t(`audiogen.devices.${name}`)}</option>
-            ))}
-          </select>
-        </label>
-        {(catalog.data?.presets[kind]?.length ?? 0) > 0 && (
-          <label className="space-y-2 text-sm">
-            <span>{t('audiogen.preset')}</span>
-            <select className={FIELD} disabled={running} value={preset} onChange={(event) => setPreset(event.target.value)}>
-              <option value="">{t('audiogen.presets.none')}</option>
-              {catalog.data?.presets[kind]?.map((item) => (
-                <option key={item.id} value={item.id}>{t(`audiogen.presets.${item.id}`)}</option>
+        <Field label={t('audiogen.quality')} hint={t('audiogen.qualityHint')}>
+          {(described) => (
+            <select className={FIELD} aria-describedby={described} value={chosenProfile} onChange={(event) => patch({ profile: event.target.value as ProfileName })}>
+              {Object.keys(model.profiles).map((name) => (
+                <option key={name} value={name}>{t(`audiogen.profiles.${name}`)}</option>
+              ))}
+              <option value="custom">{t('audiogen.profiles.custom')}</option>
+            </select>
+          )}
+        </Field>
+        <Field label={t('audiogen.duration', { min: limits?.duration_min_s, max: limits?.duration_max_s })} hint={t('audiogen.durationHint')}>
+          {(described) => (
+            <Input type="number" aria-describedby={described} min={limits?.duration_min_s} max={limits?.duration_max_s} placeholder={String(limits?.duration_default_s ?? '')} value={duration} onChange={(event) => patch({ duration: event.target.value })} />
+          )}
+        </Field>
+        <Field label={t('audiogen.variations')} hint={t('audiogen.variationsHint')}>
+          {(described) => (
+            <Input type="number" aria-describedby={described} min={1} max={limits?.variations_max} value={variations} onChange={(event) => patch({ variations: event.target.value })} />
+          )}
+        </Field>
+        <Field label={t('audiogen.seed')} hint={t('audiogen.seedHint')}>
+          {(described) => (
+            <Input type="number" aria-describedby={described} min={0} placeholder={t('audiogen.seedPlaceholder')} value={seed} onChange={(event) => patch({ seed: event.target.value })} />
+          )}
+        </Field>
+        <Field label={t('audiogen.device')} hint={t('audiogen.deviceHint')}>
+          {(described) => (
+            <select className={FIELD} aria-describedby={described} value={device} onChange={(event) => patch({ device: event.target.value })}>
+              {['auto', ...model.devices].map((name) => (
+                <option key={name} value={name}>{t(`audiogen.devices.${name}`)}</option>
               ))}
             </select>
-          </label>
+          )}
+        </Field>
+        {presets.length > 0 && (
+          <Field label={t('audiogen.preset')} hint={t('audiogen.presetHint')}>
+            {(described) => (
+              <select className={FIELD} aria-describedby={described} value={preset} onChange={(event) => patch({ preset: event.target.value })}>
+                <option value="">{t('audiogen.presets.none')}</option>
+                {presets.map((item) => (
+                  <option key={item.id} value={item.id}>{t(`audiogen.presets.${item.id}`)}</option>
+                ))}
+              </select>
+            )}
+          </Field>
         )}
       </div>
 
       {chosenProfile === 'custom' && (
         <div className="grid gap-4 sm:grid-cols-2">
           {Object.entries(model.custom_params).map(([name, spec]) => (
-            <label key={name} className="space-y-2 text-sm">
-              <span>{name} ({spec.min}–{spec.max})</span>
-              <Input type="number" disabled={running} min={spec.min} max={spec.max} step={spec.type === 'int' ? 1 : 0.1} value={custom[name] ?? ''} onChange={(event) => setCustom({ ...custom, [name]: event.target.value })} />
-            </label>
+            <Field key={name} label={`${name} (${spec.min}–${spec.max})`}>
+              {() => (
+                <Input type="number" min={spec.min} max={spec.max} step={spec.type === 'int' ? 1 : 0.1} value={custom[name] ?? ''} onChange={(event) => patch({ custom: { ...custom, [name]: event.target.value } })} />
+              )}
+            </Field>
           ))}
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" disabled={busy || running || !ready || blocked || (needsAck && !acknowledged) || !prompt.trim()}>
+        <Button type="submit" disabled={!canGenerate}>
           {t('audiogen.generate')}
         </Button>
-        {running && (
-          <Button type="button" variant="outline" onClick={() => void cancel()}>
-            {t('audiogen.cancel')}
-          </Button>
-        )}
       </div>
 
       {error && <PipelineFailure fallback={error} onDismiss={() => setError(null)} />}
       {installation.error && <PipelineFailure fallback={installation.error} onDismiss={installation.clearError} />}
 
-      {job && (
-        <div role="status" className="space-y-3 rounded-xl border border-border/60 p-4 text-sm">
-          <p>{stage}</p>
-          {running && <Progress value={fraction == null ? null : Math.round(fraction * 100)} />}
-          {job.state === 'failed' && job.error && (
-            <PipelineFailure fallback={t(`audiogen.errors.${job.error.code}`, { defaultValue: job.error.message || job.error.code })} />
-          )}
-          {job.fell_back && <p className="text-xs text-muted-foreground">{t('audiogen.fellBack')}</p>}
-          {job.state === 'done' && job.device && <p className="text-xs text-muted-foreground">{t('audiogen.ranOn', { device: job.device })}</p>}
-          {job.takes.map((take) => (
-            <div key={take.id} className="space-y-2">
-              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-              <audio controls className="w-full" src={audioUrl(take.audio_path)} />
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={() => void saveBlob(`/audio/${encodeURIComponent(take.audio_path)}`, `${take.id}.wav`).catch((reason) => setError(describeError(reason)))}>
-                  {t('audiogen.downloadWav')}
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => void saveBlob(`/audio-gen/takes/${take.id}/export`, `azuria-${take.id}.zip`).catch((reason) => setError(describeError(reason)))}>
-                  {t('audiogen.exportProvenance')}
-                </Button>
-              </div>
-            </div>
+      {jobs.length > 0 && (
+        <section className="space-y-3" aria-label={t('audiogen.jobs.title')}>
+          <h3 className="text-sm font-medium">{t('audiogen.jobs.title')}</h3>
+          {jobs.map((job) => (
+            <JobCard key={job.id} job={job} onCancel={(item) => void cancel(item)} onError={setError} />
           ))}
-        </div>
+        </section>
       )}
     </form>
   );

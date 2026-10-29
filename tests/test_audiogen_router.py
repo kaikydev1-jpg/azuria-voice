@@ -109,6 +109,19 @@ def test_wrong_kind_unknown_model_and_bad_input(client, accepted, submitted):
     assert submitted == []
 
 
+def test_generate_hands_the_event_loop_to_the_job_manager(client, accepted, submitted):
+    # The sync route runs in a worker thread with no loop; the dependency must
+    # supply it or resident TTS engines are never unloaded before the music model loads.
+    router_mod.manager._loop = None
+    assert client.post("/audio-gen/music", json=body(model="musicgen-small")).status_code == 202
+    assert router_mod.manager._loop is not None
+
+
+def test_job_list_reports_the_queue_limit(client):
+    data = client.get("/audio-gen/jobs").json()
+    assert data["queue_limit"] == router_mod.MAX_QUEUED and isinstance(data["jobs"], list)
+
+
 def test_cancel_and_get_unknown_job(client):
     assert client.post("/audio-gen/jobs/deadbeef0000/cancel").status_code == 404
     assert client.get("/audio-gen/jobs/deadbeef0000").status_code == 404

@@ -3804,10 +3804,10 @@
     "local": "로컬에서 실행됩니다. 모델을 내려받은 후에는 인터넷이 필요하지 않습니다.",
     "purpose": "이 오디오를 어떻게 사용하시나요?",
     "purposes": {
-      "personal": "개인용 / 비상업적",
-      "commercial": "상업용 / 수익화"
+      "personal": "개인 용도(수익 없음)",
+      "commercial": "상업 용도(수익 창출)"
     },
-    "purposeNote": "선택한 내용은 모델 라이선스와 대조되고 각 결과와 함께 저장됩니다. 이는 신고일 뿐 라이선스가 아닙니다.",
+    "purposeNote": "수익화된 영상, 게임, 광고처럼 이 오디오로 돈을 벌 예정이라면 상업 용도를 선택하세요. 라이선스가 허용하는 모델만 표시됩니다. 선택은 각 결과와 함께 저장되며, 선언일 뿐 라이선스는 아닙니다.",
     "model": "모델",
     "license": {
       "commercial": "상업적 사용 허용 — 라이선스에 따름",
@@ -3832,14 +3832,14 @@
     "lyrics": "가사(선택)",
     "quality": "품질",
     "profiles": {
-      "fast": "빠름",
+      "fast": "빠름(초안)",
       "balanced": "균형",
-      "high": "높음",
-      "custom": "사용자 지정"
+      "high": "높음(느림, 더 자세함)",
+      "custom": "사용자 지정(고급)"
     },
     "duration": "길이(초)({{min}}–{{max}})",
-    "variations": "변형",
-    "seed": "시드(비워 두면 무작위)",
+    "variations": "만들 버전 수",
+    "seed": "반복 코드(선택)",
     "device": "장치",
     "devices": {
       "auto": "자동",
@@ -3884,6 +3884,30 @@
       "declaredUse": "신고된 용도",
       "acknowledged": "조건 확인됨",
       "notRecorded": "이 테이크의 출처가 기록되지 않았습니다. 어떤 모델, 라이선스, 허용된 용도도 가정하지 않습니다."
-    }
+    },
+    "qualityHint": "빠름은 아이디어를 시험하기에 좋습니다. 균형은 대부분의 용도에 맞습니다. 높음은 시간이 더 걸리지만 더 자세합니다.",
+    "durationHint": "오디오 길이입니다. 길수록 만드는 데 훨씬 오래 걸립니다.",
+    "variationsHint": "같은 설명으로 서로 다른 버전을 몇 개 만들지 정합니다. 각 버전은 첫 번째와 비슷한 시간이 걸립니다.",
+    "seedPlaceholder": "무작위",
+    "seedHint": "비워 두면 매번 다른 결과가 나옵니다. 숫자를 입력하면 같은 설명과 설정으로 같은 결과를 다시 얻습니다.",
+    "deviceHint": "자동은 그래픽 카드가 있으면 사용하고, 없으면 프로세서(더 느림)를 사용합니다.",
+    "presetHint": "선택 사항입니다. 저장된 기록에 오디오의 용도를 적어 둘 뿐, 소리는 바뀌지 않습니다.",
+    "lyricsHint": "부를 가사입니다. [verse], [chorus]로 부분을 표시하세요. 노래 없는 음악이면 비워 두세요.",
+    "batch": {
+      "toggle": "여러 개 한꺼번에 만들기(한 줄에 설명 하나)",
+      "hint": "각 줄이 별도의 오디오가 되며, 컴퓨터에 부담이 가지 않도록 하나씩 차례로 만듭니다. 지금 {{max}}개 더 넣을 수 있습니다.",
+      "count": "{{n}}개 만들 예정",
+      "promptLabel": "설명(한 줄에 하나, 영어가 가장 잘 맞습니다)",
+      "tooMany": "줄이 너무 많습니다. 지금 대기열에 {{max}}개 더 넣을 수 있습니다."
+    },
+    "jobs": {
+      "title": "내 생성 목록",
+      "background": "이 화면을 떠나도 생성은 계속됩니다. 언제든 돌아와 확인하고, 재생하고, 취소할 수 있습니다."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

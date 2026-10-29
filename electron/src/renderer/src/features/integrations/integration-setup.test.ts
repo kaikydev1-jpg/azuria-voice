@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import {
   INTEGRATION_CATALOG,
-  integrationSlug,
+  entrySlug,
   getIntegrationBySlug,
 } from '@shared/config/integration-catalog';
 import {
@@ -26,7 +26,9 @@ it('gives every catalog category its own label key, never one borrowed from anot
 });
 
 it('gives every directory entry one stable route and its actual category', () => {
-  const slugs = INTEGRATION_CATALOG.map((entry) => integrationSlug(entry.name));
+  // Renamed to Azúria Voice API; the old route must keep opening it.
+  expect(getIntegrationBySlug('voicestudio-api')?.name).toBe('Azúria Voice API');
+  const slugs = INTEGRATION_CATALOG.map(entrySlug);
   expect(new Set(slugs).size).toBe(slugs.length);
   expect(getIntegrationBySlug('n8n')?.category).toBe('automation');
   expect(getIntegrationBySlug('claude-code')?.category).toBe('agents');

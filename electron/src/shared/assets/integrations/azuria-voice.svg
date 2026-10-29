@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">Azúria Voice</title>
+  <desc id="description">A silver and blue M-shaped audio waveform with a tiny black hole at the upper right, on a dark rounded square.</desc>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="14" fill="#0B1220"/>
+  <g id="audio-wave" fill="none" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round">
+    <path id="silver-wave" stroke="#CBD5E1" d="M8 39h5l7-19 10 28"/>
+    <path id="blue-wave" stroke="#2563EB" d="m30 48 9-23 8 14h9"/>
+  </g>
+  <g id="black-hole" transform="rotate(-24 50 14)">
+    <ellipse cx="50" cy="14" rx="7.6" ry="3.1" fill="none" stroke="#CBD5E1" stroke-width="1.45"/>
+    <circle id="black-hole-center" cx="50" cy="14" r="3.7" fill="#0B1220"/>
+    <path d="M42.4 14c0 1.7 3.4 3.1 7.6 3.1s7.6-1.4 7.6-3.1" fill="none" stroke="#2563EB" stroke-width="1.55" stroke-linecap="round"/>
+  </g>
+</svg>

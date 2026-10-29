@@ -7,6 +7,7 @@ as a cancellable job in the model's isolated runtime.
 """
 from __future__ import annotations
 
+import asyncio
 import io
 import os
 import zipfile
@@ -20,7 +21,7 @@ from core.browser_guard import reject_cross_site_get
 from core.config import OUTPUTS_DIR
 from core.db import db_conn
 from services.audiogen import catalog, params, policy, provenance, runtime
-from services.audiogen.jobs import manager
+from services.audiogen.jobs import MAX_QUEUED, manager
 
 router = APIRouter(prefix="/audio-gen", tags=["audio-gen"])
 
@@ -40,6 +41,11 @@ class GenerateRequest(BaseModel):
     content_preset: Optional[str] = Field(None, max_length=48)
     conditions_acknowledged: bool = False
     device: Literal["auto", "cpu", "cuda", "mps"] = "auto"
+
+
+async def _bind_loop() -> None:
+    """Runs on the event loop (unlike the sync handlers) so the job manager can reach it."""
+    manager.bind_loop(asyncio.get_running_loop())
 
 
 def _raise(exc: policy.PolicyError):
@@ -83,19 +89,19 @@ def _start(kind: str, req: GenerateRequest):
     return JSONResponse(job, status_code=202)
 
 
-@router.post("/music")
+@router.post("/music", dependencies=[Depends(_bind_loop)])
 def generate_music(req: GenerateRequest):
     return _start("music", req)
 
 
-@router.post("/sfx")
+@router.post("/sfx", dependencies=[Depends(_bind_loop)])
 def generate_sfx(req: GenerateRequest):
     return _start("sfx", req)
 
 
 @router.get("/jobs", dependencies=[Depends(reject_cross_site_get)])
 def list_jobs():
-    return {"jobs": manager.list()}
+    return {"jobs": manager.list(), "queue_limit": MAX_QUEUED}
 
 
 @router.get("/jobs/{job_id}", dependencies=[Depends(reject_cross_site_get)])

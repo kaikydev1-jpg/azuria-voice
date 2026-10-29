@@ -60,6 +60,18 @@ class Manager:
 
     # ── public API ────────────────────────────────────────────────────────
 
+    def bind_loop(self, loop: asyncio.AbstractEventLoop) -> None:
+        """Remember the app's event loop.
+
+        The generate routes are plain ``def`` handlers, which FastAPI runs in a
+        worker thread where ``asyncio.get_running_loop()`` always fails. Without
+        the loop, resident TTS engines were never unloaded before a multi-GB
+        music model loaded, leaving the machine short of memory and slower than
+        the same request on a fresh backend. A route dependency calls this from
+        the event loop itself.
+        """
+        self._loop = loop
+
     def submit(self, plan: Plan, decision: Decision, *, content_preset: Optional[str], device: str) -> dict:
         model = plan.model
         python = runtime.venv_python(model)
@@ -80,6 +92,7 @@ class Manager:
             job = {
                 "id": job_id, "kind": model["kind"], "model_id": model["id"], "state": "queued",
                 "stage": "queued", "fraction": None, "variation": 0, "variations": plan.variations,
+                "prompt": plan.prompt[:200], "profile": plan.profile, "duration_s": plan.duration_s,
                 "created_at": time.time(), "started_at": None, "finished_at": None,
                 "error": None, "takes": [], "device": None, "fell_back": False,
                 "_plan": plan, "_decision": decision, "_preset": content_preset,

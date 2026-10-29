@@ -54,6 +54,10 @@ export interface AudioTake {
 
 export interface AudioJob {
   id: string;
+  kind: AudioKind;
+  prompt: string;
+  profile: string;
+  duration_s: number;
   state: 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
   stage: string;
   fraction: number | null;
@@ -64,6 +68,26 @@ export interface AudioJob {
   fell_back: boolean;
   error: { code: string; message: string } | null;
   takes: AudioTake[];
+}
+
+export interface AudioJobList {
+  jobs: AudioJob[];
+  queue_limit?: number;
+}
+
+const DEFAULT_QUEUE_LIMIT = 20;
+
+export const isActive = (job: Pick<AudioJob, 'state'>): boolean => job.state === 'queued' || job.state === 'running';
+
+/** Jobs of one kind, newest first (the server lists oldest first). */
+export function jobsOfKind(list: Partial<AudioJobList> | undefined, kind: AudioKind): AudioJob[] {
+  return (Array.isArray(list?.jobs) ? list.jobs : []).filter((job) => job.kind === kind).reverse();
+}
+
+/** Free places in the server queue for new jobs. */
+export function queueRoom(list: Partial<AudioJobList> | undefined): number {
+  const active = (Array.isArray(list?.jobs) ? list.jobs : []).filter(isActive).length;
+  return Math.max(0, (list?.queue_limit ?? DEFAULT_QUEUE_LIMIT) - active);
 }
 
 export const LICENSE_KEYS: Record<LicenseClass, string> = {

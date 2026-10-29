@@ -31,7 +31,7 @@ vi.mock('@/hooks/use-backend-status', () => ({
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('sonner', () => ({ toast }));
 vi.mock('./twilio-setup', () => ({
-  TWILIO_DOCS: 'https://github.com/debpalash/VoiceStudio/blob/main/docs/integrations/twilio.md',
+  TWILIO_DOCS: 'https://github.com/kaikydev1-jpg/azuria-voice/blob/main/docs/integrations/twilio.md',
   TwilioSetup: ({
     hero,
     rail,

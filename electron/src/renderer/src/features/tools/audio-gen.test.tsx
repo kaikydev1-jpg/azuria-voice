@@ -20,6 +20,7 @@ vi.mock('@/components/pipeline-failure', () => ({
   PipelineFailure: ({ fallback }: { fallback: string }) => <div role="alert">{fallback}</div>,
 }));
 import { AudioGen } from './audio-gen';
+import { resetAudioGenDrafts } from './audio-gen-store';
 
 const base = {
   kind: 'sfx' as const,
@@ -72,6 +73,7 @@ function mount(data = catalog, installation?: (path: string) => Promise<unknown>
 }
 afterEach(() => {
   cleanup();
+  resetAudioGenDrafts();
   vi.useRealTimers();
   vi.clearAllMocks();
 });
@@ -256,4 +258,59 @@ it('does not start status polling when unmounted before admission returns', asyn
   await act(async () => { admit({ status: 'started' }); });
   await tick(9_000);
   expect(mock.api.mock.calls.some(([path]) => path.endsWith('/status'))).toBe(false);
+});
+
+const running = {
+  id: 'job1', kind: 'sfx', prompt: 'door slam', profile: 'balanced', duration_s: 5, state: 'running', stage: 'generating',
+  fraction: 0.5, variation: 1, variations: 1, queue_position: -1, device: null, fell_back: false, error: null, takes: [],
+};
+
+it('shows and cancels a generation that was started before the screen was reopened', async () => {
+  const jobs = { jobs: [running, { ...running, id: 'music1', kind: 'music' }], queue_limit: 20 };
+  mock.api.mockImplementation((path: string) => {
+    if (path.startsWith('/audio-gen/catalog')) return Promise.resolve(catalog);
+    if (path === '/audio-gen/jobs') return Promise.resolve(jobs);
+    if (path === '/audio-gen/jobs/job1/cancel') return Promise.resolve({ ...running, state: 'cancelled', stage: 'cancelled' });
+    return Promise.resolve({});
+  });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={client}><AudioGen kind="sfx" /></QueryClientProvider>);
+  // Only this screen's kind is listed.
+  expect(await screen.findByText('door slam')).toBeInTheDocument();
+  expect(screen.getAllByText('door slam')).toHaveLength(1);
+  fireEvent.click(screen.getAllByRole('button', { name: 'audiogen.cancel' })[0]);
+  await waitFor(() => expect(mock.api).toHaveBeenCalledWith('/audio-gen/jobs/job1/cancel', { method: 'POST' }));
+  expect(await screen.findByText('audiogen.status.cancelled')).toBeInTheDocument();
+});
+
+it('keeps what was typed when the screen is closed and opened again', async () => {
+  const first = mount();
+  fireEvent.change(await screen.findByLabelText('audiogen.prompt'), { target: { value: 'rain on a tin roof' } });
+  first.unmount();
+  mount();
+  expect(await screen.findByDisplayValue('rain on a tin roof')).toBeInTheDocument();
+});
+
+it('queues one job per line in batch mode and keeps the lines that were not accepted', async () => {
+  let accepted = 0;
+  mock.api.mockImplementation((path: string) => {
+    if (path.startsWith('/audio-gen/catalog')) return Promise.resolve(catalog);
+    if (path === '/audio-gen/jobs') return Promise.resolve({ jobs: [], queue_limit: 20 });
+    if (path === '/audio-gen/sfx') {
+      accepted += 1;
+      return accepted > 2 ? Promise.reject(new Error('queue is full')) : Promise.resolve({ ...running, id: `j${accepted}`, state: 'queued' });
+    }
+    return Promise.resolve({});
+  });
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  render(<QueryClientProvider client={client}><AudioGen kind="sfx" /></QueryClientProvider>);
+  fireEvent.click(await screen.findByLabelText('audiogen.batch.toggle'));
+  fireEvent.change(screen.getByLabelText('audiogen.batch.promptLabel'), { target: { value: 'one\n\n two \nthree\nfour' } });
+  const generate = screen.getByRole('button', { name: 'audiogen.generate' });
+  await waitFor(() => expect(generate).toBeEnabled());
+  fireEvent.click(generate);
+  expect(await screen.findByRole('alert')).toHaveTextContent('queue is full');
+  const posted = mock.api.mock.calls.filter(([path]) => path === '/audio-gen/sfx').map(([, init]) => JSON.parse(init.body).prompt);
+  expect(posted).toEqual(['one', 'two', 'three']);
+  expect(screen.getByLabelText('audiogen.batch.promptLabel')).toHaveValue('three\nfour');
 });

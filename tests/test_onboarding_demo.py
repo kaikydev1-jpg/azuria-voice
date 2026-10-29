@@ -176,3 +176,28 @@ def test_existing_demo_profile_receives_the_latest_bundled_voice(tmp_path, monke
     ).fetchone()[0]
     conn.close()
     assert description == onboarding._DEMO_DESCRIPTION
+
+
+def test_untouched_legacy_demo_name_is_renamed_but_a_custom_name_is_kept(tmp_path, monkeypatch):
+    db_path = str(tmp_path / "ob.db")
+    conn = sqlite3.connect(db_path)
+    conn.execute(_table_sql())
+    conn.execute(
+        "INSERT INTO voice_profiles (id, name, is_demo) VALUES (?, ?, 1)",
+        (onboarding.DEMO_PROFILE_ID, onboarding._LEGACY_DEMO_NAME),
+    )
+    conn.commit()
+    monkeypatch.setattr(onboarding, "get_db", lambda: sqlite3.connect(db_path))
+    monkeypatch.setattr(onboarding, "VOICES_DIR", str(tmp_path / "voices"))
+    monkeypatch.setattr(onboarding, "_DEMO_AUDIO", str(tmp_path / "missing.wav"))
+
+    onboarding.seed_sample_project()
+    name = lambda: sqlite3.connect(db_path).execute(
+        "SELECT name FROM voice_profiles WHERE id=?", (onboarding.DEMO_PROFILE_ID,)
+    ).fetchone()[0]
+    assert name() == onboarding.DEMO_PROFILE_NAME
+
+    conn.execute("UPDATE voice_profiles SET name='My narrator' WHERE id=?", (onboarding.DEMO_PROFILE_ID,))
+    conn.commit()
+    onboarding.seed_sample_project()
+    assert name() == "My narrator"

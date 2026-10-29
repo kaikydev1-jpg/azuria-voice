@@ -7,6 +7,17 @@ A revisão de segurança e as pendências conhecidas estão no
 [PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
 nova versão instalada.
 
+## Atualização 0.5.13
+
+A versão 0.5.13 é uma revisão geral, sem mudar a API nem mover funções. A tela de
+música e efeitos sonoros ganhou explicações simples em cada campo (em todos os
+idiomas), guarda o que você escreveu, mostra de novo as gerações em andamento
+(com Cancelar) e cria vários áudios de uma vez. A geração ficou mais rápida num app
+já usado porque as vozes de fala são descarregadas antes do modelo de música.
+Na tela Integrações, "VoiceStudio API" agora é "Azúria Voice API"; o endereço
+`http://127.0.0.1:3900/v1` e a rota interna continuam iguais. Detalhes em
+[Música e efeitos sonoros](music-and-sound-effects.md).
+
 ## Atualização 0.5.11
 
 A versão 0.5.11 adiciona geração local de música e efeitos sonoros, com escolha de

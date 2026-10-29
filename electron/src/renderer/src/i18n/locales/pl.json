@@ -3808,10 +3808,10 @@
     "local": "Działa lokalnie. Po pobraniu modelu internet nie jest potrzebny.",
     "purpose": "Jak wykorzystasz dźwięk?",
     "purposes": {
-      "personal": "Osobiste / niekomercyjne",
-      "commercial": "Komercyjne / z monetyzacją"
+      "personal": "Użytek osobisty (bez zarabiania)",
+      "commercial": "Użytek komercyjny (do zarabiania)"
     },
-    "purposeNote": "Twój wybór jest sprawdzany względem licencji modelu i zapisywany przy każdym wyniku. To oświadczenie, a nie licencja.",
+    "purposeNote": "Wybierz Komercyjny, jeśli zarobisz na nagraniu, np. na filmach z monetyzacją, w grach lub reklamach. Pokazujemy tylko modele, których licencja na to pozwala. Wybór zapisuje się przy każdym wyniku; to deklaracja, a nie licencja.",
     "model": "Model",
     "license": {
       "commercial": "Użycie komercyjne dozwolone — zgodnie z licencją",
@@ -3836,14 +3836,14 @@
     "lyrics": "Tekst piosenki (opcjonalnie)",
     "quality": "Jakość",
     "profiles": {
-      "fast": "Szybka",
+      "fast": "Szybka (szkic)",
       "balanced": "Zrównoważona",
-      "high": "Wysoka",
-      "custom": "Własna"
+      "high": "Wysoka (wolniej, więcej szczegółów)",
+      "custom": "Własna (zaawansowane)"
     },
     "duration": "Czas trwania w sekundach ({{min}}–{{max}})",
-    "variations": "Warianty",
-    "seed": "Ziarno (puste = losowe)",
+    "variations": "Wersje do utworzenia",
+    "seed": "Kod powtórzenia (opcjonalnie)",
     "device": "Urządzenie",
     "devices": {
       "auto": "Automatyczne",
@@ -3888,6 +3888,30 @@
       "declaredUse": "Zadeklarowane użycie",
       "acknowledged": "warunki potwierdzone",
       "notRecorded": "Brak zapisanego pochodzenia dla tego nagrania. Nie zakłada się żadnego modelu, licencji ani dozwolonego użycia."
-    }
+    },
+    "qualityHint": "Szybka nadaje się do testowania pomysłów. Zrównoważona pasuje do większości zastosowań. Wysoka trwa dłużej i dodaje szczegółów.",
+    "durationHint": "Jak długie będzie nagranie. Dłuższe nagrania powstają znacznie dłużej.",
+    "variationsHint": "Ile różnych wersji powstanie z tego samego opisu. Każda trwa mniej więcej tyle co pierwsza.",
+    "seedPlaceholder": "Losowy",
+    "seedHint": "Zostaw puste, aby za każdym razem dostać inny wynik. Wpisz liczbę, aby ponownie dostać ten sam wynik przy tym samym opisie i ustawieniach.",
+    "deviceHint": "Automatycznie używa karty graficznej, jeśli jest, a w przeciwnym razie procesora (wolniej).",
+    "presetHint": "Opcjonalne. Tylko zapisuje w rekordzie, do czego służy nagranie; nie zmienia dźwięku.",
+    "lyricsHint": "Słowa, które zostaną zaśpiewane. Oznacz części znacznikami [verse] i [chorus]. Zostaw puste dla muzyki bez śpiewu.",
+    "batch": {
+      "toggle": "Utwórz kilka naraz (jeden opis w wierszu)",
+      "hint": "Każdy wiersz staje się osobnym nagraniem, tworzonym jedno po drugim, aby komputer nigdy nie był przeciążony. Teraz jest miejsce na jeszcze {{max}}.",
+      "count": "Do utworzenia: {{n}}",
+      "promptLabel": "Opisy (jeden w wierszu, najlepiej po angielsku)",
+      "tooMany": "Za dużo wierszy. W kolejce jest teraz miejsce na jeszcze {{max}}."
+    },
+    "jobs": {
+      "title": "Twoje generowania",
+      "background": "Generowanie trwa dalej, gdy opuścisz ten ekran. Wróć w dowolnej chwili, aby je zobaczyć, odtworzyć lub anulować."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

@@ -79,6 +79,12 @@ def test_success_reports_device_and_hands_files_to_saving(mgr):
     assert len(mgr.saved[0]["files"]) == 2
 
 
+def test_public_job_shows_what_was_asked_for(mgr):
+    job = wait(mgr, submit(mgr, "calm piano")["id"])
+    assert job["prompt"] == "calm piano" and job["profile"] == "balanced" and job["duration_s"] == 30.0
+    assert not any(key.startswith("_") for key in job)
+
+
 def test_worker_error_event_is_reported_with_its_code(mgr):
     job = wait(mgr, submit(mgr, "error")["id"])
     assert job["state"] == "failed" and job["error"]["code"] == "out_of_memory"
