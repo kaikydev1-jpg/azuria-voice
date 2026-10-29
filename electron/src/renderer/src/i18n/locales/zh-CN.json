@@ -3804,10 +3804,10 @@
     "local": "在本地运行。模型下载后无需联网。",
     "purpose": "你将如何使用这段音频？",
     "purposes": {
-      "personal": "个人 / 非商业",
-      "commercial": "商业 / 变现"
+      "personal": "个人使用（不赚钱）",
+      "commercial": "商业使用（用来赚钱）"
     },
-    "purposeNote": "你的选择会与模型的许可证核对，并随每个结果一起保存。这是一份声明，不是许可证。",
+    "purposeNote": "如果你会用这段音频赚钱，例如变现视频、游戏或广告，请选“商业使用”。只会提供许可证允许这样做的模型。你的选择会随每个结果一起保存；它是一份声明，不是许可证。",
     "model": "模型",
     "license": {
       "commercial": "允许商业使用 — 依据许可证",
@@ -3832,14 +3832,14 @@
     "lyrics": "歌词（可选）",
     "quality": "质量",
     "profiles": {
-      "fast": "快速",
+      "fast": "快速（草稿）",
       "balanced": "均衡",
-      "high": "高",
-      "custom": "自定义"
+      "high": "高质量（更慢，细节更多）",
+      "custom": "自定义（高级）"
     },
     "duration": "时长（秒）（{{min}}–{{max}}）",
-    "variations": "变体",
-    "seed": "种子（留空 = 随机）",
+    "variations": "生成的版本数",
+    "seed": "重复代码（可选）",
     "device": "设备",
     "devices": {
       "auto": "自动",
@@ -3884,6 +3884,30 @@
       "declaredUse": "声明的用途",
       "acknowledged": "已确认条件",
       "notRecorded": "此次生成未记录来源。不会假定任何模型、许可证或允许的用途。"
-    }
+    },
+    "qualityHint": "快速适合试想法。平衡适合大多数用途。高质量耗时更长，细节更多。",
+    "durationHint": "音频的长度。音频越长，生成耗时越久。",
+    "variationsHint": "用同一段描述生成多少个不同版本。每个版本的耗时与第一个差不多。",
+    "seedPlaceholder": "随机",
+    "seedHint": "留空则每次结果都不同。输入一个数字，用相同的描述和设置就能再次得到相同的结果。",
+    "deviceHint": "“自动”会优先使用显卡，没有显卡时使用处理器（更慢）。",
+    "presetHint": "可选。它只在保存的记录里注明这段音频的用途，不会改变声音。",
+    "lyricsHint": "将要演唱的歌词。用 [verse] 和 [chorus] 标出各段。纯音乐请留空。",
+    "batch": {
+      "toggle": "一次生成多个（每行一段描述）",
+      "hint": "每一行会生成一段独立的音频，依次进行，避免电脑负担过重。目前队列还能再放 {{max}} 个。",
+      "count": "待生成：{{n}} 个",
+      "promptLabel": "描述（每行一段，英文效果最好）",
+      "tooMany": "行数太多。目前队列还能再放 {{max}} 个。"
+    },
+    "jobs": {
+      "title": "你的生成任务",
+      "background": "离开此页面后，生成仍会继续。随时回来查看、播放或取消。"
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

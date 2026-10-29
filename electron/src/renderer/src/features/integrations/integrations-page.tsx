@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from '@tanstack/react-router';
 import { WorkspaceHeader } from '@/components/app-shell/workspace-header';
 import { Input } from '@/components/ui/input';
-import { INTEGRATION_CATALOG, integrationSlug } from '@shared/config/integration-catalog';
+import { INTEGRATION_CATALOG, entrySlug } from '@shared/config/integration-catalog';
 import { integrationSetup } from './setup-registry';
 import { INTEGRATION_CATEGORIES, integrationCategoryKey } from './integration-categories';
 import './integrations-page.css';
@@ -16,14 +16,14 @@ export function IntegrationsPage() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string | null>(null);
   // Every logo opens its in-app page; vendor websites are only on its Website card.
-  const openIntegration = (name: string) =>
+  const openIntegration = (slug: string) =>
     runRendererTask('Open integration', () =>
-      navigate({ to: '/integrations/$slug', params: { slug: integrationSlug(name) } }),
+      navigate({ to: '/integrations/$slug', params: { slug } }),
     );
   const entries = useMemo(
     () =>
       INTEGRATION_CATALOG.flatMap((entry) => {
-        const setup = integrationSetup(integrationSlug(entry.name));
+        const setup = integrationSetup(entrySlug(entry));
         if (!setup) return [];
         return [
           {
@@ -94,8 +94,8 @@ export function IntegrationsPage() {
             {filtered.map((entry) => (
               <button
                 type="button"
-                key={integrationSlug(entry.name)}
-                onClick={() => openIntegration(entry.name)}
+                key={entrySlug(entry)}
+                onClick={() => openIntegration(entrySlug(entry))}
                 className="integration-card"
               >
                 <div className="integration-card-top">

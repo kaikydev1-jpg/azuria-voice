@@ -204,15 +204,20 @@ export function integrationSlug(name) {
     .replace(/^-|-$/g, '');
 }
 
+/** Public route of an entry: an explicit `slug` wins so a renamed entry keeps its old link. */
+export function entrySlug(entry) {
+  return entry.slug ?? integrationSlug(entry.name);
+}
+
 export function getIntegrationBySlug(slug) {
-  return INTEGRATION_CATALOG.find((entry) => integrationSlug(entry.name) === slug);
+  return INTEGRATION_CATALOG.find((entry) => entrySlug(entry) === slug);
 }
 
 // Curated rows supply bundled logos; category groups supply taxonomy. Reconcile
 // them by the public route instead of rendering duplicate cards and React keys.
 const catalogBySlug = new Map();
 for (const entry of catalogEntries) {
-  const slug = integrationSlug(entry.name);
+  const slug = entrySlug(entry);
   const previous = catalogBySlug.get(slug);
   catalogBySlug.set(slug, { ...entry, logoUrl: previous?.logoUrl ?? entry.logoUrl });
 }

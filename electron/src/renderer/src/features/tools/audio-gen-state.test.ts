@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { clampParam, modelReady, offeredFor, overallFraction, type AudioModel } from './audio-gen-state';
+import { clampParam, jobsOfKind, modelReady, offeredFor, overallFraction, queueRoom, type AudioJob, type AudioModel } from './audio-gen-state';
 import { parseProvenance } from '../clone/take-provenance';
 
 const model = (klass: AudioModel['license']['class'], installed = true, weights = 'ready'): AudioModel =>
@@ -46,4 +46,14 @@ it('treats old, broken or foreign provenance as not recorded', () => {
     parameters: { profile: 'fast', seed: 1 },
   };
   expect(parseProvenance(JSON.stringify(record))?.model.repo_id).toBe('a/b');
+});
+
+const job = (id: string, kind: 'music' | 'sfx', state: AudioJob['state']) => ({ id, kind, state }) as AudioJob;
+
+it('lists one kind newest first and counts the free places in the queue', () => {
+  const list = { jobs: [job('a', 'music', 'done'), job('b', 'sfx', 'running'), job('c', 'music', 'queued')], queue_limit: 5 };
+  expect(jobsOfKind(list, 'music').map((item) => item.id)).toEqual(['c', 'a']);
+  expect(queueRoom(list)).toBe(3);
+  expect(jobsOfKind(undefined, 'sfx')).toEqual([]);
+  expect(queueRoom({})).toBe(20);
 });

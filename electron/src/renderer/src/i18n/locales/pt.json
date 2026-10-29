@@ -3806,10 +3806,10 @@
     "local": "Roda localmente. Depois de baixar o modelo, não precisa de internet.",
     "purpose": "Como você vai usar o áudio?",
     "purposes": {
-      "personal": "Pessoal / não comercial",
-      "commercial": "Comercial / monetizado"
+      "personal": "Uso pessoal (sem ganhar dinheiro)",
+      "commercial": "Uso comercial (para ganhar dinheiro)"
     },
-    "purposeNote": "Sua escolha é conferida com a licença do modelo e salva em cada resultado. É uma declaração, não uma licença.",
+    "purposeNote": "Escolha Comercial se você for ganhar dinheiro com o áudio, como em vídeos monetizados, jogos ou anúncios. Só aparecem modelos cuja licença permite isso. Sua escolha fica salva em cada resultado; é uma declaração, não uma licença.",
     "model": "Modelo",
     "license": {
       "commercial": "Uso comercial permitido — conforme licença",
@@ -3834,14 +3834,14 @@
     "lyrics": "Letra (opcional)",
     "quality": "Qualidade",
     "profiles": {
-      "fast": "Rápido",
+      "fast": "Rápida (rascunho)",
       "balanced": "Equilibrado",
-      "high": "Alto",
-      "custom": "Personalizado"
+      "high": "Alta (mais lenta, mais detalhes)",
+      "custom": "Personalizada (avançado)"
     },
     "duration": "Duração em segundos ({{min}}–{{max}})",
-    "variations": "Variações",
-    "seed": "Semente (vazio = aleatória)",
+    "variations": "Versões a criar",
+    "seed": "Código de repetição (opcional)",
     "device": "Dispositivo",
     "devices": {
       "auto": "Automático",
@@ -3886,6 +3886,30 @@
       "declaredUse": "Uso declarado",
       "acknowledged": "condições reconhecidas",
       "notRecorded": "Proveniência não registrada para esta geração. Nenhum modelo, licença ou uso permitido é presumido."
-    }
+    },
+    "qualityHint": "Rápida serve para testar ideias. Equilibrada atende à maioria dos casos. Alta demora mais e traz mais detalhes.",
+    "durationHint": "Quanto tempo o áudio vai durar. Áudios mais longos demoram bem mais para ficar prontos.",
+    "variationsHint": "Quantas versões diferentes fazer a partir da mesma descrição. Cada uma leva quase o mesmo tempo da primeira.",
+    "seedPlaceholder": "Aleatório",
+    "seedHint": "Deixe vazio para ter um resultado diferente a cada vez. Digite um número para obter o mesmo resultado de novo, com a mesma descrição e as mesmas opções.",
+    "deviceHint": "Automático usa a placa de vídeo, se houver; senão, usa o processador (mais lento).",
+    "presetHint": "Opcional. Só anota para que serve o áudio no registro salvo; não muda o som.",
+    "lyricsHint": "A letra que será cantada. Marque as partes com [verse] e [chorus]. Deixe vazio para música sem canto.",
+    "batch": {
+      "toggle": "Criar vários de uma vez (uma descrição por linha)",
+      "hint": "Cada linha vira um áudio, feitos um depois do outro para o computador nunca ficar sobrecarregado. Há espaço para mais {{max}} agora.",
+      "count": "{{n}} para criar",
+      "promptLabel": "Descrições (uma por linha; em inglês funciona melhor)",
+      "tooMany": "Linhas demais. Há espaço para mais {{max}} na fila agora."
+    },
+    "jobs": {
+      "title": "Suas gerações",
+      "background": "As gerações continuam rodando se você sair desta tela. Volte quando quiser para ver, ouvir ou cancelar."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

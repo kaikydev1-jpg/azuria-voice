@@ -3804,10 +3804,10 @@
     "local": "Chạy cục bộ. Sau khi tải mô hình, không cần internet.",
     "purpose": "Bạn sẽ dùng âm thanh này như thế nào?",
     "purposes": {
-      "personal": "Cá nhân / phi thương mại",
-      "commercial": "Thương mại / kiếm tiền"
+      "personal": "Dùng cá nhân (không kiếm tiền)",
+      "commercial": "Dùng thương mại (để kiếm tiền)"
     },
-    "purposeNote": "Lựa chọn của bạn được đối chiếu với giấy phép của mô hình và lưu cùng mỗi kết quả. Đây là lời khai, không phải giấy phép.",
+    "purposeNote": "Chọn Thương mại nếu bạn sẽ kiếm tiền từ âm thanh này, ví dụ video bật kiếm tiền, trò chơi hoặc quảng cáo. Chỉ các mô hình có giấy phép cho phép mới được đề xuất. Lựa chọn của bạn được lưu cùng mỗi kết quả; đây là lời khai, không phải giấy phép.",
     "model": "Mô hình",
     "license": {
       "commercial": "Được phép dùng thương mại — theo giấy phép",
@@ -3832,14 +3832,14 @@
     "lyrics": "Lời bài hát (tùy chọn)",
     "quality": "Chất lượng",
     "profiles": {
-      "fast": "Nhanh",
+      "fast": "Nhanh (bản nháp)",
       "balanced": "Cân bằng",
-      "high": "Cao",
-      "custom": "Tùy chỉnh"
+      "high": "Cao (chậm hơn, nhiều chi tiết hơn)",
+      "custom": "Tùy chỉnh (nâng cao)"
     },
     "duration": "Thời lượng tính bằng giây ({{min}}–{{max}})",
-    "variations": "Biến thể",
-    "seed": "Seed (trống = ngẫu nhiên)",
+    "variations": "Số phiên bản cần tạo",
+    "seed": "Mã lặp lại (không bắt buộc)",
     "device": "Thiết bị",
     "devices": {
       "auto": "Tự động",
@@ -3884,6 +3884,30 @@
       "declaredUse": "Mục đích đã khai",
       "acknowledged": "đã xác nhận điều kiện",
       "notRecorded": "Chưa ghi nguồn gốc cho bản này. Không giả định mô hình, giấy phép hay mục đích sử dụng được phép nào."
-    }
+    },
+    "qualityHint": "Nhanh phù hợp để thử ý tưởng. Cân bằng hợp với hầu hết nhu cầu. Cao mất nhiều thời gian hơn và chi tiết hơn.",
+    "durationHint": "Âm thanh sẽ dài bao lâu. Âm thanh càng dài thì càng mất nhiều thời gian.",
+    "variationsHint": "Số phiên bản khác nhau được tạo từ cùng một mô tả. Mỗi phiên bản mất thời gian gần bằng phiên bản đầu.",
+    "seedPlaceholder": "Ngẫu nhiên",
+    "seedHint": "Để trống để mỗi lần có một kết quả khác. Nhập một số để nhận lại cùng kết quả với cùng mô tả và cùng thiết lập.",
+    "deviceHint": "Tự động dùng card đồ họa nếu có, nếu không thì dùng bộ xử lý (chậm hơn).",
+    "presetHint": "Không bắt buộc. Chỉ ghi chú âm thanh dùng để làm gì trong bản ghi đã lưu; không thay đổi âm thanh.",
+    "lyricsHint": "Lời sẽ được hát. Đánh dấu các phần bằng [verse] và [chorus]. Để trống nếu là nhạc không lời.",
+    "batch": {
+      "toggle": "Tạo nhiều mục cùng lúc (mỗi dòng một mô tả)",
+      "hint": "Mỗi dòng thành một âm thanh riêng, được tạo lần lượt để máy tính không bao giờ quá tải. Hiện còn chỗ cho thêm {{max}} mục.",
+      "count": "{{n}} mục sẽ tạo",
+      "promptLabel": "Mô tả (mỗi dòng một mô tả, tiếng Anh cho kết quả tốt nhất)",
+      "tooMany": "Quá nhiều dòng. Hiện hàng đợi còn chỗ cho thêm {{max}} mục."
+    },
+    "jobs": {
+      "title": "Các lần tạo của bạn",
+      "background": "Việc tạo vẫn tiếp tục nếu bạn rời màn hình này. Quay lại bất cứ lúc nào để xem, nghe hoặc hủy."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

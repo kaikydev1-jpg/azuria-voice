@@ -3804,10 +3804,10 @@
     "local": "Berjalan secara lokal. Setelah model diunduh, internet tidak diperlukan.",
     "purpose": "Bagaimana Anda akan memakai audio ini?",
     "purposes": {
-      "personal": "Pribadi / nonkomersial",
-      "commercial": "Komersial / dimonetisasi"
+      "personal": "Penggunaan pribadi (tanpa menghasilkan uang)",
+      "commercial": "Penggunaan komersial (untuk menghasilkan uang)"
     },
-    "purposeNote": "Pilihan Anda dicocokkan dengan lisensi model dan disimpan bersama setiap hasil. Ini pernyataan, bukan lisensi.",
+    "purposeNote": "Pilih Komersial jika Anda akan menghasilkan uang dari audio ini, misalnya video yang dimonetisasi, game, atau iklan. Hanya model dengan lisensi yang mengizinkannya yang ditawarkan. Pilihan Anda disimpan bersama setiap hasil; ini pernyataan, bukan lisensi.",
     "model": "Model",
     "license": {
       "commercial": "Penggunaan komersial diizinkan — sesuai lisensi",
@@ -3832,14 +3832,14 @@
     "lyrics": "Lirik (opsional)",
     "quality": "Kualitas",
     "profiles": {
-      "fast": "Cepat",
+      "fast": "Cepat (draf)",
       "balanced": "Seimbang",
-      "high": "Tinggi",
-      "custom": "Kustom"
+      "high": "Tinggi (lebih lambat, lebih detail)",
+      "custom": "Kustom (lanjutan)"
     },
     "duration": "Durasi dalam detik ({{min}}–{{max}})",
-    "variations": "Variasi",
-    "seed": "Seed (kosong = acak)",
+    "variations": "Versi yang dibuat",
+    "seed": "Kode pengulangan (opsional)",
     "device": "Perangkat",
     "devices": {
       "auto": "Otomatis",
@@ -3884,6 +3884,30 @@
       "declaredUse": "Penggunaan yang dinyatakan",
       "acknowledged": "syarat diakui",
       "notRecorded": "Asal-usul tidak tercatat untuk hasil ini. Tidak ada model, lisensi, atau penggunaan yang diizinkan yang diasumsikan."
-    }
+    },
+    "qualityHint": "Cepat cocok untuk mencoba ide. Seimbang cocok untuk kebanyakan keperluan. Tinggi lebih lama dan menambah detail.",
+    "durationHint": "Berapa lama audionya. Audio yang lebih panjang butuh waktu jauh lebih lama.",
+    "variationsHint": "Berapa versi berbeda yang dibuat dari deskripsi yang sama. Tiap versi butuh waktu kira-kira sama dengan yang pertama.",
+    "seedPlaceholder": "Acak",
+    "seedHint": "Kosongkan agar hasilnya berbeda setiap kali. Ketik angka untuk mendapat hasil yang sama lagi dengan deskripsi dan pengaturan yang sama.",
+    "deviceHint": "Otomatis memakai kartu grafis jika ada, jika tidak memakai prosesor (lebih lambat).",
+    "presetHint": "Opsional. Hanya mencatat untuk apa audio itu di catatan tersimpannya; suaranya tidak berubah.",
+    "lyricsHint": "Kata-kata yang akan dinyanyikan. Tandai bagian dengan [verse] dan [chorus]. Kosongkan untuk musik tanpa nyanyian.",
+    "batch": {
+      "toggle": "Buat beberapa sekaligus (satu deskripsi per baris)",
+      "hint": "Setiap baris menjadi audio sendiri, dibuat satu per satu agar komputer Anda tidak pernah kelebihan beban. Saat ini ada ruang untuk {{max}} lagi.",
+      "count": "{{n}} akan dibuat",
+      "promptLabel": "Deskripsi (satu per baris, bahasa Inggris paling baik)",
+      "tooMany": "Terlalu banyak baris. Saat ini ada ruang untuk {{max}} lagi di antrean."
+    },
+    "jobs": {
+      "title": "Hasil buatan Anda",
+      "background": "Pembuatan tetap berjalan jika Anda meninggalkan layar ini. Kembali kapan saja untuk melihat, memutar, atau membatalkannya."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

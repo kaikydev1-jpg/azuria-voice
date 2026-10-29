@@ -3804,10 +3804,10 @@
     "local": "Runs locally. After the model is downloaded, no internet is needed.",
     "purpose": "How will you use the audio?",
     "purposes": {
-      "personal": "Personal / non-commercial",
-      "commercial": "Commercial / monetized"
+      "personal": "Personal use (not to make money)",
+      "commercial": "Commercial use (to make money)"
     },
-    "purposeNote": "Your choice is checked against the model's licence and saved with each result. It is a declaration, not a licence.",
+    "purposeNote": "Pick Commercial if you will earn money with the audio, such as monetized videos, games or ads. Only models whose licence allows it are offered. Your choice is saved with each result; it is a declaration, not a licence.",
     "model": "Model",
     "license": {
       "commercial": "Commercial use allowed — per licence",
@@ -3832,14 +3832,14 @@
     "lyrics": "Lyrics (optional)",
     "quality": "Quality",
     "profiles": {
-      "fast": "Fast",
+      "fast": "Fast (quick draft)",
       "balanced": "Balanced",
-      "high": "High",
-      "custom": "Custom"
+      "high": "High (slower, more detail)",
+      "custom": "Custom (advanced)"
     },
     "duration": "Duration in seconds ({{min}}–{{max}})",
-    "variations": "Variations",
-    "seed": "Seed (empty = random)",
+    "variations": "Versions to create",
+    "seed": "Repeat code (optional)",
     "device": "Device",
     "devices": {
       "auto": "Automatic",
@@ -3884,6 +3884,30 @@
       "declaredUse": "Declared use",
       "acknowledged": "conditions acknowledged",
       "notRecorded": "Provenance not recorded for this take. No model, licence or permitted use is implied."
-    }
+    },
+    "qualityHint": "Fast is good for trying ideas. Balanced suits most uses. High takes longer and adds detail.",
+    "durationHint": "How long the audio will be. Longer audio takes much longer to make.",
+    "variationsHint": "How many different versions to make from the same description. Each one takes about as long as the first.",
+    "seedPlaceholder": "Random",
+    "seedHint": "Leave empty to get a different result every time. Type a number to get the same result again with the same description and settings.",
+    "deviceHint": "Automatic uses your graphics card when there is one, otherwise the processor (slower).",
+    "presetHint": "Optional. It only notes what the audio is for in its saved record; it does not change the sound.",
+    "lyricsHint": "The words that will be sung. Mark parts with [verse] and [chorus]. Leave empty for music without singing.",
+    "batch": {
+      "toggle": "Make several at once (one description per line)",
+      "hint": "Each line becomes its own audio, made one after another so your computer is never overloaded. Room for {{max}} more right now.",
+      "count": "{{n}} to make",
+      "promptLabel": "Descriptions (one per line, English works best)",
+      "tooMany": "Too many lines. There is room for {{max}} more in the queue right now."
+    },
+    "jobs": {
+      "title": "Your generations",
+      "background": "Generations keep running if you leave this screen. Come back any time to see, play or cancel them."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

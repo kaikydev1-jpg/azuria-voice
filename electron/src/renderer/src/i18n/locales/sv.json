@@ -3804,10 +3804,10 @@
     "local": "Körs lokalt. När modellen har laddats ned behövs inget internet.",
     "purpose": "Hur ska du använda ljudet?",
     "purposes": {
-      "personal": "Personligt / icke-kommersiellt",
-      "commercial": "Kommersiellt / intäktsgenererande"
+      "personal": "Personligt bruk (utan att tjäna pengar)",
+      "commercial": "Kommersiellt bruk (för att tjäna pengar)"
     },
-    "purposeNote": "Ditt val kontrolleras mot modellens licens och sparas med varje resultat. Det är en försäkran, inte en licens.",
+    "purposeNote": "Välj Kommersiellt om du ska tjäna pengar på ljudet, till exempel med monetiserade videor, spel eller annonser. Bara modeller vars licens tillåter det visas. Ditt val sparas med varje resultat; det är en försäkran, inte en licens.",
     "model": "Modell",
     "license": {
       "commercial": "Kommersiell användning tillåten — enligt licensen",
@@ -3832,14 +3832,14 @@
     "lyrics": "Text (valfritt)",
     "quality": "Kvalitet",
     "profiles": {
-      "fast": "Snabb",
+      "fast": "Snabb (utkast)",
       "balanced": "Balanserad",
-      "high": "Hög",
-      "custom": "Anpassad"
+      "high": "Hög (långsammare, mer detaljer)",
+      "custom": "Anpassad (avancerat)"
     },
     "duration": "Längd i sekunder ({{min}}–{{max}})",
-    "variations": "Variationer",
-    "seed": "Seed (tomt = slumpmässigt)",
+    "variations": "Versioner att skapa",
+    "seed": "Upprepningskod (valfritt)",
     "device": "Enhet",
     "devices": {
       "auto": "Automatisk",
@@ -3884,6 +3884,30 @@
       "declaredUse": "Angiven användning",
       "acknowledged": "villkor bekräftade",
       "notRecorded": "Ursprung ej registrerat för den här tagningen. Ingen modell, licens eller tillåten användning antas."
-    }
+    },
+    "qualityHint": "Snabb passar för att testa idéer. Balanserad passar de flesta fall. Hög tar längre tid och ger mer detaljer.",
+    "durationHint": "Hur långt ljudet blir. Längre ljud tar mycket längre tid att göra.",
+    "variationsHint": "Hur många olika versioner som skapas från samma beskrivning. Varje version tar ungefär lika lång tid som den första.",
+    "seedPlaceholder": "Slumpmässig",
+    "seedHint": "Lämna tomt för att få ett nytt resultat varje gång. Skriv ett tal för att få samma resultat igen med samma beskrivning och inställningar.",
+    "deviceHint": "Automatisk använder ditt grafikkort om du har ett, annars processorn (långsammare).",
+    "presetHint": "Valfritt. Det noterar bara vad ljudet ska användas till i den sparade posten; ljudet ändras inte.",
+    "lyricsHint": "Orden som ska sjungas. Markera delar med [verse] och [chorus]. Lämna tomt för musik utan sång.",
+    "batch": {
+      "toggle": "Skapa flera på en gång (en beskrivning per rad)",
+      "hint": "Varje rad blir ett eget ljud, skapade efter varandra så att datorn aldrig överbelastas. Det finns plats för {{max}} till just nu.",
+      "count": "{{n}} att skapa",
+      "promptLabel": "Beskrivningar (en per rad, engelska fungerar bäst)",
+      "tooMany": "För många rader. Det finns plats för {{max}} till i kön just nu."
+    },
+    "jobs": {
+      "title": "Dina genereringar",
+      "background": "Genereringar fortsätter om du lämnar den här skärmen. Kom tillbaka när du vill för att se, spela upp eller avbryta dem."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

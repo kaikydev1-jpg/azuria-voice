@@ -40,6 +40,14 @@ Rápido, Equilibrado, Alto e Personalizado (parâmetros dentro de limites valida
 
 Cada geração roda em um processo próprio. Os trabalhos entram numa fila (um por vez). Cancelar um trabalho em execução encerra o processo e libera a memória; nada fica no histórico.
 
+Antes de carregar o modelo de música, o servidor descarrega as vozes de fala que estiverem na memória (política de um motor por vez). Até a 0.5.12 essa liberação nunca acontecia pela tela nem pela API, o que deixava a geração mais lenta num app já usado.
+
+A tela guarda o que você escreveu e escolheu (também depois de reiniciar o app). Os trabalhos pertencem ao servidor: ao sair da tela e voltar, os que ainda estão na fila ou rodando aparecem de novo, com barra de progresso e botão **Cancelar**; os concluídos ficam na lista por cerca de uma hora e, depois, no histórico.
+
+### Vários de uma vez
+
+Marque **Criar vários de uma vez** e escreva uma descrição por linha. Cada linha vira um trabalho; eles rodam um depois do outro, então o computador nunca carrega dois modelos juntos. A fila aceita até 20 trabalhos ativos (`queue_limit` em `GET /audio-gen/jobs`). Se a fila encher no meio do lote, as linhas não aceitas continuam na caixa.
+
 ## Ambientes isolados
 
 Os modelos usam ambientes Python separados (`audiogen-torch` e `audiogen-acestep`), instalados pelo app. O Torch e o Transformers do aplicativo principal não são alterados.
@@ -54,6 +62,7 @@ Cada take guarda: modelo, revisão exata dos pesos, classe e documentos da licen
 
 - `GET /audio-gen/catalog` — modelos, licenças e estado de instalação (não baixa nada)
 - `POST /audio-gen/music` e `/audio-gen/sfx` — iniciam um trabalho (202)
+- `GET /audio-gen/jobs` — lista os trabalhos (`prompt`, `profile`, `duration_s` e estado) e o `queue_limit`
 - `GET /audio-gen/jobs/{id}` e `POST /audio-gen/jobs/{id}/cancel`
 - `GET /audio-gen/takes/{id}/provenance` e `/export`
 

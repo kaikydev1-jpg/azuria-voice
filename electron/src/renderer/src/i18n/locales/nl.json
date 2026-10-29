@@ -3804,10 +3804,10 @@
     "local": "Draait lokaal. Na het downloaden van het model is geen internet nodig.",
     "purpose": "Hoe ga je de audio gebruiken?",
     "purposes": {
-      "personal": "Persoonlijk / niet-commercieel",
-      "commercial": "Commercieel / gemonetariseerd"
+      "personal": "Persoonlijk gebruik (zonder geld te verdienen)",
+      "commercial": "Commercieel gebruik (om geld te verdienen)"
     },
-    "purposeNote": "Je keuze wordt gecontroleerd aan de licentie van het model en bij elk resultaat opgeslagen. Het is een verklaring, geen licentie.",
+    "purposeNote": "Kies Commercieel als je geld gaat verdienen met de audio, zoals met gemonetiseerde video's, games of advertenties. Alleen modellen waarvan de licentie dat toestaat worden getoond. Je keuze wordt bij elk resultaat bewaard; het is een verklaring, geen licentie.",
     "model": "Model",
     "license": {
       "commercial": "Commercieel gebruik toegestaan — volgens de licentie",
@@ -3832,14 +3832,14 @@
     "lyrics": "Songtekst (optioneel)",
     "quality": "Kwaliteit",
     "profiles": {
-      "fast": "Snel",
+      "fast": "Snel (concept)",
       "balanced": "Gebalanceerd",
-      "high": "Hoog",
-      "custom": "Aangepast"
+      "high": "Hoog (langzamer, meer detail)",
+      "custom": "Aangepast (geavanceerd)"
     },
     "duration": "Duur in seconden ({{min}}–{{max}})",
-    "variations": "Variaties",
-    "seed": "Seed (leeg = willekeurig)",
+    "variations": "Te maken versies",
+    "seed": "Herhaalcode (optioneel)",
     "device": "Apparaat",
     "devices": {
       "auto": "Automatisch",
@@ -3884,6 +3884,30 @@
       "declaredUse": "Opgegeven gebruik",
       "acknowledged": "voorwaarden erkend",
       "notRecorded": "Herkomst niet vastgelegd voor deze take. Er wordt geen model, licentie of toegestaan gebruik aangenomen."
-    }
+    },
+    "qualityHint": "Snel is handig om ideeën te proberen. Gebalanceerd past bij de meeste toepassingen. Hoog duurt langer en voegt detail toe.",
+    "durationHint": "Hoe lang de audio wordt. Langere audio duurt veel langer om te maken.",
+    "variationsHint": "Hoeveel verschillende versies er van dezelfde beschrijving komen. Elke versie duurt ongeveer even lang als de eerste.",
+    "seedPlaceholder": "Willekeurig",
+    "seedHint": "Laat leeg voor elke keer een ander resultaat. Typ een getal om met dezelfde beschrijving en instellingen opnieuw hetzelfde resultaat te krijgen.",
+    "deviceHint": "Automatisch gebruikt je videokaart als je die hebt, anders de processor (langzamer).",
+    "presetHint": "Optioneel. Het noteert alleen waarvoor de audio dient in het opgeslagen record; het geluid verandert niet.",
+    "lyricsHint": "De tekst die gezongen wordt. Markeer delen met [verse] en [chorus]. Laat leeg voor muziek zonder zang.",
+    "batch": {
+      "toggle": "Meerdere tegelijk maken (één beschrijving per regel)",
+      "hint": "Elke regel wordt een eigen audio, na elkaar gemaakt zodat je computer nooit overbelast raakt. Er is nu ruimte voor {{max}} meer.",
+      "count": "{{n}} te maken",
+      "promptLabel": "Beschrijvingen (één per regel, Engels werkt het best)",
+      "tooMany": "Te veel regels. Er is nu ruimte voor {{max}} meer in de wachtrij."
+    },
+    "jobs": {
+      "title": "Je generaties",
+      "background": "Generaties blijven doorlopen als je dit scherm verlaat. Kom op elk moment terug om ze te bekijken, af te spelen of te annuleren."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }

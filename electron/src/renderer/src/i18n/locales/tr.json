@@ -3804,10 +3804,10 @@
     "local": "Yerel çalışır. Model indirildikten sonra internet gerekmez.",
     "purpose": "Sesi nasıl kullanacaksınız?",
     "purposes": {
-      "personal": "Kişisel / ticari olmayan",
-      "commercial": "Ticari / gelir getiren"
+      "personal": "Kişisel kullanım (para kazanmadan)",
+      "commercial": "Ticari kullanım (para kazanmak için)"
     },
-    "purposeNote": "Seçiminiz modelin lisansıyla karşılaştırılır ve her sonuçla birlikte kaydedilir. Bu bir beyandır, lisans değildir.",
+    "purposeNote": "Sesle para kazanacaksanız, örneğin gelir getiren videolar, oyunlar veya reklamlar için Ticari'yi seçin. Yalnızca lisansı buna izin veren modeller sunulur. Seçiminiz her sonuçla birlikte kaydedilir; bu bir beyandır, lisans değildir.",
     "model": "Model",
     "license": {
       "commercial": "Ticari kullanıma izin var — lisansa göre",
@@ -3832,14 +3832,14 @@
     "lyrics": "Şarkı sözü (isteğe bağlı)",
     "quality": "Kalite",
     "profiles": {
-      "fast": "Hızlı",
+      "fast": "Hızlı (taslak)",
       "balanced": "Dengeli",
-      "high": "Yüksek",
-      "custom": "Özel"
+      "high": "Yüksek (daha yavaş, daha ayrıntılı)",
+      "custom": "Özel (gelişmiş)"
     },
     "duration": "Saniye cinsinden süre ({{min}}–{{max}})",
-    "variations": "Varyasyonlar",
-    "seed": "Tohum (boş = rastgele)",
+    "variations": "Oluşturulacak sürümler",
+    "seed": "Tekrar kodu (isteğe bağlı)",
     "device": "Aygıt",
     "devices": {
       "auto": "Otomatik",
@@ -3884,6 +3884,30 @@
       "declaredUse": "Beyan edilen kullanım",
       "acknowledged": "koşullar kabul edildi",
       "notRecorded": "Bu kayıt için kaynak bilgisi saklanmadı. Hiçbir model, lisans veya izinli kullanım varsayılmaz."
-    }
+    },
+    "qualityHint": "Hızlı, fikirleri denemek için iyidir. Dengeli çoğu kullanıma uyar. Yüksek daha uzun sürer ve daha fazla ayrıntı ekler.",
+    "durationHint": "Sesin ne kadar süreceği. Daha uzun sesler çok daha uzun sürede hazırlanır.",
+    "variationsHint": "Aynı açıklamadan kaç farklı sürüm yapılacağı. Her biri yaklaşık ilki kadar sürer.",
+    "seedPlaceholder": "Rastgele",
+    "seedHint": "Her seferinde farklı bir sonuç için boş bırakın. Aynı açıklama ve ayarlarla aynı sonucu yeniden almak için bir sayı yazın.",
+    "deviceHint": "Otomatik, varsa ekran kartınızı, yoksa işlemciyi (daha yavaş) kullanır.",
+    "presetHint": "İsteğe bağlı. Yalnızca sesin ne için olduğunu kayıtlı kaydına not eder; sesi değiştirmez.",
+    "lyricsHint": "Söylenecek sözler. Bölümleri [verse] ve [chorus] ile işaretleyin. Sözsüz müzik için boş bırakın.",
+    "batch": {
+      "toggle": "Aynı anda birkaç tane oluştur (satır başına bir açıklama)",
+      "hint": "Her satır ayrı bir ses olur ve bilgisayarınız hiç aşırı yüklenmesin diye art arda hazırlanır. Şu anda {{max}} tane daha için yer var.",
+      "count": "{{n}} oluşturulacak",
+      "promptLabel": "Açıklamalar (satır başına bir tane, İngilizce en iyi sonucu verir)",
+      "tooMany": "Çok fazla satır. Sırada şu anda {{max}} tane daha için yer var."
+    },
+    "jobs": {
+      "title": "Oluşturmalarınız",
+      "background": "Bu ekrandan çıksanız bile oluşturmalar sürer. Görmek, dinlemek veya iptal etmek için istediğiniz zaman geri gelin."
+    },
+    "promptPlaceholder": {
+      "music": "Calm lo-fi piano with soft rain, slow tempo",
+      "sfx": "A wooden door creaking open slowly"
+    },
+    "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
   }
 }
