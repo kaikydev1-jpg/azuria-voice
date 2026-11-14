@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useBackendStatus } from '@/hooks/use-backend-status';
 import { isBackendReachable } from '@shared/utils/backendStage';
 import { AccountCorner } from './account-corner';
+import { WindowControls } from './window-controls';
 
 export function AppShell() {
   const backend = useBackendStatus();
@@ -64,6 +65,8 @@ export function AppShell() {
           no-drag controls after every workspace titlebar, outside BackendGate. */}
       {/* Top-right corner on every page and platform: account, then the notifications bell. */}
       <AccountCorner notificationsEnabled={isBackendReachable(backend.stage)} />
+      {/* Drawn window buttons (Linux, Matsu OS); nothing where the system draws them. */}
+      <WindowControls />
     </div>
   );
 }

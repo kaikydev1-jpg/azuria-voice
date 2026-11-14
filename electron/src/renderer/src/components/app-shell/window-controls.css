@@ -1,0 +1,208 @@
+/* Integrated title bar buttons (window-controls.tsx). One group per side,
+   vertically centered in the 52px title bar; never a drag region. */
+:root {
+  --window-inactive-dot: #c9c9cf;
+}
+.dark {
+  --window-inactive-dot: #59545d;
+}
+
+.window-controls {
+  position: fixed;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  height: 52px;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+.window-controls[data-side='left'] {
+  left: 0;
+}
+.window-controls[data-side='right'] {
+  right: 0;
+}
+.window-control {
+  display: grid;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  color: var(--foreground);
+  background: transparent;
+  cursor: default;
+  outline: none;
+}
+.window-control svg {
+  fill: none;
+  stroke: currentColor;
+}
+
+/* Matsu OS (owner's spec): 12px dots, 8px apart, 14px from the side; symbols
+   in thin 1.35px strokes only while the group is hovered; pressed = 82%
+   brightness; grey in the background until hovered. */
+html[data-window-chrome='matsu'] .window-controls {
+  gap: 8px;
+  padding: 0 14px;
+}
+html[data-window-chrome='matsu'] .window-control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+html[data-window-chrome='matsu'] .window-control[data-button='close'] {
+  background: #ff5f57;
+  color: #4d0000;
+}
+html[data-window-chrome='matsu'] .window-control[data-button='minimize'] {
+  background: #febc2e;
+  color: #995700;
+}
+html[data-window-chrome='matsu'] .window-control[data-button='maximize'] {
+  background: #28c840;
+  color: #006500;
+}
+html[data-window-chrome='matsu'] .window-control svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity var(--dur-micro, 80ms) var(--ease-out, ease-out);
+}
+html[data-window-chrome='matsu'] .window-controls:hover svg {
+  opacity: 1;
+}
+html[data-window-chrome='matsu'] .window-control:active {
+  filter: brightness(0.82);
+}
+html[data-window-inactive][data-window-chrome='matsu'] .window-controls:not(:hover) .window-control {
+  background: var(--window-inactive-dot);
+}
+
+/* Mac style on other systems: the same dots and behavior. */
+html[data-window-chrome='mac'] .window-controls {
+  gap: 8px;
+  padding: 0 14px;
+}
+html[data-window-chrome='mac'] .window-control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+html[data-window-chrome='mac'] .window-control[data-button='close'] {
+  background: #ff5f57;
+  color: #4d0000;
+}
+html[data-window-chrome='mac'] .window-control[data-button='minimize'] {
+  background: #febc2e;
+  color: #995700;
+}
+html[data-window-chrome='mac'] .window-control[data-button='maximize'] {
+  background: #28c840;
+  color: #006500;
+}
+html[data-window-chrome='mac'] .window-control svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity var(--dur-micro, 80ms) var(--ease-out, ease-out);
+}
+html[data-window-chrome='mac'] .window-controls:hover svg {
+  opacity: 1;
+}
+html[data-window-chrome='mac'] .window-control:active {
+  filter: brightness(0.82);
+}
+html[data-window-inactive][data-window-chrome='mac'] .window-controls:not(:hover) .window-control {
+  background: var(--window-inactive-dot);
+}
+
+/* GNOME (Adwaita): 24px circles on a soft fill. */
+html[data-window-chrome='gnome'] .window-controls {
+  gap: 12px;
+  padding: 0 10px;
+}
+html[data-window-chrome='gnome'] .window-control {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+html[data-window-chrome='gnome'] .window-control:hover {
+  background: color-mix(in srgb, var(--foreground) 16%, transparent);
+}
+html[data-window-chrome='gnome'] .window-control:active {
+  background: color-mix(in srgb, var(--foreground) 24%, transparent);
+}
+html[data-window-chrome='gnome'] .window-control svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.6;
+}
+html[data-window-inactive][data-window-chrome='gnome'] .window-control:not(:hover) {
+  opacity: 0.55;
+}
+
+/* KDE (Breeze): loose icons, a circle on hover, red close. */
+html[data-window-chrome='kde'] .window-controls {
+  gap: 6px;
+  padding: 0 8px;
+}
+html[data-window-chrome='kde'] .window-control {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+html[data-window-chrome='kde'] .window-control:hover {
+  background: color-mix(in srgb, var(--foreground) 14%, transparent);
+}
+html[data-window-chrome='kde'] .window-control[data-button='close']:hover {
+  background: #da4453;
+  color: #fff;
+}
+html[data-window-chrome='kde'] .window-control svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.5;
+}
+html[data-window-inactive][data-window-chrome='kde'] .window-control:not(:hover) {
+  opacity: 0.55;
+}
+
+/* Windows 11 drawn by the app (Linux with the Windows style picked): 46px
+   cells, thin 10px icons, red close. */
+html[data-window-chrome='windows'] .window-controls {
+  align-items: stretch;
+  height: 40px;
+}
+html[data-window-chrome='windows'] .window-control {
+  width: 46px;
+}
+html[data-window-chrome='windows'] .window-control svg {
+  width: 10px;
+  height: 10px;
+  stroke-width: 1;
+}
+html[data-window-chrome='windows'] .window-control:hover {
+  background: color-mix(in srgb, var(--foreground) 9%, transparent);
+}
+html[data-window-chrome='windows'] .window-control[data-button='close']:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+html[data-window-inactive][data-window-chrome='windows'] .window-control:not(:hover) {
+  color: var(--muted-foreground);
+}
+
+/* Linux windows without a system frame get a hairline edge (Windows and macOS
+   draw their own shadow). */
+html[data-window-os='linux']:not([data-window-maximized]) body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}

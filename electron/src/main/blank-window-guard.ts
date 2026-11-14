@@ -59,9 +59,18 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#39;');
 }
 
-export function blankFallbackUrl(locale: string): string {
+/**
+ * `drawControls`: the window has no system title bar buttons (Linux, or a
+ * drawn style on Windows), so the recovery page adds a drag strip and a close
+ * button — otherwise a failed renderer would leave a window that cannot be
+ * moved or closed with the mouse.
+ */
+export function blankFallbackUrl(locale: string, options: { drawControls?: boolean } = {}): string {
   const copy = localizedFallbackCopy(locale);
-  const html = `<!doctype html><html lang="${escapeHtml(fallbackLocale(locale))}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(PRODUCT_NAME)}</title><style>html{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#071421;color:#dbe6ef;font:15px/1.5 Inter,system-ui,sans-serif}.card{width:min(28rem,calc(100vw - 3rem));padding:2.5rem;text-align:center;border:1px solid #ffffff18;border-radius:1.5rem;background:#ffffff08;box-shadow:0 24px 80px #0008}.mark{display:grid;place-items:center;width:3.5rem;height:3.5rem;margin:0 auto 1.25rem;border-radius:1rem;background:#287ec71c;color:#7ec4ff;font-size:1.75rem}h1{margin:0 0 1.5rem;font-size:1.25rem}button{border:1px solid #ffffff1f;border-radius:.75rem;background:#287ec7;color:white;padding:.7rem 1.15rem;font:inherit;font-weight:650;cursor:pointer}button:hover{background:#3495df}</style></head><body><main class="card"><div class="mark" aria-hidden="true">⌁</div><h1>${escapeHtml(copy.title)}</h1><button type="button" onclick="location.replace('${BLANK_CACHE_REPAIR_URL}')">${escapeHtml(copy.retry)}</button></main></body></html>`;
+  const controls = options.drawControls
+    ? '<div style="position:fixed;inset:0 0 auto 0;height:40px;-webkit-app-region:drag"></div><button type="button" aria-label="×" title="×" onclick="window.close()" style="position:fixed;top:8px;right:10px;width:28px;height:28px;padding:0;border-radius:50%;background:#ffffff14;font-size:18px;line-height:1;-webkit-app-region:no-drag">×</button>'
+    : '';
+  const html = `<!doctype html><html lang="${escapeHtml(fallbackLocale(locale))}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${escapeHtml(PRODUCT_NAME)}</title><style>html{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#071421;color:#dbe6ef;font:15px/1.5 Inter,system-ui,sans-serif}.card{width:min(28rem,calc(100vw - 3rem));padding:2.5rem;text-align:center;border:1px solid #ffffff18;border-radius:1.5rem;background:#ffffff08;box-shadow:0 24px 80px #0008}.mark{display:grid;place-items:center;width:3.5rem;height:3.5rem;margin:0 auto 1.25rem;border-radius:1rem;background:#287ec71c;color:#7ec4ff;font-size:1.75rem}h1{margin:0 0 1.5rem;font-size:1.25rem}button{border:1px solid #ffffff1f;border-radius:.75rem;background:#287ec7;color:white;padding:.7rem 1.15rem;font:inherit;font-weight:650;cursor:pointer}button:hover{background:#3495df}</style></head><body>${controls}<main class="card"><div class="mark" aria-hidden="true">⌁</div><h1>${escapeHtml(copy.title)}</h1><button type="button" onclick="location.replace('${BLANK_CACHE_REPAIR_URL}')">${escapeHtml(copy.retry)}</button></main></body></html>`;
   return `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
 }
 
@@ -91,6 +100,7 @@ export function installBlankWindowGuard(
   locale: string,
   devOrigin?: string,
   repairCacheAndRelaunch?: () => Promise<void>,
+  drawControls = false,
 ): () => void {
   // Keep the EventEmitter reference while the window is alive. Electron's
   // `win.webContents` getter itself throws after the native window is gone.
@@ -137,7 +147,7 @@ export function installBlankWindowGuard(
     }
     showingFallback = true;
     console.error('[window] renderer remained empty; showing built-in recovery');
-    void win.loadURL(blankFallbackUrl(locale)).catch(() => {});
+    void win.loadURL(blankFallbackUrl(locale, { drawControls })).catch(() => {});
   };
   const navigationStarted = (
     details: Electron.Event<Electron.WebContentsDidStartNavigationEventParams>,

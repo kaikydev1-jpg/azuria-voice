@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 from check_electron_release_assets import parse_targets, select_targets, verify_release
@@ -42,10 +43,29 @@ def required_installers(targets=None):
     return suffixes
 
 
+#: Matsu OS (the owner's Fedora Atomic based system) downloads this fixed name,
+#: so `releases/latest/download/<name>` never breaks; electron-updater keeps an
+#: AppImage whose name has no version in place when it updates.
+MATSU_APPIMAGE = "Azuria-Voice-Matsu-OS-x64.AppImage"
+LINUX_INSTALLER = Path("scripts/instalar.sh")
+
+
+def add_linux_extras(assets, version, targets=None):
+    """Matsu OS copy of the Linux AppImage and the one-line installer."""
+    if "linux-x64" not in select_targets(targets):
+        return
+    appimage = assets / f"Azuria-Voice-Electron-{version}-linux-x64.AppImage"
+    if not appimage.is_file():
+        return
+    shutil.copyfile(appimage, assets / MATSU_APPIMAGE)
+    shutil.copyfile(LINUX_INSTALLER, assets / "instalar.sh")
+
+
 def prepare(assets, tag, sunset_tag=None, targets=None, notes=True):
     version = json.loads(Path("package.json").read_text())["version"]
     if tag != f"v{version}":
         raise ValueError("Tag must match package version")
+    add_linux_extras(assets, version, targets)
     files = [p for p in assets.iterdir() if p.is_file()]
     release = {"tagName": tag, "isPrerelease": False, "assets": [
         {"name": p.name, "size": p.stat().st_size,

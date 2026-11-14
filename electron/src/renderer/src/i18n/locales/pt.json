@@ -3911,5 +3911,45 @@
       "sfx": "A wooden door creaking open slowly"
     },
     "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
+  },
+  "ignis": {
+    "title": "Usar a placa de vídeo pelo Ignis",
+    "description": "O Ignis roda a voz, a transcrição e o modelo de linguagem em placas AMD, NVIDIA ou Intel.",
+    "closed_title": "Abra o Ignis para usar a placa de vídeo",
+    "closed_desc": "O Ignis é um motor local gratuito que roda voz, transcrição e tradução em placas AMD, NVIDIA ou Intel. Instale, abra (ele fica perto do relógio) e verifique de novo. Nada muda até você ligar.",
+    "download": "Baixar o Ignis",
+    "check_again": "Verificar de novo",
+    "mac_unsupported": "O Ignis ainda não tem versão para macOS, então esta opção não aparece neste Mac.",
+    "switch_title": "Usar a placa pelo Ignis",
+    "switch_desc": "Ligado, a voz, a transcrição e a tradução da dublagem vão pelo Ignis; desligar volta às escolhas de antes.",
+    "gpu": "Encontrada: {{gpu}}.",
+    "recommended": "Recomendado para este computador",
+    "state_title": "Situação no Ignis",
+    "voice_ready": "Voz pronta na placa ({{backend}})",
+    "voice_not_ready": "Voz ainda não preparada",
+    "transcription_ready": "transcrição pronta",
+    "transcription_not_ready": "transcrição ainda não preparada",
+    "prepare": "Preparar no Ignis",
+    "preparing": "Preparando no Ignis…",
+    "prepare_title": "Preparar a voz e a transcrição no Ignis?",
+    "prepare_desc": "O Ignis vai baixar cerca de {{size}}. A voz usa o OmniVoice, com licença {{license}} (somente uso não comercial).",
+    "prepare_confirm": "Preparar",
+    "error": "O Ignis não conseguiu concluir",
+    "use_in_asr": "Usar o Ignis"
+  },
+  "windowControls": {
+    "group": "Botões da janela",
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "restore": "Restaurar",
+    "close": "Fechar",
+    "style_title": "Botões da janela",
+    "style_desc": "Automático segue o seu sistema (e o Matsu OS ganha os botões dele).",
+    "style_auto": "Automático",
+    "restart_hint": "O novo estilo vale quando você abrir o Azúria Voice de novo.",
+    "tray_title": "Continuar perto do relógio ao fechar",
+    "tray_desc": "Fechar a janela deixa o Azúria Voice na bandeja, e o ditado e a voz continuam funcionando. Para encerrar, use Sair no menu do ícone.",
+    "tray_notice_title": "O Azúria Voice continua ligado",
+    "tray_notice_body": "Ele fica perto do relógio para o ditado continuar funcionando. Para encerrar, use Sair no menu do ícone."
   }
 }

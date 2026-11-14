@@ -11,6 +11,7 @@ import { useWorkspaceSidebarState } from './use-workspace-sidebar';
 import { VoicesSidebar } from '@/features/clone/voices-sidebar';
 import { WorkspaceNavigation } from './workspace-menu';
 import { StatusBar } from './status-bar';
+import { useLeftWindowControls } from './window-controls';
 
 export function versionTranslationKey(development: boolean) {
   return development ? ('app.version_dev' as const) : ('app.version' as const);
@@ -19,6 +20,8 @@ export function versionTranslationKey(development: boolean) {
 export function WorkspaceSidebar() {
   const { t } = useTranslation();
   const mac = isMac();
+  // Room for buttons on the left: macOS traffic lights or drawn Linux/Matsu dots.
+  const leftControls = useLeftWindowControls();
   const versionLabel = t(versionTranslationKey(import.meta.env.DEV), {
     version: appVersion(),
   });
@@ -30,8 +33,8 @@ export function WorkspaceSidebar() {
   const sidebarResize = usePaneResize({
     storageKey: 'voicestudio.library-width',
     side: 'left',
-    minimum: mac ? 288 : 220,
-    initial: mac ? 288 : 256,
+    minimum: leftControls ? 288 : 220,
+    initial: leftControls ? 288 : 256,
     maximum: 360,
     reserve: compactViewport && secondaryWorkspace && forceExpanded ? 520 : 640,
     enabled: libraryOpen,
@@ -45,7 +48,7 @@ export function WorkspaceSidebar() {
           onDoubleClick={() => setOpen(true)}
           className={cn(
             'brand-sidebar relative isolate grid h-dvh min-h-0 shrink-0 grid-rows-[auto_minmax(0,1fr)_auto_auto] overflow-hidden bg-sidebar',
-            mac ? 'w-16' : 'w-12 border-r border-border/50',
+            mac ? 'w-16' : leftControls ? 'w-[4.5rem] border-r border-border/50' : 'w-12 border-r border-border/50',
           )}
         >
           {mac && (
@@ -58,7 +61,7 @@ export function WorkspaceSidebar() {
           <div
             className={cn(
               'workspace-titlebar flex shrink-0 justify-center',
-              mac ? 'min-h-[72px] items-end pb-1' : 'h-12 items-center',
+              leftControls ? 'min-h-[72px] items-end pb-1' : 'h-12 items-center',
             )}
           >
             {/* The rail can always reopen itself, on every platform: the
@@ -124,7 +127,7 @@ export function WorkspaceSidebar() {
           <header
             className={cn(
               'workspace-titlebar flex shrink-0 items-center gap-2 px-4',
-              mac && 'pl-24',
+              leftControls && 'pl-24',
             )}
           >
             <Link

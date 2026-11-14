@@ -26,6 +26,7 @@ vi.mock('@/features/settings/model-settings', () => ({
   modelFamilies: ['tts'],
 }));
 vi.mock('@/features/settings/mirror-settings', () => ({ MirrorSettings: () => null }));
+vi.mock('@/features/settings/ignis-settings', () => ({ IgnisCard: () => <div>Ignis</div> }));
 vi.mock('@/features/settings/media-tools', () => ({
   SetupMediaEngine: () => null,
   MediaTools: () => null,
@@ -169,4 +170,21 @@ it('the privacy step also waits for the account choice when accounts are offered
   await waitFor(() =>
     expect(screen.getByRole('button', { name: 'setup.continue_ok' })).toBeEnabled(),
   );
+});
+it('marks finished, current and upcoming steps on the step rail', async () => {
+  mock.preflight = { ok: true, checks: [] } as typeof mock.preflight;
+  mount();
+  await screen.findByText('Preflight');
+  const first = () => screen.getByRole('button', { name: '1.setup.system_check' });
+  await waitFor(() => expect(first()).toHaveAttribute('data-step-state', 'current'));
+  expect(screen.getByRole('button', { name: '2.models.pack_title' })).toHaveAttribute(
+    'data-step-state',
+    'upcoming',
+  );
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'setup.continue_ok' })).toBeEnabled(),
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'setup.continue_ok' }));
+  await screen.findByText('Model packs');
+  expect(first()).toHaveAttribute('data-step-state', 'done');
 });

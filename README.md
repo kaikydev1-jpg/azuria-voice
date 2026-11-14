@@ -17,6 +17,24 @@ Na primeira execução, use o assistente existente para preparar o ambiente Pyth
 
 Sem NVIDIA, o ambiente padrão de PyTorch no Windows usa CPU. Motores com runtime próprio mantêm suas opções existentes. A AMD Radeon RX 580 não oferece aceleração CUDA.
 
+Para usar placas **AMD, Intel ou NVIDIA** de verdade, instale o [Ignis](https://github.com/kaikydev1-jpg/Ignis/releases/latest), o motor local do mesmo autor, e ligue **Usar a placa pelo Ignis** no assistente da primeira execução ou em **Configurações → Desempenho**. A voz, a transcrição e a tradução da dublagem passam a rodar na placa (Vulkan, CUDA ou ROCm); desligar volta às escolhas anteriores. Detalhes em [Ignis](docs/engines/ignis.md).
+
+## Linux e Matsu OS
+
+Pelo terminal, em qualquer Linux x64 (descobre o sistema, confere o SHA-256 e instala):
+
+```bash
+curl -fsSL https://github.com/kaikydev1-jpg/azuria-voice/releases/latest/download/instalar.sh | bash
+```
+
+| Sistema | Baixe |
+|---|---|
+| **Matsu OS** | [Azuria-Voice-Matsu-OS-x64.AppImage](https://github.com/kaikydev1-jpg/azuria-voice/releases/latest/download/Azuria-Voice-Matsu-OS-x64.AppImage) (o mesmo do Fedora Atomic; já abre com os botões do Matsu OS) |
+| Ubuntu, Debian e derivados | `.deb` em [Releases](https://github.com/kaikydev1-jpg/azuria-voice/releases/latest) |
+| Outras distribuições | `.AppImage` em [Releases](https://github.com/kaikydev1-jpg/azuria-voice/releases/latest) |
+
+O AppImage se atualiza sozinho pelo próprio app. Detalhes em [instalação Linux](docs/install/linux.md).
+
 ## Executar e compilar o código
 
 Requisitos: Git, Node.js 22+, Bun 1.4.2; para o instalador, Rust/Cargo e Visual Studio Build Tools com C++/Windows SDK.

@@ -318,3 +318,31 @@ def test_release_tag_override_preserves_exact_tag_checkout(tmp_path, workflow_re
                TEST_HEAD='tagged' if head_matches else 'different')
     result = subprocess.run(['bash', '-e', '-c', guard['run']], env=env, capture_output=True)
     assert (result.returncode == 0) == ok, result.stderr
+
+
+def test_linux_release_adds_the_matsu_os_download_and_installer(monkeypatch, tmp_path):
+    """Matsu OS gets a fixed-name copy of the AppImage (stable latest/download
+    link, updated in place) plus instalar.sh, both listed in SHA256SUMS."""
+    import json
+    import shutil as _shutil
+    monkeypatch.syspath_prepend(str(ROOT / "scripts"))
+    spec = importlib.util.spec_from_file_location("release_matsu_test", ROOT / "scripts/prepare_electron_release.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, "verify_release", lambda *args, **kwargs: None)
+    scripts = tmp_path / "scripts"
+    scripts.mkdir()
+    _shutil.copy(ROOT / "scripts" / "instalar.sh", scripts / "instalar.sh")
+    monkeypatch.chdir(tmp_path)
+    Path("package.json").write_text(json.dumps({"version": "1.2.3"}))
+    assets = tmp_path / "assets"
+    assets.mkdir()
+    (assets / "Azuria-Voice-Electron-1.2.3-linux-x64.deb").write_bytes(b"deb")
+    (assets / "Azuria-Voice-Electron-1.2.3-linux-x64.AppImage").write_bytes(b"appimage-bytes")
+    module.prepare(assets, "v1.2.3", targets=["linux-x64"], notes=False)
+    matsu = assets / "Azuria-Voice-Matsu-OS-x64.AppImage"
+    assert matsu.read_bytes() == b"appimage-bytes"
+    assert (assets / "instalar.sh").read_bytes() == (ROOT / "scripts" / "instalar.sh").read_bytes()
+    listed = [line.split("  ", 1)[1] for line in (assets / "SHA256SUMS.txt").read_text().splitlines()]
+    assert "Azuria-Voice-Matsu-OS-x64.AppImage" in listed
+    assert "instalar.sh" in listed

@@ -1,3 +1,4 @@
+import { IgnisCard } from './ignis-settings';
 import {
   CpuIcon,
   MemoryStickIcon,
@@ -108,6 +109,7 @@ export function PerformanceSettings() {
   return (
     <>
       <SystemPreflight />
+      <IgnisCard variant="settings" />
       <SettingsSection icon={ZapIcon} title={t('performanceProfile.title')}>
         <div className="p-4">
           <PerformanceProfile variant="settings" />

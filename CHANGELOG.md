@@ -62,6 +62,50 @@ metadata and the backend fallback mirror it.
 
 - Gallery preview fallback smoke no longer flakes when a slower runner reads the playing clip in several byte ranges (#3018)
 
+## [0.5.14] — 2026-11-14
+
+Visual novo e mais calmo, a placa de vídeo pelo Ignis (AMD, Intel e NVIDIA) e a versão para o Matsu OS. As funções continuam nos mesmos lugares, e fechar a janela agora deixa o Azúria perto do relógio, com o ditado funcionando.
+
+**Linux, pelo terminal:** `curl -fsSL https://github.com/kaikydev1-jpg/azuria-voice/releases/latest/download/instalar.sh | bash`
+
+| Sistema | Baixe |
+|---|---|
+| Windows 10 e 11 | `Azuria-Voice-Electron-0.5.14-win-x64.exe` |
+| Matsu OS e Fedora Atomic | `Azuria-Voice-Matsu-OS-x64.AppImage` |
+| Ubuntu, Debian e derivados | `Azuria-Voice-Electron-0.5.14-linux-x64.deb` |
+| Outras distribuições Linux | `Azuria-Voice-Electron-0.5.14-linux-x64.AppImage` |
+| Mac com Apple Silicon | `Azuria-Voice-Electron-0.5.14-mac-arm64.dmg` |
+
+Quem já usa o Azúria Voice recebe a atualização pelo aviso do próprio app; vozes, projetos e modelos continuam onde estão.
+
+![Tela inicial do Azúria Voice 0.5.14 no tema escuro](https://raw.githubusercontent.com/kaikydev1-jpg/azuria-voice/main/docs/assets/azuria-2/inicio-escuro.webp)
+
+![Botões da janela no Matsu OS: em uso, mouse em cima e segundo plano](https://raw.githubusercontent.com/kaikydev1-jpg/azuria-voice/main/docs/assets/azuria-2/matsu-botoes-escuro.webp)
+
+**Highlights**
+
+- Visual Azúria 2: fundo azul-noite (ou gelo no tema claro), botão principal em pílula e cartões que sobem ao passar o mouse
+- Usar a placa de vídeo pelo Ignis: voz, transcrição e tradução da dublagem em placas AMD, Intel ou NVIDIA
+- Matsu OS: botões da janela do próprio sistema, reconhecido sozinho, e download com link fixo
+- Fechar a janela deixa o app na bandeja em todos os sistemas; Sair no menu do ícone encerra
+
+### Added
+
+- Azúria Voice: nova opção **Usar a placa pelo Ignis** (assistente e Configurações → Desempenho): voz OmniVoice, transcrição Whisper e tradução da dublagem na placa AMD, Intel ou NVIDIA pelo Ignis; desligar restaura as escolhas anteriores ([Ignis](docs/engines/ignis.md)) (#20)
+- Azúria Voice: motor de voz `ignis`, provedor de linguagem **Ignis (local)** e botão **Usar o Ignis** na transcrição compatível com OpenAI (#20)
+- Azúria Voice: barra de título integrada no Linux com botões no estilo do sistema (GNOME, KDE ou bolinhas, conforme `gtk-decoration-layout`) e as bolinhas do Matsu OS automáticas; estilo manual em Aparência ([Linux](docs/install/linux.md)) (#20)
+- Azúria Voice: download `Azuria-Voice-Matsu-OS-x64.AppImage` (link fixo, atualiza sozinho) e `instalar.sh` para instalar pelo terminal em qualquer Linux (#20)
+- Azúria Voice: fechar a janela deixa o Azúria na bandeja no Windows, no Linux e no macOS, com ditado e voz funcionando; abrir o app de novo traz a janela; dá para desligar em Geral (#20)
+
+### Changed
+
+- Azúria Voice: visual Azúria 2 em temas claro e escuro: fundo azul-noite, botão principal em pílula, cartões que sobem ao passar o mouse e escala única de animação ([marca](docs/branding.md)) (#20)
+- Azúria Voice: ícones do menu e da tela inicial sem violeta, e o assistente da primeira execução mostra os passos numerados com o passo concluído marcado (#20)
+
+### CI
+
+- Pacote do macOS Apple Silicon no runner macos-15 (o GitHub aposentou o macos-14) e testes do Ignis e do instalador nas verificações (#20)
+
 ## [0.5.13] — 2026-10-29
 
 Revisão geral do Azúria Voice: a tela de música e efeitos sonoros ficou mais clara e deixou de perder o trabalho ao sair dela, dá para criar vários áudios de uma vez, e a integração de API agora se chama **Azúria Voice API**. Nenhuma função mudou de lugar e a API (`http://127.0.0.1:3900/v1`) segue igual.

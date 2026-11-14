@@ -57,9 +57,10 @@ jobs:
             local_runtime: true
             optional: false
           - label: macOS arm64
-            # macos-15 arm64 jobs were repeatedly dropped for GitHub capacity
-            # ("not acquired by Runner"); macos-14 is the same native arm64 class.
-            runner: macos-14
+            # GitHub retired the macos-14 image in Nov 2026 ("The configuration
+            # 'macos-14-arm64-us-default' is not supported"); macos-15 is the
+            # same native arm64 class (it was briefly avoided for capacity).
+            runner: macos-15
             platform: darwin
             arch: arm64
             target: aarch64-apple-darwin
@@ -170,7 +171,7 @@ jobs:
           HF_HUB_CACHE: ${{ runner.temp }}/azuria-empty-hf-cache
           OMNIVOICE_DISABLE_FILE_LOG: '1'
           PYTHONUTF8: '1'
-        run: uv run --no-sync pytest backend/tests tests/test_python_security_flows.py tests/test_network_share.py tests/test_network_share_lifecycle.py tests/test_network_middleware.py tests/test_mcp_session_limits.py tests/test_dependency_security_floors.py tests/test_app_version.py tests/test_changelog_style.py tests/test_azuria_release_notes.py tests/test_electron_release_assets.py tests/test_azuria_linux_macos_workflow.py -q
+        run: uv run --no-sync pytest backend/tests tests/test_python_security_flows.py tests/test_network_share.py tests/test_network_share_lifecycle.py tests/test_network_middleware.py tests/test_mcp_session_limits.py tests/test_dependency_security_floors.py tests/test_app_version.py tests/test_changelog_style.py tests/test_azuria_release_notes.py tests/test_electron_release_assets.py tests/test_azuria_linux_macos_workflow.py tests/backend/services/test_ignis_client.py tests/backend/services/test_ignis_backend.py tests/backend/api/test_ignis_routes.py tests/test_llm_providers.py tests/test_instalar_sh.py -q
       - name: Shared frontend unit tests
         run: bun run test:frontend
       - name: Validate Electron

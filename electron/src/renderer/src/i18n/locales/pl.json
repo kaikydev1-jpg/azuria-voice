@@ -3913,5 +3913,45 @@
       "sfx": "A wooden door creaking open slowly"
     },
     "lyricsPlaceholder": "[verse]\nWalking home beneath the stars\n[chorus]\nOh, take me far"
+  },
+  "ignis": {
+    "title": "Use your graphics card through Ignis",
+    "description": "Ignis runs voice, transcription and the language model on AMD, NVIDIA or Intel graphics cards.",
+    "closed_title": "Open Ignis to use your graphics card",
+    "closed_desc": "Ignis is a free local engine that runs voice, transcription and translation on AMD, NVIDIA or Intel cards. Install it, open it (it stays near the clock) and check again. Nothing changes until you turn it on.",
+    "download": "Download Ignis",
+    "check_again": "Check again",
+    "mac_unsupported": "Ignis has no macOS version yet, so this option is not available on this Mac.",
+    "switch_title": "Use the graphics card through Ignis",
+    "switch_desc": "When on, voice, transcription and dub translation go through Ignis; turning it off restores your previous choices.",
+    "gpu": "Found: {{gpu}}.",
+    "recommended": "Recommended for this computer",
+    "state_title": "Status in Ignis",
+    "voice_ready": "Voice ready on the graphics card ({{backend}})",
+    "voice_not_ready": "Voice not prepared yet",
+    "transcription_ready": "transcription ready",
+    "transcription_not_ready": "transcription not prepared yet",
+    "prepare": "Prepare in Ignis",
+    "preparing": "Preparing in Ignis…",
+    "prepare_title": "Prepare voice and transcription in Ignis?",
+    "prepare_desc": "Ignis will download about {{size}}. The voice uses OmniVoice, licensed {{license}} (non-commercial use only).",
+    "prepare_confirm": "Prepare",
+    "error": "Ignis could not complete this",
+    "use_in_asr": "Use Ignis"
+  },
+  "windowControls": {
+    "group": "Window buttons",
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close",
+    "style_title": "Window buttons",
+    "style_desc": "Automatic follows your system (and Matsu OS gets its own buttons).",
+    "style_auto": "Automatic",
+    "restart_hint": "The new style applies after you reopen Azúria Voice.",
+    "tray_title": "Keep running near the clock when closed",
+    "tray_desc": "Closing the window keeps Azúria Voice in the tray, so dictation and voice keep working. Use Exit in the tray menu to quit.",
+    "tray_notice_title": "Azúria Voice is still running",
+    "tray_notice_body": "It stays near the clock so dictation keeps working. Use Exit in the tray menu to quit."
   }
 }

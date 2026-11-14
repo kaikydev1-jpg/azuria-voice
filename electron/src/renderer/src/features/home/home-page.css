@@ -158,13 +158,66 @@
   background: var(--card);
   outline: none;
   transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+/* Azúria 2: a soft light follows the pointer (use-spotlight.ts) and the card
+   rises 2px. Nothing moves for reduced motion or touch-only input. */
+.home-destination::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 0%),
+    color-mix(in srgb, var(--home-accent) 16%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.home-destination:is(:hover, :focus-visible)::after {
+  opacity: 1;
+}
+.home-destination:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 30%, transparent);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .home-destination:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--home-accent) 34%, var(--border));
+    box-shadow: var(--shadow-pop);
+  }
+}
+
+/* The first screen enters once when the page opens; nothing reveals on scroll. */
+@media (prefers-reduced-motion: no-preference) {
+  .home-heading-copy,
+  .home-destinations {
+    animation: home-enter var(--dur-slow) var(--ease-out) both;
+  }
+  .home-destinations--primary {
+    animation-delay: 60ms;
+  }
+  .home-destinations--secondary {
+    animation-delay: 120ms;
+  }
+}
+@keyframes home-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 
 .home-destination[data-destination='/design'] {
-  --home-accent: #b8a1ee;
+  --home-accent: #8ab4ff;
 }
 .home-destination[data-destination='/dub'] {
   --home-accent: #72cebd;

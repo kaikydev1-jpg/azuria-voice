@@ -30,6 +30,16 @@ describe('blank window fallback', () => {
     expect(html).toContain(BLANK_CACHE_REPAIR_URL);
   });
 
+  it('gives a window without system buttons a way to move and close the recovery page', () => {
+    const decode = (url: string) => decodeURIComponent(url.slice(url.indexOf(',') + 1));
+    const drawn = decode(blankFallbackUrl('pt-BR', { drawControls: true }));
+    expect(drawn).toContain('-webkit-app-region:drag');
+    expect(drawn).toContain('onclick="window.close()"');
+    expect(drawn).toContain('aria-label="×"');
+    const native = decode(blankFallbackUrl('pt-BR'));
+    expect(native).not.toContain('window.close()');
+  });
+
   it('stays aligned with every renderer locale catalogue', () => {
     const directory = join(process.cwd(), 'src/renderer/src/i18n/locales');
     const locales = readdirSync(directory).filter((file) => file.endsWith('.json'));

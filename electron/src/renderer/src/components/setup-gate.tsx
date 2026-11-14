@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { apiJson } from '@/lib/api/client';
 import type { PreflightReport } from '@shared/api/setup-types';
 import { SystemPreflight } from '@/features/settings/system-preflight';
+import { IgnisCard } from '@/features/settings/ignis-settings';
 import { PermissionsSettings } from '@/features/settings/permissions-settings';
 import { SetupMediaEngine } from '@/features/settings/media-tools';
 import { ModelSettings } from '@/features/settings/model-settings';
@@ -20,14 +21,14 @@ import { brandIcon } from '@/lib/brand';
 import { cn } from '@/lib/utils';
 import { appearanceScales, useAppearance } from '@/hooks/use-appearance';
 import { FIRST_SOUND_EVENT } from '@/lib/first-sound';
-import { isMac } from './bridge';
+import { useLeftWindowControls } from './app-shell/window-controls';
 import {
   rememberSetupCompleted,
   rememberSetupStarted,
   setupWasCompleted,
   setupWasStarted,
 } from '@/lib/setup-progress';
-import { AudioLinesIcon, CpuIcon, SparklesIcon, ShieldCheckIcon } from 'lucide-react';
+import { AudioLinesIcon, CheckIcon, CpuIcon, SparklesIcon, ShieldCheckIcon } from 'lucide-react';
 
 interface SetupStatus {
   models_ready: boolean;
@@ -42,6 +43,7 @@ const steps = [
 
 export function SetupGate({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
+  const leftControls = useLeftWindowControls();
   const queryClient = useQueryClient();
   const appearance = useAppearance();
   const [needed, setNeeded] = useState<boolean | null>(null);
@@ -106,7 +108,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
       <header
         className={cn(
           'workspace-titlebar flex shrink-0 items-center gap-2 border-b border-border/50 px-5',
-          isMac() && 'pl-24',
+          leftControls && 'pl-24',
         )}
       >
         <img src={brandIcon} alt="" className="size-6" />
@@ -131,26 +133,40 @@ export function SetupGate({ children }: { children: ReactNode }) {
       </header>
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         <nav className="grid shrink-0 grid-cols-2 gap-1 border-b border-border/50 bg-sidebar p-3 md:flex md:w-48 md:flex-col md:border-r md:border-b-0">
-          {steps.map(({ label, icon: Icon }, index) => (
-            <Button
-              key={label}
-              className="h-auto min-h-11 w-full justify-start whitespace-normal text-left"
-              aria-current={index === step ? 'step' : undefined}
-              variant={index === step ? 'secondary' : 'ghost'}
-              disabled={index > step}
-              onClick={() => setStep(index)}
-            >
-              <Icon />
-              <span className="tabular-nums text-muted-foreground">{index + 1}.</span>
-              {t(label)}
-            </Button>
-          ))}
+          {steps.map(({ label }, index) => {
+            const state = index < step ? 'done' : index === step ? 'current' : 'upcoming';
+            return (
+              <Button
+                key={label}
+                data-step-state={state}
+                className="group/step h-auto min-h-11 w-full justify-start gap-2.5 rounded-xl whitespace-normal text-left"
+                aria-current={index === step ? 'step' : undefined}
+                variant={index === step ? 'secondary' : 'ghost'}
+                disabled={index > step}
+                onClick={() => setStep(index)}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'grid size-6 shrink-0 place-items-center rounded-full border text-[11px] font-semibold tabular-nums transition-ui',
+                    state === 'current' && 'border-primary bg-primary text-primary-foreground',
+                    state === 'done' && 'border-primary/40 bg-primary/10 text-(--accent-text)',
+                    state === 'upcoming' && 'border-border text-muted-foreground',
+                  )}
+                >
+                  {state === 'done' ? <CheckIcon className="size-3.5" /> : index + 1}
+                </span>
+                <span className="sr-only">{index + 1}.</span>
+                {t(label)}
+              </Button>
+            );
+          })}
         </nav>
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <main key={step} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+          <main key={step} className="setup-step-enter min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
             <div className="mx-auto max-w-3xl space-y-6">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold">{t(steps[step].label)}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">{t(steps[step].label)}</h2>
                 <Button
                   variant={advanced ? 'secondary' : 'outline'}
                   aria-pressed={advanced}
@@ -162,6 +178,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
               {step === 0 && (
                 <>
                   <SystemPreflight />
+                  <IgnisCard variant="setup" />
                   <SetupMediaEngine />
                   {preflight.data?.checks?.some(
                     (check) => check.id === 'network' && check.status !== 'pass',

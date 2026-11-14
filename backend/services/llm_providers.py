@@ -168,6 +168,15 @@ _PROVIDERS: tuple[Provider, ...] = (
              base_url_env="LMSTUDIO_BASE_URL", model_env="LMSTUDIO_MODEL",
              signup_url="https://lmstudio.ai",
              notes="Fully offline. Start the LM Studio local server and load a model."),
+    # Ignis: the owner's local engine (kaikydev1-jpg/Ignis) — runs the model on
+    # the person's AMD, NVIDIA or Intel GPU (Vulkan/CUDA/ROCm). `default` asks
+    # Ignis for whichever model it has loaded; the port comes from Ignis's own
+    # config.json (resolve_base_url → services.ignis_client).
+    Provider("ignis", "Ignis (local)", "http://127.0.0.1:11470/v1",
+             "default", local=True, key_envs=("IGNIS_API_KEY",),
+             base_url_env="IGNIS_BASE_URL", model_env="IGNIS_MODEL",
+             signup_url="https://github.com/kaikydev1-jpg/Ignis/releases/latest",
+             notes="Fully offline. Uses your AMD, NVIDIA or Intel GPU through Ignis."),
     Provider("anthropic", "Anthropic (Claude)", "", "claude-sonnet-4-6",
              key_envs=("ANTHROPIC_API_KEY",), model_env="ANTHROPIC_MODEL",
              transport="sdk", sdk_provider="anthropic", signup_url="https://console.anthropic.com"),
@@ -252,6 +261,19 @@ def resolve_account_id(p: Provider) -> str:
     )
 
 
+def _dynamic_default_base_url(p: Provider) -> str:
+    """Defaults that live on this machine rather than in the registry.
+
+    Ignis lets the person change its port; the saved port is read from its own
+    config.json so the provider keeps working without any setting here.
+    """
+    if p.id == "ignis":
+        from services.ignis_client import discover_base_url
+
+        return discover_base_url() + "/v1"
+    return ""
+
+
 def resolve_base_url(p: Provider, *, substitute: bool = True) -> str:
     """Resolve a provider's base URL (env → stored override → default).
 
@@ -265,6 +287,7 @@ def resolve_base_url(p: Provider, *, substitute: bool = True) -> str:
     val = (
         (p.base_url_env and os.environ.get(p.base_url_env))
         or settings_store.get_text(_BASE_URL_KEY + p.id)
+        or _dynamic_default_base_url(p)
         or p.default_base_url
     )
     if substitute and p.needs_account and val and "{account_id}" in val:

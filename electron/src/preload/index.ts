@@ -9,6 +9,7 @@ import type {
   VoiceStudioBridge,
   RepairAgentEvent,
   AccountPublicState,
+  WindowChromeState,
 } from './index.d';
 
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
@@ -67,6 +68,9 @@ const bridge: VoiceStudioBridge = {
     platform: process.platform,
     isDev: process.env.NODE_ENV === 'development' || !!process.env.ELECTRON_RENDERER_URL,
     onNavigate: (callback) => subscribe<string>('app:navigate', callback),
+    closeToTray: () => ipcRenderer.invoke('app:closeToTray') as Promise<boolean>,
+    setCloseToTray: (value) => ipcRenderer.invoke('app:setCloseToTray', value) as Promise<boolean>,
+    setTrayNoticeText: (text) => ipcRenderer.invoke('app:trayNoticeText', text) as Promise<void>,
     onPersistenceFlush: (callback) => {
       const listener = (_event: IpcRendererEvent, token: string) => {
         void (async () => {
@@ -155,6 +159,13 @@ const bridge: VoiceStudioBridge = {
     close: () => ipcRenderer.send('window:close'),
     onMaximizedChange: (cb) => subscribe<boolean>('window:maximized', cb),
     isMaximized: () => ipcRenderer.invoke('window:isMaximized') as Promise<boolean>,
+    chrome: () => ipcRenderer.invoke('window:chrome') as Promise<WindowChromeState>,
+    setChromePreference: (preference) =>
+      ipcRenderer.invoke('window:setChromePreference', preference) as Promise<{
+        restartRequired: boolean;
+      }>,
+    onChromeChange: (cb) => subscribe<WindowChromeState>('window:chromeChanged', cb),
+    onFocusChange: (cb) => subscribe<boolean>('window:focused', cb),
   },
 };
 

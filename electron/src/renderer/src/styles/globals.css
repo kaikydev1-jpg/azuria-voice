@@ -72,6 +72,17 @@
 }
 
 :root {
+  /* Azúria 2 motion scale: one set of durations and curves for the whole app. */
+  --dur-micro: 80ms;
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-medium: 350ms;
+  --dur-slow: 500ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 6%), 0 8px 24px -16px rgb(15 23 42 / 18%);
+  --shadow-pop: 0 2px 6px rgb(15 23 42 / 8%), 0 18px 40px -20px rgb(15 23 42 / 28%);
+  --canvas-glow: radial-gradient(1100px 520px at 12% -12%, rgb(37 99 235 / 8%), transparent 62%);
   --workspace-footer-height: 40px;
   --control-radius: 0.5rem;
   --workspace-gap: 1rem;
@@ -88,6 +99,29 @@
 .dark {
   --glass-blur: 16px;
   --glass-saturation: 1.08;
+  --shadow-card: inset 0 1px 0 rgb(255 255 255 / 4%), 0 10px 30px -18px rgb(0 0 0 / 60%);
+  --shadow-pop: inset 0 1px 0 rgb(255 255 255 / 6%), 0 22px 48px -22px rgb(0 0 0 / 75%);
+  --canvas-glow: radial-gradient(1100px 520px at 12% -12%, rgb(37 99 235 / 12%), transparent 62%);
+}
+
+/* One transition for interactive controls, on the shared scale. */
+@utility transition-ui {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform, filter;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-out);
+}
+
+/* Linked cards rise 2px and gain depth on hover; never on touch-only devices. */
+@utility lift-on-hover {
+  transition-property: transform, box-shadow, border-color, background-color;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-out);
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-pop);
+    }
+  }
 }
 
 @utility surface-glass {
@@ -179,8 +213,9 @@
   -webkit-app-region: no-drag;
 }
 .native-controls-right {
-  /* + the top-right corner (account and notifications, account-corner.tsx). */
-  padding-right: calc(148px + var(--corner-space, 0px));
+  /* Window buttons on the right (Windows overlay ~138px, or the drawn Linux
+     buttons' width from window-controls.tsx) + the top-right corner. */
+  padding-right: calc(var(--window-controls-right, 138px) + 10px + var(--corner-space, 0px));
 }
 .macos-notification-safe-area main .workspace-titlebar,
 .account-corner-safe {
@@ -664,5 +699,29 @@ html[data-theme-id='heritage'] {
 @media (prefers-reduced-motion: reduce) {
   [data-slot='switch'].app-switch {
     transition: none;
+  }
+}
+
+/* Azúria 2: a soft azure light at the top of the canvas when Glass is off
+   (Glass paints its own layered light above). */
+html:not([data-glass='true']) .app-surface {
+  background-image: var(--canvas-glow);
+}
+@media (prefers-reduced-transparency: reduce) {
+  html:not([data-glass='true']) .app-surface {
+    background-image: none;
+  }
+}
+
+/* Each first-run step fades in once when it opens. */
+@media (prefers-reduced-motion: no-preference) {
+  .setup-step-enter {
+    animation: setup-step-enter var(--dur-base) var(--ease-out) both;
+  }
+}
+@keyframes setup-step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
   }
 }

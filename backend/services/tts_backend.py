@@ -3377,6 +3377,9 @@ _LAZY_REGISTRY: dict[str, tuple[str, str]] = {
     # same import-cycle reason as the entries above (engines.audiocpp
     # imports services.tts_backend for TTSBackend).
     "audiocpp": ("engines.audiocpp", "AudioCPPBackend"),
+    # Ignis: the owner's local engine serves OmniVoice on the person's GPU
+    # (Vulkan/CUDA/ROCm) over loopback HTTP; available only while Ignis runs.
+    "ignis": ("engines.ignis", "IgnisTTSBackend"),
 }
 
 
@@ -3482,6 +3485,7 @@ _INSTALL_HINTS: dict[str, str] = {
     "dots-tts":      "git clone rednote-hilab/dots.tts + set OMNIVOICE_DOTS_TTS_DIR  (own venv, transformers==4.57; 2B, ~9 GB weights; CUDA/CPU, Linux/macOS only — no Windows; Apache-2.0)",
     "confucius4-tts":"git clone netease-youdao/Confucius4-TTS + set OMNIVOICE_CONFUCIUS4_TTS_DIR  (own Python 3.10 venv; 14-lang cross-lingual zero-shot clone; ~5 GB weights auto-download; CUDA/ROCm/XPU/NPU/CPU, no MPS; Apache-2.0)",
     "audiocpp":     "download the matching audio.cpp v0.7.4 prebuilt + set OMNIVOICE_AUDIOCPP_BIN, then explicitly install Breeze-TTS-2 in Model Catalogue → Models  (native CPU/Vulkan/CUDA/Metal GGUF server, no Python; en+zh clone+design; ~4.73 GiB; weights research/non-commercial only)",
+    "ignis":        "install and open Ignis (github.com/kaikydev1-jpg/Ignis), then prepare its voice in Settings → Performance  (OmniVoice on AMD/NVIDIA/Intel GPUs via Vulkan/CUDA/ROCm; weights CC BY-NC 4.0, non-commercial)",
 }
 
 
@@ -3529,6 +3533,7 @@ _ENGINE_DOCS: dict[str, str] = {
     "supertonic3":          "docs/engines/supertonic3.md",
     "pockettts":            "docs/engines/pockettts.md",
     "audiocpp":             "docs/engines/audio-cpp.md",
+    "ignis":                "docs/engines/ignis.md",
 }
 
 
