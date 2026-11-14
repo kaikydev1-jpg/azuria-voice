@@ -46,6 +46,7 @@ approval), [Windows](../install/windows.md), [Linux](../install/linux.md),
 | PocketTTS (Kyutai) | [pockettts](pockettts.md) | CPU (not Intel Mac) | ✅ | `uv sync --extra pockettts` + license |
 | Confucius4-TTS | [confucius4-tts](confucius4-tts.md) | CUDA · CPU | ✅ | clone + env var |
 | audio.cpp (Breeze-TTS-2) | [audio-cpp](audio-cpp.md) | CPU + Vulkan/Metal/CUDA/HIP/ROCm where compiled | ✅ + voice design | prebuilt binary + env var (weights research/non-commercial) |
+| Ignis (OmniVoice on your GPU) | [ignis](ignis.md) | AMD/Intel via Vulkan, NVIDIA via CUDA, ROCm on Linux, or CPU — through the Ignis app | ✅ | Settings → Performance → **Use the graphics card through Ignis** (Ignis app running; weights CC BY-NC 4.0) |
 
 ### Reference clip length
 

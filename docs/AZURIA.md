@@ -14,6 +14,12 @@ Ainda sem número de versão: o dono define quando publicar.
 - **Visual Azúria 2:** mais calmo e limpo, com fundo azul-noite (ou gelo no tema
   claro), botão principal em pílula e cartões que sobem ao passar o mouse. As
   funções continuam nos mesmos lugares. Regras em [Marca](branding.md).
+- **Placa de vídeo pelo Ignis:** opção a mais na instalação e em
+  **Configurações → Desempenho** para usar placas AMD, Intel ou NVIDIA por meio
+  do [Ignis](https://github.com/kaikydev1-jpg/Ignis). Ligada, a voz (OmniVoice,
+  licença não comercial), a transcrição (Whisper) e a tradução da dublagem vão
+  pela placa; desligar devolve as escolhas anteriores. Sem o Ignis, nada muda.
+  Veja [Ignis](engines/ignis.md).
 
 | Escuro | Claro |
 |---|---|

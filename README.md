@@ -17,6 +17,8 @@ Na primeira execução, use o assistente existente para preparar o ambiente Pyth
 
 Sem NVIDIA, o ambiente padrão de PyTorch no Windows usa CPU. Motores com runtime próprio mantêm suas opções existentes. A AMD Radeon RX 580 não oferece aceleração CUDA.
 
+Para usar placas **AMD, Intel ou NVIDIA** de verdade, instale o [Ignis](https://github.com/kaikydev1-jpg/Ignis/releases/latest), o motor local do mesmo autor, e ligue **Usar a placa pelo Ignis** no assistente da primeira execução ou em **Configurações → Desempenho**. A voz, a transcrição e a tradução da dublagem passam a rodar na placa (Vulkan, CUDA ou ROCm); desligar volta às escolhas anteriores. Detalhes em [Ignis](docs/engines/ignis.md).
+
 ## Executar e compilar o código
 
 Requisitos: Git, Node.js 22+, Bun 1.4.2; para o instalador, Rust/Cargo e Visual Studio Build Tools com C++/Windows SDK.
