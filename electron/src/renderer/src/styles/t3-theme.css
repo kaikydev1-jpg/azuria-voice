@@ -2,8 +2,9 @@
  * See electron/T3CODE-LICENSE.txt. */
 :root {
   color-scheme: light;
-  --radius: 0.625rem;
-  --background: #f1f5f9;
+  --radius: 0.75rem;
+  /* Azúria 2: ice canvas, white cards, one azure action color. */
+  --background: #f5f7fa;
   --app-chrome-background: var(--background);
   --toolbar-background: var(--app-chrome-background);
   --toolbar-foreground: var(--foreground);
@@ -22,7 +23,7 @@
   --secondary: var(--color-zinc-50);
   --secondary-foreground: var(--color-zinc-800);
   --muted: var(--color-zinc-50);
-  --muted-foreground: #64748b;
+  --muted-foreground: #5b6779;
   --placeholder: var(--muted-foreground);
   --secondary-label: var(--muted-foreground);
   --icon-muted: var(--muted-foreground);
@@ -38,9 +39,11 @@
   --tool-error-icon: var(--error);
   --error-surface: color-mix(in srgb, var(--error) 8%, transparent);
   --destructive: var(--error);
-  --border: #cbd5e1;
+  --border: #e2e8f0;
   --input: #cbd5e1;
   --ring: var(--primary);
+  /* Links, focus text and selected labels: brand blue tuned for contrast. */
+  --accent-text: #1d4ed8;
   --destructive-foreground: var(--error-foreground);
   --info: var(--color-blue-500);
   --info-foreground: var(--color-blue-700);
@@ -54,7 +57,7 @@
   --update-surface: color-mix(in srgb, var(--update) 12%, transparent);
   /* Keep every sidebar primitive on the same light surface hierarchy, including
      portaled mobile sheets and settings navigation outside the app sidebar. */
-  --sidebar: #e2e8f0;
+  --sidebar: #eef2f7;
   --sidebar-foreground: var(--foreground);
   --sidebar-muted-foreground: var(--muted-foreground);
   --sidebar-control-surface: var(--color-zinc-100);
@@ -74,38 +77,41 @@
     color-scheme: dark;
     /* Keep controls and floating surfaces close to the neutral-black canvas.
        Borders and hover states provide separation without milky gray fills. */
-    --background: #0b1220;
-    --surface-raised: color-mix(in srgb, var(--background) 97%, var(--color-white));
-    --foreground: #e2e8f0;
-    --card: color-mix(in srgb, var(--background) 97%, var(--color-white));
-    --card-foreground: #e2e8f0;
-    --popover: color-mix(in srgb, var(--background) 97%, var(--color-white));
-    --popover-foreground: #e2e8f0;
+    --background: #070b14;
+    --app-chrome-background: #0a101c;
+    --surface-raised: #0c1322;
+    --foreground: #e6ebf2;
+    --card: #0e1524;
+    --card-foreground: #e6ebf2;
+    --popover: #111a2c;
+    --popover-foreground: #e6ebf2;
     --primary: #2563eb;
     --secondary: --alpha(var(--color-white) / 3%);
-    --secondary-foreground: #e2e8f0;
+    --secondary-foreground: #e6ebf2;
     --muted: --alpha(var(--color-white) / 3%);
-    --muted-foreground: #94a3b8;
-    --accent: --alpha(var(--color-white) / 4%);
-    --accent-foreground: #e2e8f0;
+    --muted-foreground: #8d9ab0;
+    --accent: --alpha(var(--color-white) / 5%);
+    --accent-foreground: #e6ebf2;
     --error: color-mix(in srgb, var(--color-red-500) 90%, var(--color-white));
     --error-foreground: var(--color-red-400);
     --tool-error-icon: #fca5a5;
     --error-surface: color-mix(in srgb, var(--error) 16%, transparent);
-    --border: rgb(203 213 225 / 14%);
-    --input: rgb(203 213 225 / 20%);
+    --border: rgb(203 213 225 / 10%);
+    --input: rgb(203 213 225 / 14%);
+    --ring: #60a5fa;
+    --accent-text: #60a5fa;
     --info-foreground: var(--color-blue-400);
     --success-foreground: var(--color-emerald-400);
     --warning-foreground: var(--color-amber-400);
     --warning-surface: color-mix(in srgb, var(--warning) 16%, transparent);
     --update-foreground: var(--color-blue-400);
     --update-surface: color-mix(in srgb, var(--update) 18%, transparent);
-    --sidebar: var(--card);
+    --sidebar: #0a101c;
     --sidebar-control-surface: var(--muted);
     --sidebar-row-hover: var(--accent);
     --sidebar-row-active: var(--accent);
     --sidebar-row-selected: var(--muted);
-    --sidebar-stage-fade: var(--card);
+    --sidebar-stage-fade: #0a101c;
     --terminal-cursor: rgb(180 203 255);
     --terminal-selection-background: rgb(180 203 255 / 25%);
   }
@@ -161,6 +167,7 @@ html[data-theme-id]:not([data-theme-id='']) {
   --border: var(--app-theme-border);
   --input: var(--app-theme-input);
   --ring: var(--app-theme-focus);
+  --accent-text: var(--app-theme-focus);
   --sidebar: var(--app-theme-sidebar);
   --sidebar-foreground: var(--app-theme-sidebar-foreground);
   --sidebar-muted-foreground: var(--app-theme-sidebar-muted-foreground);
