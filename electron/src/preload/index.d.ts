@@ -385,6 +385,11 @@ export interface VoiceStudioBridge {
     isDev: boolean;
     onNavigate(callback: (path: string) => void): () => void;
     onPersistenceFlush(callback: () => void | Promise<void>): () => void;
+    /** Closing the window keeps Azúria in the tray (default on, every system). */
+    closeToTray(): Promise<boolean>;
+    setCloseToTray(value: boolean): Promise<boolean>;
+    /** Localized text for the one-time "still running near the clock" notice. */
+    setTrayNoticeText(text: { title: string; body: string }): Promise<void>;
   };
   backend: {
     getStatus(): Promise<BackendStatus>;

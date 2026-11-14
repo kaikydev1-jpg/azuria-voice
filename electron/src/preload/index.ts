@@ -68,6 +68,9 @@ const bridge: VoiceStudioBridge = {
     platform: process.platform,
     isDev: process.env.NODE_ENV === 'development' || !!process.env.ELECTRON_RENDERER_URL,
     onNavigate: (callback) => subscribe<string>('app:navigate', callback),
+    closeToTray: () => ipcRenderer.invoke('app:closeToTray') as Promise<boolean>,
+    setCloseToTray: (value) => ipcRenderer.invoke('app:setCloseToTray', value) as Promise<boolean>,
+    setTrayNoticeText: (text) => ipcRenderer.invoke('app:trayNoticeText', text) as Promise<void>,
     onPersistenceFlush: (callback) => {
       const listener = (_event: IpcRendererEvent, token: string) => {
         void (async () => {

@@ -1,3 +1,4 @@
+import { CloseToTraySettings } from './close-to-tray-settings';
 import { WindowStyleSettings } from './window-style-settings';
 import { SupportSettings } from './support-settings';
 import { UpdateSettings } from './update-settings';
@@ -695,6 +696,7 @@ export function SettingsPage() {
                       </SelectContent>
                     </Select>
                   </SettingsRow>
+                  <CloseToTraySettings />
                   <SettingsRow
                     id="review-mode-label"
                     title={t('settings.review_mode')}

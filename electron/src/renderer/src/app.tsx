@@ -89,6 +89,12 @@ export function App() {
         exit: t('crash.field_exit'),
       })
       .catch(() => {});
+    void window.voicestudio?.app
+      ?.setTrayNoticeText?.({
+        title: t('windowControls.tray_notice_title'),
+        body: t('windowControls.tray_notice_body'),
+      })
+      .catch(() => {});
   }, [t]);
   useEffect(() => {
     const app = getBridge()?.app;

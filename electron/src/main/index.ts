@@ -1,4 +1,5 @@
 import { createTrayIcon } from './tray-icon';
+import { closeAction, reopenWindow, shouldShowTrayNotice } from './close-policy';
 import { readDesktopInfo } from './window-chrome';
 import {
   ChromeController,
@@ -12,7 +13,7 @@ import { isTrustedRenderer } from './trusted-renderer';
 import { dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { app, BrowserWindow, ipcMain, Menu, nativeImage, session, shell, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, Notification, session, shell, Tray } from 'electron';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import { BackendSupervisor, backendRoot } from './backend';
 import { assertTrustedMainFrame, registerIpc, wireWindowMaximizeEvents } from './ipc';
@@ -137,6 +138,42 @@ function brandIconPath(file: string): string {
     : join(backendRoot(), 'electron', 'build', 'icons', file);
 }
 
+let trayNoticeText: { title: string; body: string } | null = null;
+
+/** The one-time "Azúria keeps running near the clock" notice, in the app's language. */
+function showTrayNotice(): void {
+  if (!windowPrefs) return;
+  observeMainProcessTask(windowPrefs.update({ trayNoticeShown: true }), mainErrors, 'Tray notice flag');
+  if (!trayNoticeText || !Notification.isSupported()) return;
+  new Notification({
+    title: trayNoticeText.title,
+    body: trayNoticeText.body,
+    icon: brandIconPath('icon.png'),
+    silent: true,
+  }).show();
+}
+
+/** Settings → General: "keep running near the clock when closed" (+ notice text). */
+function registerCloseBehaviorIpc(): void {
+  const trusted = (event: Electron.IpcMainInvokeEvent) => assertTrustedMainFrame(event, mainWindow);
+  ipcMain.handle('app:closeToTray', (event) => {
+    trusted(event);
+    return windowPrefs?.get().closeToTray ?? true;
+  });
+  ipcMain.handle('app:setCloseToTray', async (event, value: unknown) => {
+    trusted(event);
+    if (typeof value !== 'boolean') throw new Error('Invalid close behavior');
+    return (await windowPrefs?.update({ closeToTray: value }))?.closeToTray ?? value;
+  });
+  ipcMain.handle('app:trayNoticeText', (event, text: unknown) => {
+    trusted(event);
+    const { title, body } = (text ?? {}) as Record<string, unknown>;
+    if (typeof title !== 'string' || typeof body !== 'string' || !title || title.length > 200 || body.length > 400)
+      throw new Error('Invalid tray notice');
+    trayNoticeText = { title, body };
+  });
+}
+
 function createWindow(): BrowserWindow {
   const appUrl =
     is.dev && process.env.ELECTRON_RENDERER_URL
@@ -169,24 +206,44 @@ function createWindow(): BrowserWindow {
   });
 
   win.on('ready-to-show', () => activateLiveWindow(win));
+  // Closing keeps Azúria running in the tray on every system (close-policy.ts);
+  // the window is destroyed so its memory is freed, and comes back from the
+  // tray icon or by opening the app again.
+  let keptInTray = false;
   win.on('close', (event) => {
     if (quitting) return;
     event.preventDefault();
-    if (process.platform === 'darwin') {
-      observeMainProcessTask(
-        flushRendererPersistence().finally(() => {
-          if (!win.isDestroyed()) win.destroy();
-        }),
-        mainErrors,
-        'Window persistence flush',
-      );
+    const prefs = windowPrefs?.get();
+    const action = closeAction({
+      quitting,
+      platform: process.platform,
+      closeToTray: prefs?.closeToTray ?? true,
+      trayAvailable: tray !== null,
+    });
+    if (action === 'quit') {
+      observeMainProcessTask(beginOrderlyQuit(), mainErrors, 'Orderly quit');
       return;
     }
-    observeMainProcessTask(beginOrderlyQuit(), mainErrors, 'Orderly quit');
+    keptInTray = true;
+    if (
+      shouldShowTrayNotice({
+        action,
+        platform: process.platform,
+        noticeShown: prefs?.trayNoticeShown ?? true,
+      })
+    )
+      showTrayNotice();
+    observeMainProcessTask(
+      flushRendererPersistence().finally(() => {
+        if (!win.isDestroyed()) win.destroy();
+      }),
+      mainErrors,
+      'Window persistence flush',
+    );
   });
   win.on('closed', () => {
     if (mainWindow === win) mainWindow = null;
-    if (process.platform !== 'darwin' && !quitting) app.quit();
+    if (process.platform !== 'darwin' && !quitting && !keptInTray) app.quit();
   });
   wireWindowMaximizeEvents(win);
   wireWindowFocusEvents(win);
@@ -247,8 +304,11 @@ async function openOutside(url: string): Promise<void> {
 if (process.env.VOICESTUDIO_ALLOW_MULTIPLE_INSTANCES !== '1' && !app.requestSingleInstanceLock()) {
   app.quit();
 } else {
+  // Opening the app again brings the window back, even after it was closed
+  // to the tray (the window no longer exists then).
   app.on('second-instance', () => {
-    activateLiveWindow(mainWindow);
+    if (!app.isReady() || quitting) return;
+    mainWindow = reopenWindow(mainWindow, isLiveWindow, createWindow, activateLiveWindow);
   });
 
   void app
@@ -354,9 +414,9 @@ if (process.env.VOICESTUDIO_ALLOW_MULTIPLE_INSTANCES !== '1' && !app.requestSing
       tray.setToolTip(PRODUCT_NAME);
       closeCapture = installNativeCapture(PRELOAD_PATH, tray, () => mainWindow);
       tray.on('click', () => {
-        if (!isLiveWindow(mainWindow)) mainWindow = createWindow();
-        activateLiveWindow(mainWindow);
+        mainWindow = reopenWindow(mainWindow, isLiveWindow, createWindow, activateLiveWindow);
       });
+      registerCloseBehaviorIpc();
       observeMainProcessTask(backend.start(), mainErrors, 'Backend startup');
 
       app.on('activate', () => {
@@ -372,7 +432,8 @@ if (process.env.VOICESTUDIO_ALLOW_MULTIPLE_INSTANCES !== '1' && !app.requestSing
     });
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    // A window closed to the tray keeps the app (and dictation) running.
+    if (process.platform !== 'darwin' && !(windowPrefs?.get().closeToTray && tray)) app.quit();
   });
 
   // The first pass gives renderer persistence a bounded chance to settle, then
