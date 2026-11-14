@@ -42,6 +42,7 @@ GET /api/settings/gpu-report
 GET /api/settings/hf-mirror
 GET /api/settings/hf-token/state
 GET /api/settings/history-retention
+GET /api/settings/ignis/status
 GET /api/settings/license/{engine_id}
 GET /api/settings/llm-endpoint
 GET /api/settings/llm-providers
@@ -58,6 +59,11 @@ GET /archetypes/previews/status
 GET /archetypes/{archetype_id}
 GET /archetypes/{archetype_id}/preview
 GET /archetypes/{archetype_id}/preview/state
+GET /audio-gen/catalog
+GET /audio-gen/jobs
+GET /audio-gen/jobs/{job_id}
+GET /audio-gen/takes/{take_id}/export
+GET /audio-gen/takes/{take_id}/provenance
 GET /audio/{audio_id}.ogg
 GET /audio/{audio_id}.opus
 GET /audio/{audio_id}/quality
@@ -196,6 +202,9 @@ POST /api/integrations/twilio/test
 POST /api/settings/asr-openai-compat/test
 POST /api/settings/hf-mirror/test
 POST /api/settings/hf-token
+POST /api/settings/ignis/disable
+POST /api/settings/ignis/enable
+POST /api/settings/ignis/prepare
 POST /api/settings/license
 POST /api/settings/llm-providers/active
 POST /api/settings/llm-providers/{provider_id}/connect
@@ -203,6 +212,9 @@ POST /api/settings/llm-providers/{provider_id}/test
 POST /api/settings/storage/temp/clear
 POST /archetypes/previews/check
 POST /archetypes/{archetype_id}/use
+POST /audio-gen/jobs/{job_id}/cancel
+POST /audio-gen/music
+POST /audio-gen/sfx
 POST /audiobook
 POST /audiobook/cover
 POST /audiobook/import

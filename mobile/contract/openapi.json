@@ -5513,6 +5513,28 @@
     "title": "_PerformanceProfileBody",
     "type": "object"
    },
+   "_PrepareBody": {
+    "properties": {
+     "families": {
+      "items": {
+       "enum": [
+        "voz",
+        "transcricao"
+       ],
+       "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 1,
+      "title": "Families",
+      "type": "array"
+     }
+    },
+    "required": [
+     "families"
+    ],
+    "title": "_PrepareBody",
+    "type": "object"
+   },
    "_PreviewBody": {
     "properties": {
      "engine": {
@@ -7372,6 +7394,102 @@
      }
     },
     "summary": "Set History Retention",
+    "tags": [
+     "settings"
+    ]
+   }
+  },
+  "/api/settings/ignis/disable": {
+   "post": {
+    "operationId": "ignis_disable_api_settings_ignis_disable_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Ignis Disable",
+    "tags": [
+     "settings"
+    ]
+   }
+  },
+  "/api/settings/ignis/enable": {
+   "post": {
+    "operationId": "ignis_enable_api_settings_ignis_enable_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Ignis Enable",
+    "tags": [
+     "settings"
+    ]
+   }
+  },
+  "/api/settings/ignis/prepare": {
+   "post": {
+    "operationId": "ignis_prepare_api_settings_ignis_prepare_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/_PrepareBody"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ignis Prepare",
+    "tags": [
+     "settings"
+    ]
+   }
+  },
+  "/api/settings/ignis/status": {
+   "get": {
+    "operationId": "ignis_status_api_settings_ignis_status_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Ignis Status",
     "tags": [
      "settings"
     ]
