@@ -170,3 +170,20 @@ it('the privacy step also waits for the account choice when accounts are offered
     expect(screen.getByRole('button', { name: 'setup.continue_ok' })).toBeEnabled(),
   );
 });
+it('marks finished, current and upcoming steps on the step rail', async () => {
+  mock.preflight = { ok: true, checks: [] } as typeof mock.preflight;
+  mount();
+  await screen.findByText('Preflight');
+  const first = () => screen.getByRole('button', { name: '1.setup.system_check' });
+  await waitFor(() => expect(first()).toHaveAttribute('data-step-state', 'current'));
+  expect(screen.getByRole('button', { name: '2.models.pack_title' })).toHaveAttribute(
+    'data-step-state',
+    'upcoming',
+  );
+  await waitFor(() =>
+    expect(screen.getByRole('button', { name: 'setup.continue_ok' })).toBeEnabled(),
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'setup.continue_ok' }));
+  await screen.findByText('Model packs');
+  expect(first()).toHaveAttribute('data-step-state', 'done');
+});

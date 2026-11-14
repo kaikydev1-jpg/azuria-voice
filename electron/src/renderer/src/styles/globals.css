@@ -711,3 +711,16 @@ html:not([data-glass='true']) .app-surface {
     background-image: none;
   }
 }
+
+/* Each first-run step fades in once when it opens. */
+@media (prefers-reduced-motion: no-preference) {
+  .setup-step-enter {
+    animation: setup-step-enter var(--dur-base) var(--ease-out) both;
+  }
+}
+@keyframes setup-step-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
