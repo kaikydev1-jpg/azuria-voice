@@ -30,7 +30,7 @@ jobs:
           - { os: ubuntu-24.04, model: musicgen-small }
           - { os: ubuntu-24.04, model: audioldm2 }
           - { os: ubuntu-24.04, model: stable-audio-open-1.0 }
-          - { os: macos-14, model: musicgen-small }
+          - { os: macos-15, model: musicgen-small }
           - { os: windows-2022, model: musicgen-small }
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262

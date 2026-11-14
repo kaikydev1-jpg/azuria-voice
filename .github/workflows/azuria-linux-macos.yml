@@ -57,9 +57,10 @@ jobs:
             local_runtime: true
             optional: false
           - label: macOS arm64
-            # macos-15 arm64 jobs were repeatedly dropped for GitHub capacity
-            # ("not acquired by Runner"); macos-14 is the same native arm64 class.
-            runner: macos-14
+            # GitHub retired the macos-14 image in Nov 2026 ("The configuration
+            # 'macos-14-arm64-us-default' is not supported"); macos-15 is the
+            # same native arm64 class (it was briefly avoided for capacity).
+            runner: macos-15
             platform: darwin
             arch: arm64
             target: aarch64-apple-darwin
