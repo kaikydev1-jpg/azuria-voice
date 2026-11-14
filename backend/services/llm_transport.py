@@ -75,6 +75,25 @@ def _configure_sdk_http(litellm, model, kwargs):
         kwargs["client"] = HTTPHandler(client=client)
 
 
+#: Ignis serves "thinking" models (Qwen3…); Azúria's calls (dub translation,
+#: refinement, speech rate) want the answer, fast — thinking stays off.
+IGNIS_EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": False}}
+
+
+def _with_extra_body(client, extra: dict):
+    """The same client, with ``extra`` merged into every chat request body."""
+    create = client.chat.completions.create
+
+    def create_with_extra(**kwargs):
+        kwargs["extra_body"] = {**(kwargs.get("extra_body") or {}), **extra}
+        return create(**kwargs)
+
+    return SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create_with_extra)),
+        models=getattr(client, "models", None),
+    )
+
+
 def create_client(provider):
     from services import llm_providers as registry
     error = registry.credential_transport_error(provider)
@@ -82,8 +101,11 @@ def create_client(provider):
         raise ValueError(error)
     if provider.transport == "openai":
         from openai import OpenAI
-        return OpenAI(api_key=registry.resolve_api_key(provider),
-                      base_url=registry.resolve_base_url(provider), max_retries=0)
+        client = OpenAI(api_key=registry.resolve_api_key(provider),
+                        base_url=registry.resolve_base_url(provider), max_retries=0)
+        if provider.id == "ignis":
+            return _with_extra_body(client, IGNIS_EXTRA_BODY)
+        return client
     if provider.transport == "cli":
         from services.llm_cli import completion
         create = lambda **kwargs: completion(provider, **kwargs)

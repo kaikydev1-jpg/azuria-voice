@@ -596,3 +596,57 @@ def test_credentialed_loopback_or_https_remains_supported(lp, url):
     lp.save_key("custom", "fixture-secret")
     lp.save_overrides("custom", base_url=url, model="chat")
     assert lp.configuration_error(lp.get_provider("custom")) is None
+
+
+# ── Ignis (the owner's local GPU engine, docs/IGNIS_PARA_AZURIA.md) ──────────
+
+@pytest.fixture
+def ignis_home(monkeypatch, tmp_path):
+    """Point every Ignis config location at an empty temp home."""
+    for name in ("APPDATA", "XDG_CONFIG_HOME", "IGNIS_BASE_URL"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
+    return tmp_path
+
+
+def test_ignis_is_a_local_keyless_provider(lp, ignis_home):
+    p = lp.get_provider("ignis")
+    assert p.display_name == "Ignis (local)"
+    assert p.local is True
+    assert p.default_model == "default"
+    assert lp.resolve_base_url(p) == "http://127.0.0.1:11470/v1"
+    assert lp.describe(p)["configured"] is True
+
+
+def test_ignis_base_url_follows_its_config_port(lp, ignis_home):
+    cfg = ignis_home / ".config" / "ignis" / "config.json"
+    cfg.parent.mkdir(parents=True)
+    cfg.write_text(json.dumps({"porta": 12001}))
+    assert lp.resolve_base_url(lp.get_provider("ignis")) == "http://127.0.0.1:12001/v1"
+
+
+def test_ignis_saved_base_url_still_wins(lp, ignis_home):
+    lp._text["llm.base_url.ignis"] = "http://127.0.0.1:15000/v1"
+    assert lp.resolve_base_url(lp.get_provider("ignis")) == "http://127.0.0.1:15000/v1"
+
+
+def test_ignis_requests_turn_thinking_off_and_others_do_not(lp, ignis_home, monkeypatch):
+    import openai
+    from services import llm_transport
+
+    sent: list[dict] = []
+
+    class FakeOpenAI:
+        def __init__(self, **_kwargs):
+            self.chat = type("C", (), {})()
+            self.chat.completions = type("K", (), {})()
+            self.chat.completions.create = lambda **kw: sent.append(kw) or "ok"
+
+    monkeypatch.setattr(openai, "OpenAI", FakeOpenAI)
+    llm_transport.create_client(lp.get_provider("ignis")).chat.completions.create(
+        model="default", messages=[], extra_body={"top_k": 20})
+    llm_transport.create_client(lp.get_provider("ollama")).chat.completions.create(
+        model="llama3.1", messages=[])
+    assert sent[0]["extra_body"] == {"top_k": 20, "chat_template_kwargs": {"enable_thinking": False}}
+    assert "extra_body" not in sent[1]
