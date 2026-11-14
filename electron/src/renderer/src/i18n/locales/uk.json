@@ -3938,5 +3938,20 @@
     "prepare_confirm": "Prepare",
     "error": "Ignis could not complete this",
     "use_in_asr": "Use Ignis"
+  },
+  "windowControls": {
+    "group": "Window buttons",
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close",
+    "style_title": "Window buttons",
+    "style_desc": "Automatic follows your system (and Matsu OS gets its own buttons).",
+    "style_auto": "Automatic",
+    "restart_hint": "The new style applies after you reopen Azúria Voice.",
+    "tray_title": "Keep running near the clock when closed",
+    "tray_desc": "Closing the window keeps Azúria Voice in the tray, so dictation and voice keep working. Use Exit in the tray menu to quit.",
+    "tray_notice_title": "Azúria Voice is still running",
+    "tray_notice_body": "It stays near the clock so dictation keeps working. Use Exit in the tray menu to quit."
   }
 }

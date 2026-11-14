@@ -1,3 +1,4 @@
+import { WindowStyleSettings } from './window-style-settings';
 import { SupportSettings } from './support-settings';
 import { UpdateSettings } from './update-settings';
 import { MirrorSettings } from './mirror-settings';
@@ -632,6 +633,7 @@ export function SettingsPage() {
                       onCheckedChange={(keep) => setWorkspace({ autoCollapseSidebar: !keep })}
                     />
                   </SettingsRow>
+                  <WindowStyleSettings />
                   <PalettePicker appearance="light" />
                   <PalettePicker appearance="dark" />
                   <SettingsRow id="font-label" title={t('preferences.font')}>
