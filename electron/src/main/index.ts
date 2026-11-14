@@ -258,6 +258,7 @@ function createWindow(): BrowserWindow {
       // The independent fallback has no mounted persistence handler to flush.
       await beginOrderlyQuit(false);
     },
+    process.platform !== 'darwin' && !(chromeController?.startup.native ?? process.platform === 'win32'),
   );
 
   win.webContents.setWindowOpenHandler(({ url }) => {
