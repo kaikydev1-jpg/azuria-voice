@@ -20,6 +20,14 @@ Ainda sem número de versão: o dono define quando publicar.
   licença não comercial), a transcrição (Whisper) e a tradução da dublagem vão
   pela placa; desligar devolve as escolhas anteriores. Sem o Ignis, nada muda.
   Veja [Ignis](engines/ignis.md).
+- **Linux e Matsu OS:** barra de título integrada no Linux, com os botões no
+  estilo do sistema (GNOME, KDE ou bolinhas) e, no Matsu OS, as bolinhas do
+  próprio sistema, reconhecido sozinho. A release ganha o download
+  `Azuria-Voice-Matsu-OS-x64.AppImage` (link fixo, atualiza sozinho) e o
+  `instalar.sh` para instalar pelo terminal. Veja [instalação Linux](install/linux.md).
+- **Bandeja em todos os sistemas:** fechar a janela deixa o Azúria perto do
+  relógio, com o ditado e a voz funcionando; **Sair** no menu do ícone encerra.
+  Dá para desligar em **Configurações → Geral**.
 
 | Escuro | Claro |
 |---|---|
@@ -107,6 +115,26 @@ bun run dev
 No Mac Intel, pule `bun run setup:api`, execute `VOICESTUDIO_SKIP_BACKEND=1 bun run dev` e configure a conexão com um backend em outra máquina suportada. Os modelos e ambientes continuam exigindo configuração e downloads próprios.
 
 Os guias de [macOS](install/macos.md) e [Linux](install/linux.md) detalham os requisitos da base. São guias históricos: seus links e nomes de arquivos de download apontam para VoiceStudio original, não para pacotes Azúria. Os scripts de download automático deste repositório dependem de o pacote da plataforma existir na própria [release Azúria](https://github.com/kaikydev1-jpg/azuria-voice/releases); mudar a marca não cria esses arquivos.
+
+## Página da versão: Linux e Matsu OS
+
+Ao publicar, a introdução da versão no `CHANGELOG.md` (que vira a página da
+release) traz o comando do terminal no topo e uma linha por sistema, como no
+padrão dos apps do dono:
+
+```markdown
+**Linux, pelo terminal:** `curl -fsSL https://github.com/kaikydev1-jpg/azuria-voice/releases/latest/download/instalar.sh | bash`
+
+| Sistema | Baixe |
+|---|---|
+| Windows 10 e 11 | `Azuria-Voice-Electron-<versão>-win-x64.exe` |
+| Matsu OS e Fedora Atomic | `Azuria-Voice-Matsu-OS-x64.AppImage` |
+| Ubuntu, Debian e derivados | `Azuria-Voice-Electron-<versão>-linux-x64.deb` |
+| Outras distribuições Linux | `Azuria-Voice-Electron-<versão>-linux-x64.AppImage` |
+```
+
+O `scripts/prepare_electron_release.py` copia o AppImage para o nome fixo do
+Matsu OS e anexa o `instalar.sh`; os dois entram no `SHA256SUMS.txt`.
 
 ## Pacotes de teste para Linux e macOS
 

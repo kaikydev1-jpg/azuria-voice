@@ -15,6 +15,8 @@ metadata and the backend fallback mirror it.
 
 - Azúria Voice: visual novo Azúria 2, mais calmo e limpo, com as mesmas funções nos mesmos lugares
 - Azúria Voice: opção de usar placas AMD, Intel ou NVIDIA pelo Ignis, na instalação e em Desempenho
+- Azúria Voice: versão para o Matsu OS, com os botões da janela do sistema e download próprio
+- Azúria Voice: fechar a janela deixa o app na bandeja em todos os sistemas
 - Preview iOS and Android companion apps for your own VoiceStudio
 
 ### Changed
@@ -23,6 +25,9 @@ metadata and the backend fallback mirror it.
 - Azúria Voice: ícones do menu e da tela inicial sem violeta, e o assistente da primeira execução mostra os passos numerados com o passo concluído marcado
 - Azúria Voice: nova opção **Usar a placa pelo Ignis** (assistente e Configurações → Desempenho): voz OmniVoice, transcrição Whisper e tradução da dublagem na placa AMD, Intel ou NVIDIA pelo Ignis; desligar restaura as escolhas anteriores ([Ignis](docs/engines/ignis.md))
 - Azúria Voice: motor de voz `ignis`, provedor de linguagem **Ignis (local)** e botão **Usar o Ignis** na transcrição compatível com OpenAI
+- Azúria Voice: barra de título integrada no Linux com botões no estilo do sistema (GNOME, KDE ou bolinhas, conforme `gtk-decoration-layout`) e as bolinhas do Matsu OS automáticas; estilo manual em Aparência ([Linux](docs/install/linux.md))
+- Azúria Voice: download `Azuria-Voice-Matsu-OS-x64.AppImage` (link fixo, atualiza sozinho) e `instalar.sh` para instalar pelo terminal em qualquer Linux
+- Azúria Voice: fechar a janela deixa o Azúria na bandeja no Windows, no Linux e no macOS, com ditado e voz funcionando; abrir o app de novo traz a janela; dá para desligar em Geral
 
 ### Added
 

@@ -4,6 +4,46 @@ VoiceStudio's Linux desktop app is built with Electron. The archived Tauri app
 is no longer maintained; if you still run it, follow the
 [migration guide](../electron-migration.md).
 
+## Azúria Voice: Matsu OS, Fedora Atomic e o instalador pelo terminal
+
+> Esta seção vale para a distribuição Azúria Voice (`kaikydev1-jpg/azuria-voice`).
+> O resto deste guia é o histórico do VoiceStudio.
+
+Um comando descobre o sistema, baixa o arquivo certo, confere o SHA-256 e instala:
+
+```bash
+curl -fsSL https://github.com/kaikydev1-jpg/azuria-voice/releases/latest/download/instalar.sh | bash
+```
+
+| Sistema | O que o `instalar.sh` instala |
+|---|---|
+| **Matsu OS** (Matsu 27 OS, 28 OS…) | [`Azuria-Voice-Matsu-OS-x64.AppImage`](https://github.com/kaikydev1-jpg/azuria-voice/releases/latest/download/Azuria-Voice-Matsu-OS-x64.AppImage) em `~/Applications/Azuria-Voice.AppImage`, com atalho no menu |
+| Fedora Atomic (Silverblue, Kinoite…) | o mesmo AppImage, sem `rpm-ostree` |
+| Ubuntu, Debian, Mint, Pop!_OS, Zorin | o `.deb` da versão, com `sudo apt install` |
+| Outras distribuições | o AppImage da versão em `~/Applications` |
+
+Use `--simular` para só ver o que ele faria (`… | bash -s -- --simular`).
+
+- **Atualização:** o AppImage se atualiza sozinho pelo aviso do próprio app, como
+  o instalador do Windows. Como o nome instalado não tem número de versão, o
+  atualizador troca o arquivo no mesmo lugar e o atalho continua valendo.
+- **Sem libfuse2:** o AppImage usa o runtime estático do AppImage (type2), que
+  roda no Fedora Atomic e no Matsu OS sem instalar nada no sistema.
+- **No Matsu OS** o app reconhece o sistema sozinho pelo `os-release` e usa os
+  botões da janela do Matsu: bolinhas de 12 px (vermelha `#ff5f57`, amarela
+  `#febc2e`, verde `#28c840`), símbolos ao passar o mouse e cinza em segundo
+  plano. Nos outros Linux, os botões seguem o lado, a ordem e o estilo do
+  sistema (GNOME, KDE ou bolinhas, conforme `gtk-decoration-layout`); dá para
+  escolher à mão em **Configurações → Aparência → Botões da janela**.
+- **Bandeja:** fechar a janela deixa o Azúria perto do relógio (o ditado e a voz
+  continuam); **Sair** no menu do ícone encerra. No GNOME, o ícone precisa da
+  extensão [AppIndicator](https://extensions.gnome.org/extension/615/appindicator-support/);
+  sem ela, abrir o app de novo traz a janela.
+
+| Escuro | Claro |
+|---|---|
+| ![Botões do Matsu OS no tema escuro: em uso, mouse em cima, segundo plano](../assets/azuria-2/matsu-botoes-escuro.webp) | ![Botões do Matsu OS no tema claro](../assets/azuria-2/matsu-botoes-claro.webp) |
+
 ## Requirements
 
 - **Linux x86_64** with a graphical desktop session (X11 or Wayland). There are
