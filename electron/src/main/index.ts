@@ -1,4 +1,11 @@
 import { createTrayIcon } from './tray-icon';
+import { readDesktopInfo } from './window-chrome';
+import {
+  ChromeController,
+  registerWindowChromeIpc,
+  wireWindowFocusEvents,
+  WindowPrefsStore,
+} from './window-chrome-settings';
 import { installWatchFolders } from './watch-folders';
 import { installNativeCapture } from './native-capture';
 import { isTrustedRenderer } from './trusted-renderer';
@@ -8,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, session, shell, Tray } from 'electron';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import { BackendSupervisor, backendRoot } from './backend';
-import { registerIpc, wireWindowMaximizeEvents } from './ipc';
+import { assertTrustedMainFrame, registerIpc, wireWindowMaximizeEvents } from './ipc';
 import { APP_ORIGIN, installAppProtocol, registerAppScheme } from './protocol';
 import { startDevBackendProxy } from './dev-backend-proxy';
 import { DesktopUpdater, registerUpdateIpc } from './updater';
@@ -21,7 +28,7 @@ import {
   MainErrorJournal,
   observeMainProcessTask,
 } from './main-error-journal';
-import { activateLiveWindow, isLiveWindow } from './window-safety';
+import { activateLiveWindow, isLiveWindow, sendToLiveWindow } from './window-safety';
 import { startAccount } from './account';
 import { installAppIdentity, installMacApplicationMenu } from './app-identity';
 import { APP_ID, DEFAULT_ELECTRON_PROXY_PORT, PRODUCT_NAME } from '../../../config/app-config.mjs';
@@ -55,6 +62,8 @@ let closeWatch: (() => void) | null = null;
 let supervisor: BackendSupervisor | null = null;
 let quitting = false;
 let tray: Tray | null = null;
+let windowPrefs: WindowPrefsStore | null = null;
+let chromeController: ChromeController | null = null;
 let closeCapture: (() => void) | null = null;
 let closeDevProxy: (() => Promise<void>) | null = null;
 let closeUpdates: (() => void) | null = null;
@@ -142,9 +151,14 @@ function createWindow(): BrowserWindow {
     show: false,
     backgroundColor: BACKGROUND,
     titleBarStyle: 'hidden',
+    // macOS: native traffic lights. Windows: native Windows 11 caption buttons
+    // (titleBarOverlay) unless another style was picked. Linux: the renderer
+    // draws buttons that follow the desktop, and Matsu OS's own dots.
     ...(process.platform === 'darwin'
       ? { trafficLightPosition: { x: 12, y: 10 } }
-      : { titleBarOverlay: OVERLAY }),
+      : (chromeController?.startup.native ?? process.platform === 'win32')
+        ? { titleBarOverlay: OVERLAY }
+        : {}),
     webPreferences: {
       preload: PRELOAD_PATH,
       contextIsolation: true,
@@ -175,6 +189,7 @@ function createWindow(): BrowserWindow {
     if (process.platform !== 'darwin' && !quitting) app.quit();
   });
   wireWindowMaximizeEvents(win);
+  wireWindowFocusEvents(win);
   installBlankWindowGuard(
     win,
     appUrl,
@@ -255,6 +270,15 @@ if (process.env.VOICESTUDIO_ALLOW_MULTIPLE_INSTANCES !== '1' && !app.requestSing
         () => backend.baseUrl,
         RENDERER_DIR,
         () => backend.requestHeaders(),
+      );
+      windowPrefs = WindowPrefsStore.load(join(app.getPath('userData'), 'window-chrome.json'));
+      chromeController = new ChromeController(
+        readDesktopInfo(),
+        windowPrefs.get().chrome,
+        (state) => sendToLiveWindow(mainWindow, 'window:chromeChanged', state),
+      );
+      registerWindowChromeIpc(ipcMain, chromeController, windowPrefs, (event) =>
+        assertTrustedMainFrame(event, mainWindow),
       );
       registerIpc(
         backend,

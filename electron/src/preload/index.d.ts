@@ -459,7 +459,25 @@ export interface VoiceStudioBridge {
     close(): void;
     onMaximizedChange(cb: (maximized: boolean) => void): () => void;
     isMaximized(): Promise<boolean>;
+    /** Buttons the renderer draws (Linux, or a non-native style on Windows); `native` = none. */
+    chrome(): Promise<WindowChromeState>;
+    /** Persist the Appearance choice; Windows may need the app reopened. */
+    setChromePreference(preference: ChromePreference): Promise<{ restartRequired: boolean }>;
+    onChromeChange(cb: (state: WindowChromeState) => void): () => void;
+    /** Window focus, so drawn buttons turn grey in the background. */
+    onFocusChange(cb: (focused: boolean) => void): () => void;
   };
+}
+
+export type WindowButton = 'close' | 'minimize' | 'maximize';
+export type ChromeStyle = 'windows' | 'gnome' | 'kde' | 'mac' | 'matsu';
+export type ChromePreference = 'auto' | 'windows' | 'gnome' | 'kde' | 'mac';
+export interface WindowChromeState {
+  style: ChromeStyle;
+  left: WindowButton[];
+  right: WindowButton[];
+  native: boolean;
+  preference: ChromePreference;
 }
 
 declare global {

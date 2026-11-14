@@ -9,6 +9,7 @@ import type {
   VoiceStudioBridge,
   RepairAgentEvent,
   AccountPublicState,
+  WindowChromeState,
 } from './index.d';
 
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
@@ -155,6 +156,13 @@ const bridge: VoiceStudioBridge = {
     close: () => ipcRenderer.send('window:close'),
     onMaximizedChange: (cb) => subscribe<boolean>('window:maximized', cb),
     isMaximized: () => ipcRenderer.invoke('window:isMaximized') as Promise<boolean>,
+    chrome: () => ipcRenderer.invoke('window:chrome') as Promise<WindowChromeState>,
+    setChromePreference: (preference) =>
+      ipcRenderer.invoke('window:setChromePreference', preference) as Promise<{
+        restartRequired: boolean;
+      }>,
+    onChromeChange: (cb) => subscribe<WindowChromeState>('window:chromeChanged', cb),
+    onFocusChange: (cb) => subscribe<boolean>('window:focused', cb),
   },
 };
 
