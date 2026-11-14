@@ -26,6 +26,7 @@ vi.mock('@/features/settings/model-settings', () => ({
   modelFamilies: ['tts'],
 }));
 vi.mock('@/features/settings/mirror-settings', () => ({ MirrorSettings: () => null }));
+vi.mock('@/features/settings/ignis-settings', () => ({ IgnisCard: () => <div>Ignis</div> }));
 vi.mock('@/features/settings/media-tools', () => ({
   SetupMediaEngine: () => null,
   MediaTools: () => null,

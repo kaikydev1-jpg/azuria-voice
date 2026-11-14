@@ -8,6 +8,7 @@ import { apiJson, describeError } from '@/lib/api/client';
 import { queryKeys } from '@/lib/query';
 import { SettingsActionError } from './settings-action-error';
 import { SettingsRow, SettingsSection } from './settings-layout';
+import { useIgnisStatus } from './ignis-settings';
 
 interface AsrCompatConfig {
   base_url: string;
@@ -43,6 +44,7 @@ export function AsrOpenAiCompatSettings() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [testResult, setTestResult] = useState<AsrCompatTestResult | null>(null);
+  const ignis = useIgnisStatus();
 
   useEffect(() => {
     if (!config.data) return;
@@ -152,6 +154,19 @@ export function AsrOpenAiCompatSettings() {
           disabled={config.isPending || saving || testing}
           onChange={(event) => edit(setBaseUrl, event.target.value)}
         />
+        {ignis.data?.open && (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={config.isPending || saving || testing}
+            onClick={() => {
+              edit(setBaseUrl, `${ignis.data!.base_url}/v1`);
+              edit(setModel, 'whisper-1');
+            }}
+          >
+            {t('ignis.use_in_asr')}
+          </Button>
+        )}
       </SettingsRow>
 
       <SettingsRow id="asr-openai-compat-model" title={t('settings.llmp_model')}>

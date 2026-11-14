@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { apiJson } from '@/lib/api/client';
 import type { PreflightReport } from '@shared/api/setup-types';
 import { SystemPreflight } from '@/features/settings/system-preflight';
+import { IgnisCard } from '@/features/settings/ignis-settings';
 import { PermissionsSettings } from '@/features/settings/permissions-settings';
 import { SetupMediaEngine } from '@/features/settings/media-tools';
 import { ModelSettings } from '@/features/settings/model-settings';
@@ -176,6 +177,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
               {step === 0 && (
                 <>
                   <SystemPreflight />
+                  <IgnisCard variant="setup" />
                   <SetupMediaEngine />
                   {preflight.data?.checks?.some(
                     (check) => check.id === 'network' && check.status !== 'pass',
