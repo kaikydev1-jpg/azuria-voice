@@ -7,9 +7,7 @@ A revisão de segurança e as pendências conhecidas estão no
 [PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
 nova versão instalada.
 
-## Próxima atualização (em preparação)
-
-Ainda sem número de versão: o dono define quando publicar.
+## Atualização 0.5.14
 
 - **Visual Azúria 2:** mais calmo e limpo, com fundo azul-noite (ou gelo no tema
   claro), botão principal em pílula e cartões que sobem ao passar o mouse. As
