@@ -32,8 +32,9 @@ import i18n, { APP_LANGUAGE_ITEMS, APP_LANGUAGES, setAppLanguage, type AppLocale
 import { brandIcon } from '@/lib/brand';
 import { cn } from '@/lib/utils';
 import type { RuntimeRegion } from '../../../preload/index.d';
-import { getBridge, isMac } from './bridge';
+import { getBridge } from './bridge';
 import { ExternalLink } from './external-link';
+import { useLeftWindowControls } from './app-shell/window-controls';
 
 interface BackendGateProps {
   children: ReactNode;
@@ -92,6 +93,7 @@ export function delimitedDiagnostic(message?: string): string {
  */
 export function BackendGate({ children, repairDock }: BackendGateProps) {
   const { t } = useTranslation();
+  const leftControls = useLeftWindowControls();
   const status = useBackendStatus();
   const [reachedReady, setReachedReady] = useState(false);
   const [logOpen, setLogOpen] = useState(false);
@@ -200,7 +202,7 @@ export function BackendGate({ children, repairDock }: BackendGateProps) {
       <header
         className={cn(
           'workspace-titlebar flex shrink-0 items-center gap-2 border-b border-border/50 px-5',
-          isMac() && 'pl-24',
+          leftControls && 'pl-24',
         )}
       >
         <img src={brandIcon} alt="" className="size-6 shrink-0" />

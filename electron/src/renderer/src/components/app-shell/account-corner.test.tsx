@@ -34,7 +34,7 @@ it('sits left of the Windows/Linux window buttons, and at the corner on macOS', 
   const corner = () => document.querySelector('[data-slot="account-corner"]')!;
   expect(corner().className).toMatch(/fixed/);
   expect(corner().className).toMatch(/app-no-drag/);
-  expect(corner().className).toMatch(/right-\[148px\]/);
+  expect(corner().className).toMatch(/right-\[calc\(var\(--window-controls-right,138px\)\+10px\)\]/);
   unmount();
   mock.mac = true;
   render(<AccountCorner notificationsEnabled={false} />);

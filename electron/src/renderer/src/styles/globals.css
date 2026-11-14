@@ -213,8 +213,9 @@
   -webkit-app-region: no-drag;
 }
 .native-controls-right {
-  /* + the top-right corner (account and notifications, account-corner.tsx). */
-  padding-right: calc(148px + var(--corner-space, 0px));
+  /* Window buttons on the right (Windows overlay ~138px, or the drawn Linux
+     buttons' width from window-controls.tsx) + the top-right corner. */
+  padding-right: calc(var(--window-controls-right, 138px) + 10px + var(--corner-space, 0px));
 }
 .macos-notification-safe-area main .workspace-titlebar,
 .account-corner-safe {
