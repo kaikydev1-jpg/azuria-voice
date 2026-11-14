@@ -33,7 +33,6 @@ nesta ordem.
   como o projeto já faz; o AppImage do Linux já se atualiza pelo GitHub, igual ao
   `.exe`).
 - Subir a versão ou publicar release (só quando o dono pedir).
-- Transformar o Azúria num app "de bandeja" (ver decisões).
 
 ## Anti-metas (falharia mesmo funcionando)
 
@@ -154,17 +153,33 @@ Conforme `docs/IGNIS_PARA_AZURIA.md` (Ignis 0.3.0):
   Windows, GNOME, KDE, Mac (Windows e Linux; no macOS ficam as bolinhas nativas).
   No Windows, um estilo diferente de Automático/Windows vale ao reabrir o app.
 - **Pacotes e atualização:** ficam como hoje: AppImage (atualiza sozinho pelo
-  GitHub, como o `.exe`) e `.deb`, já na release oficial. O AppImage é o pacote
-  indicado para o Matsu OS/Fedora Atomic (não precisa de `rpm-ostree`); a
-  documentação Linux ganha a seção Matsu OS.
+  GitHub, como o `.exe`) e `.deb`, já na release oficial.
+- **Download próprio do Matsu OS (pedido do dono, 14/11):** a release ganha
+  `Azuria-Voice-Matsu-OS-x64.AppImage` (o mesmo AppImage, com nome sem versão,
+  para o link `releases/latest/download/…` nunca quebrar; o atualizador troca o
+  arquivo no mesmo lugar e mantém o nome) e um `instalar.sh` que, no Matsu OS e
+  no Fedora Atomic, instala esse AppImage em `~/Applications` com atalho no menu
+  e ícone (sem `rpm-ostree`); no Debian/Ubuntu, o `.deb`; no resto, o AppImage.
+  O README e a página da versão trazem a linha "Matsu OS" com o link direto e o
+  comando do terminal. Tudo entra no `SHA256SUMS.txt`.
+
+### 4. Bandeja em todos os sistemas (pedido do dono, 14/11)
+- A bandeja já existe (ditado, Mostrar, Configurações, Sair), mas hoje fechar a
+  janela encerra o app no Windows e no Linux. Passa a valer em todos os
+  sistemas: **fechar a janela deixa o Azúria na bandeja**, com o backend e o
+  atalho de ditado funcionando; a janela sai da memória de verdade e volta pelo
+  ícone ou abrindo o app de novo (instância única). **Sair** no menu do ícone
+  encerra tudo.
+- Opção em Configurações para quem prefere que fechar encerre o app.
+- Aviso uma vez, na primeira vez que a janela fecha: "O Azúria continua perto
+  do relógio". No GNOME sem a extensão AppIndicator o ícone não aparece; abrir
+  o app de novo traz a janela, e o aviso explica isso.
 
 ## Decisões minhas (para o dono conferir)
 
 - Ignis desligado por padrão, mesmo quando encontrado; o assistente recomenda
   quando não há NVIDIA.
-- Sem modo "bandeja": o Azúria roda um backend Python pesado; fechar continua
-  encerrando tudo e liberando a memória, que é o que o padrão "leve em repouso"
-  pede na prática.
+- Fechar para a bandeja ligado por padrão em todos os sistemas (pedido do dono).
 - Estilo manual dos botões só no Windows e Linux.
 - Sem copiar código do React Bits/transitions.dev (licença), só ideias e números.
 
