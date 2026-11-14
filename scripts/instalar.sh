@@ -43,8 +43,9 @@ rodar() { if [ "$SIMULAR" = 1 ]; then echo "  (simulação) $*"; else "$@"; fi; 
 
 [ "${AZURIA_UNAME:-$(uname -s)}" = "Linux" ] ||
   erro "Este instalador é para Linux. No Windows e no macOS, baixe o instalador em $PAGINA/latest"
-[ "$(uname -m)" = "x86_64" ] ||
-  erro "O Azúria Voice para Linux só tem versão x86_64 (este computador é $(uname -m))."
+MAQUINA="${AZURIA_ARCH:-$(uname -m)}"
+[ "$MAQUINA" = "x86_64" ] ||
+  erro "O Azúria Voice para Linux só tem versão x86_64 (este computador é $MAQUINA)."
 
 # ---------- qual sistema é ----------
 campo() { grep -m1 "^$1=" "$OS_RELEASE" 2>/dev/null | cut -d= -f2- | tr -d '"'"'" || true; }

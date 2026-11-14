@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(shutil.which("bash") is None, reason="needs bash
 
 
 def run(tmp_path: Path, os_release: str, *, ostree: bool = False, uname: str = "Linux",
-        args: tuple[str, ...] = ("--simular",)) -> subprocess.CompletedProcess:
+        arch: str = "x86_64", args: tuple[str, ...] = ("--simular",)) -> subprocess.CompletedProcess:
     release = tmp_path / "os-release"
     release.write_text(os_release)
     mark = tmp_path / "ostree-booted"
@@ -31,6 +31,8 @@ def run(tmp_path: Path, os_release: str, *, ostree: bool = False, uname: str = "
         "AZURIA_OS_RELEASE": str(release),
         "AZURIA_OSTREE_MARK": str(mark),
         "AZURIA_UNAME": uname,
+        # CI also runs this on macOS arm64 runners: pin the machine like the OS.
+        "AZURIA_ARCH": arch,
     }
     return subprocess.run(["bash", str(SCRIPT), *args], capture_output=True, text=True, env=env, timeout=30)
 
@@ -88,3 +90,9 @@ def test_refuses_other_systems_with_a_pointer_to_the_releases(tmp_path):
 def test_unknown_option_is_rejected(tmp_path):
     out = run(tmp_path, "ID=arch\n", args=("--xyz",))
     assert out.returncode == 2
+
+
+def test_refuses_non_x86_64_machines(tmp_path):
+    out = run(tmp_path, "ID=arch\n", arch="aarch64")
+    assert out.returncode != 0
+    assert "x86_64" in out.stderr
