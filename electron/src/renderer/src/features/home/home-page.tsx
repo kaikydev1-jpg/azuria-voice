@@ -4,6 +4,7 @@ import { getBridge } from '@/components/bridge';
 import { runRendererTask } from '@/lib/global-error-recovery';
 import { HomeContributors } from './home-contributors';
 import './home-page.css';
+import { useSpotlight } from '@/hooks/use-spotlight';
 import { WorkspaceHeader } from '@/components/app-shell/workspace-header';
 import { ProfileAvatar } from '@/components/profile-avatar';
 import { Button } from '@/components/ui/button';
@@ -70,6 +71,7 @@ const iconTones: Record<string, string> = {
 
 export function HomePage() {
   const { t } = useTranslation();
+  const spotlight = useSpotlight<HTMLDivElement>('.home-destination');
   const navigate = useNavigate();
   const { data: profiles = [] } = useProfiles();
   const { data: exports = [] } = useQuery({
@@ -249,6 +251,7 @@ export function HomePage() {
             {[destinations.slice(0, 3), destinations.slice(3)].map((group, groupIndex) => (
               <div
                 key={groupIndex}
+                ref={spotlight}
                 className={`home-destinations grid grid-cols-1 gap-3 @xl:grid-cols-2 @3xl:grid-cols-3 ${groupIndex === 0 ? 'home-destinations--primary' : 'home-destinations--secondary'}`}
               >
                 {group.map(({ to, label, description }) => (
