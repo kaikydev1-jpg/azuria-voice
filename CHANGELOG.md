@@ -13,7 +13,13 @@ metadata and the backend fallback mirror it.
 
 **Highlights**
 
+- Azúria Voice: visual novo Azúria 2, mais calmo e limpo, com as mesmas funções nos mesmos lugares
 - Preview iOS and Android companion apps for your own VoiceStudio
+
+### Changed
+
+- Azúria Voice: visual Azúria 2 em temas claro e escuro: fundo azul-noite, botão principal em pílula, cartões que sobem ao passar o mouse e escala única de animação ([marca](docs/branding.md))
+- Azúria Voice: ícones do menu e da tela inicial sem violeta, e o assistente da primeira execução mostra os passos numerados com o passo concluído marcado
 
 ### Added
 

@@ -7,6 +7,19 @@ A revisão de segurança e as pendências conhecidas estão no
 [PR #9](https://github.com/kaikydev1-jpg/azuria-voice/pull/9). Esse PR não é uma
 nova versão instalada.
 
+## Próxima atualização (em preparação)
+
+Ainda sem número de versão: o dono define quando publicar.
+
+- **Visual Azúria 2:** mais calmo e limpo, com fundo azul-noite (ou gelo no tema
+  claro), botão principal em pílula e cartões que sobem ao passar o mouse. As
+  funções continuam nos mesmos lugares. Regras em [Marca](branding.md).
+
+| Escuro | Claro |
+|---|---|
+| ![Início no tema escuro](assets/azuria-2/inicio-escuro.webp) | ![Início no tema claro](assets/azuria-2/inicio-claro.webp) |
+| ![Clonar voz](assets/azuria-2/clonar-escuro.webp) | ![Dublagem](assets/azuria-2/dublagem-escuro.webp) |
+
 ## Atualização 0.5.13
 
 A versão 0.5.13 é uma revisão geral, sem mudar a API nem mover funções. A tela de
