@@ -73,7 +73,7 @@ jobs:
           HF_HUB_CACHE: ${{ runner.temp }}/azuria-empty-hf-cache
           OMNIVOICE_DISABLE_FILE_LOG: '1'
           PYTHONUTF8: '1'
-        run: uv run --no-sync pytest backend/tests tests/test_python_security_flows.py tests/test_network_share.py tests/test_network_share_lifecycle.py tests/test_network_middleware.py tests/test_mcp_session_limits.py tests/test_dependency_security_floors.py tests/test_app_version.py tests/test_changelog_style.py tests/test_azuria_release_notes.py -q
+        run: uv run --no-sync pytest backend/tests tests/test_python_security_flows.py tests/test_network_share.py tests/test_network_share_lifecycle.py tests/test_network_middleware.py tests/test_mcp_session_limits.py tests/test_dependency_security_floors.py tests/test_app_version.py tests/test_changelog_style.py tests/test_azuria_release_notes.py tests/backend/services/test_ignis_client.py tests/backend/services/test_ignis_backend.py tests/backend/api/test_ignis_routes.py tests/test_llm_providers.py -q
       - name: Shared frontend unit tests
         if: github.event_name != 'workflow_dispatch' || inputs.run_tests == true
         run: bun run test:frontend

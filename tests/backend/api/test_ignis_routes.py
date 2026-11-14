@@ -23,10 +23,11 @@ def app(monkeypatch, tmp_path):
     for name in ("LLM_DEFAULT_PROVIDER", "OMNIVOICE_LLM_BACKEND", "OMNIVOICE_TTS_BACKEND",
                  "OMNIVOICE_ASR_BACKEND", "IGNIS_MODEL"):
         monkeypatch.delenv(name, raising=False)
+    # Same purge as the other route tests: only the packages that
+    # tests/backend_module_state.py restores afterwards (never `engines`,
+    # whose module objects later suites keep references to).
     for mod in list(sys.modules):
-        if mod in ("core", "services", "api", "engines") or mod.startswith(
-            ("core.", "services.", "api.", "engines.")
-        ):
+        if mod in ("core", "services", "api") or mod.startswith(("core.", "services.", "api.")):
             del sys.modules[mod]
     from core import db
 

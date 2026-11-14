@@ -131,6 +131,8 @@ class IgnisClient:
                 code = str(err.get("code") or code)
                 message = str(err.get("message") or message)
             except (ValueError, AttributeError):
+                # Not the OpenAI error shape (proxy page, empty body): keep the
+                # generic "Ignis answered HTTP <status>" message set above.
                 pass
             if exc.code == 503 and code == "audio_nao_preparado":
                 message = NOT_PREPARED_MESSAGE

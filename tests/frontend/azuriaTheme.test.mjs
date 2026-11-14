@@ -1,10 +1,14 @@
 // Azúria 2 design-system rules (docs/branding.md), checked on the real files.
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
-const renderer = new URL('../../electron/src/renderer/src/', import.meta.url).pathname;
+// fileURLToPath, not URL#pathname: on Windows the latter is "/D:/…" and joins
+// into "D:\\D:\\…" (the CI failure this replaced).
+const renderer = fileURLToPath(new URL('../../electron/src/renderer/src/', import.meta.url));
+const posix = (path) => path.split(sep).join('/');
 const read = (path) => readFileSync(join(renderer, path), 'utf8').toLowerCase();
 const theme = read('styles/t3-theme.css');
 const globals = read('styles/globals.css');
@@ -51,7 +55,7 @@ test('hover lift and transition utilities ride the shared scale', () => {
 function sources(dir) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
-    if (relative(renderer, path) === 'lib/themes') return [];
+    if (posix(relative(renderer, path)) === 'lib/themes') return [];
     if (statSync(path).isDirectory()) return sources(path);
     return /\.(css|tsx?)$/.test(name) && !/\.test\.tsx?$/.test(name) ? [path] : [];
   });
@@ -63,6 +67,6 @@ test('no violet, fuchsia, purple or indigo in the default UI', () => {
   assert.ok(files.some((file) => file.endsWith('.css')), 'scanned CSS too');
   const offenders = files
     .filter((file) => /\b(?:violet|fuchsia|purple|indigo)-\d{2,3}\b/.test(readFileSync(file, 'utf8')))
-    .map((file) => relative(renderer, file));
+    .map((file) => posix(relative(renderer, file)));
   assert.deepEqual(offenders, []);
 });

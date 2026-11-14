@@ -1,7 +1,10 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+// Linux-only paths: always POSIX, whatever system runs the code (or its tests).
+import { posix } from 'node:path';
+
+const { join } = posix;
 
 /**
  * Window buttons that feel at home on each system (integrated title bar).
